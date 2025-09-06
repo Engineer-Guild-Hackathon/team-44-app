@@ -1,17 +1,16 @@
-# ここにチーム番号とチーム名を入れてください
+# 44 オランダ
 
-このリポジトリはハッカソン提出用の雛形です。以下の項目をすべて埋めてください。
 
 ---
 
 ## チーム情報
-- チーム番号: （ここに記入）
-- チーム名: （ここに記入）
+- チーム番号: 44
+- チーム名: オランダ
 - プロダクト名: （ここに記入）
-- メンバー: （GitHubアカウントまたは名前を列挙）
+- メンバー: soranjiro,Sora4431,Won-CCS
 
 ---
 
 ## デモ　/ プレゼン資料
 - デモURL: 
-- プレゼンURL：
+- プレゼンURL：https://docs.google.com/presentation/d/1tuaVaOBQiEgH6zRTTIhsU3APmeiQyEirYKwaF8_ImOg/edit?usp=sharing
