@@ -1,18 +1,163 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { ChatMessage } from '../../types/api'
 
 export default function ChatPage() {
   const [message, setMessage] = useState('')
-  const [messages, setMessages] = useState<string[]>([])
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
+  const [isCreatingSession, setIsCreatingSession] = useState(false)
 
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      setMessages(prev => [...prev, `You: ${message}`])
-      setMessages(prev => [...prev, `AI: こんにちは！「${message}」についてお手伝いします。何か具体的な質問はありますか？`])
-      setMessage('')
+  // モック応答を生成する関数
+  const getMockResponse = (userMessage: string): string => {
+    const responses = [
+      `「${userMessage}」についてですね。まず、この問題を解決するために、どのようなアプローチを考えますか？`,
+      `いい質問ですね。「${userMessage}」について考えてみましょう。基本的な概念から確認してみませんか？`,
+      `「${userMessage}」という問題は、段階的に考えるとわかりやすいかもしれません。まず、どの部分が難しいですか？`,
+      `それは重要なポイントですね。「${userMessage}」について、具体例を挙げて考えてみましょう。`,
+      `「${userMessage}」についてお手伝いします。自分で解いてみる前に、どのような手がかりがあるか考えてみてください。`
+    ]
+    return responses[Math.floor(Math.random() * responses.length)]
+  }
+
+  // セッション作成
+  const createNewSession = async () => {
+    if (isCreatingSession) return // 既に作成中ならスキップ
+
+    setIsCreatingSession(true)
+    try {
+      console.log('Creating new session...')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/chatSessions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title: 'AI学習サポート' }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setCurrentSessionId(data.sessionId)
+        console.log('New session created:', data.sessionId)
+        return data.sessionId
+      } else {
+        console.error('Failed to create session:', response.status, response.statusText)
+        throw new Error(`セッション作成に失敗しました (${response.status})`)
+      }
+    } catch (error) {
+      console.error('Error creating session:', error)
+      // APIが利用できない場合はデモモード
+      const demoSessionId = `demo-${Date.now()}`
+      setCurrentSessionId(demoSessionId)
+      console.log('Using demo session:', demoSessionId)
+      return demoSessionId
+    } finally {
+      setIsCreatingSession(false)
     }
   }
+
+    // メッセージ送信
+  const handleSendMessage = async () => {
+    if (!message.trim()) return
+
+    // セッションが存在しない場合は作成
+    let sessionId = currentSessionId
+    if (!sessionId) {
+      console.log('No session found, creating new session...')
+      sessionId = await createNewSession()
+      if (!sessionId) {
+        console.error('Failed to create session')
+        return
+      }
+    }
+
+    const userMessage: ChatMessage = {
+      role: 'user',
+      parts: [{ text: message }],
+      timestamp: new Date()
+    }
+
+    setMessages(prev => [...prev, userMessage])
+    setIsLoading(true)
+    const currentMessage = message
+    setMessage('') // すぐにクリア
+
+    try {
+      console.log('Sending message to session:', sessionId)
+
+      // デモセッションの場合はモック応答を返す
+      if (sessionId.startsWith('demo-')) {
+        console.log('Using demo mode for AI response')
+        await new Promise(resolve => setTimeout(resolve, 1500)) // シミュレーション遅延
+
+        const mockResponse = getMockResponse(currentMessage)
+        const aiMessage: ChatMessage = {
+          role: 'model',
+          parts: [{ text: mockResponse }],
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, aiMessage])
+        console.log('Demo AI response:', mockResponse)
+        return
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/chatSessions/${sessionId}/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: currentMessage }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const aiMessage: ChatMessage = {
+          role: 'model',
+          parts: [{ text: data.response }],
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, aiMessage])
+        console.log('AI response received:', data.response)
+      } else {
+        console.error('API error:', response.status, response.statusText)
+        const errorMessage: ChatMessage = {
+          role: 'model',
+          parts: [{ text: '申し訳ありません。メッセージの送信に失敗しました。もう一度お試しください。' }],
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, errorMessage])
+      }
+    } catch (error) {
+      console.error('Error sending message:', error)
+      const errorMessage: ChatMessage = {
+        role: 'model',
+        parts: [{ text: '申し訳ありません。メッセージの送信に失敗しました。ネットワーク接続を確認してください。' }],
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, errorMessage])
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // 初期化
+  useEffect(() => {
+    console.log('Initializing chat page...')
+    createNewSession()
+  }, [])
+
+  // デバッグ用：状態確認
+  useEffect(() => {
+    console.log('Current state:', {
+      message: message.length,
+      currentSessionId,
+      isLoading,
+      isCreatingSession,
+      messagesCount: messages.length
+    })
+  }, [message, currentSessionId, isLoading, isCreatingSession, messages])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -40,10 +185,23 @@ export default function ChatPage() {
         <div className="h-[calc(100vh-200px)] flex flex-col">
           <div className="flex-1 p-4 overflow-y-auto">
             {messages.map((msg, index) => (
-              <div key={index} className="mb-4 p-3 bg-gray-100 rounded-lg">
-                {msg}
+              <div key={index} className={`mb-4 p-3 rounded-lg ${
+                msg.role === 'user'
+                  ? 'bg-blue-100 ml-12'
+                  : 'bg-gray-100 mr-12'
+              }`}>
+                <div className="text-sm text-gray-600 mb-1">
+                  {msg.role === 'user' ? 'あなた' : 'AI'}
+                </div>
+                {msg.parts[0].text}
               </div>
             ))}
+            {isLoading && (
+              <div className="mb-4 p-3 bg-gray-100 mr-12 rounded-lg">
+                <div className="text-sm text-gray-600 mb-1">AI</div>
+                考え中...
+              </div>
+            )}
           </div>
 
           {/* メッセージ入力 */}
@@ -53,15 +211,21 @@ export default function ChatPage() {
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !isLoading && message.trim()) {
+                    handleSendMessage()
+                  }
+                }}
                 placeholder="質問や問題を入力してください..."
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={isLoading}
               />
               <button
                 onClick={handleSendMessage}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                disabled={isLoading || !message.trim()}
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                送信
+                {isLoading ? '送信中...' : '送信'}
               </button>
             </div>
           </div>

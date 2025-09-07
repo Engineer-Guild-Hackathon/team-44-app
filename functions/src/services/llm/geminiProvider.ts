@@ -10,7 +10,7 @@ export class GeminiProvider implements LLMProvider {
 
   async generateResponse(history: ChatMessage[], newMessage: string): Promise<string> {
     try {
-      const model = this.genAI.getGenerativeModel({ model: "gemini-pro" });
+      const model = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
       // システムプロンプトの定義
       const systemPrompt = `
