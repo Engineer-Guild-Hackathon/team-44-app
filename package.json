@@ -1,0 +1,20 @@
+{
+  "name": "ai-learning-support-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI学習サポート機能のMVPアプリケーション",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix=web\" \"npm run serve --prefix=functions\"",
+    "build": "npm run build --prefix=web && npm run build --prefix=functions",
+    "start": "npm run start --prefix=web",
+    "lint": "npm run lint --prefix=web && npm run lint --prefix=functions",
+    "test": "npm run test --prefix=web && npm run test --prefix=functions"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}
