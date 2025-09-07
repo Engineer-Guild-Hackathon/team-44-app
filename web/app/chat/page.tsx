@@ -4,20 +4,48 @@ import { useState, useEffect } from 'react'
 import ChatView from '../../components/common/ChatView'
 import MessageInput from '../../components/common/MessageInput'
 import { ChatMessage } from '../../types/api'
+import { apiClient } from '../../lib/apiClient'
+import { useChatStore } from '../../store/chatStore'
+import { auth } from '../../lib/firebase'
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
+
+  const { currentSession, setCurrentSession, addMessage, setLoading, setError, clearError } = useChatStore()
 
   useEffect(() => {
-    // 認証状態のチェック（簡易版）
-    // 実際の実装では useAuth フックを使用
-    setIsAuthenticated(true) // デモ用に常にtrueに設定
+    // 認証状態のチェック
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setIsAuthenticated(!!user)
+      if (user && !currentSessionId) {
+        // 新しいセッションを作成
+        createNewSession()
+      }
+    })
+
+    return () => unsubscribe()
   }, [])
 
+  const createNewSession = async () => {
+    try {
+      setLoading(true)
+      clearError()
+      const response = await apiClient.createSession('AI学習サポート')
+      setCurrentSessionId(response.sessionId)
+      console.log('New session created:', response.sessionId)
+    } catch (error) {
+      console.error('Error creating session:', error)
+      setError('セッションの作成に失敗しました')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleSendMessage = async (message: string) => {
-    if (!message.trim()) return
+    if (!message.trim() || !currentSessionId) return
 
     // ユーザーメッセージを追加
     const userMessage: ChatMessage = {
@@ -27,23 +55,33 @@ export default function ChatPage() {
     }
 
     setMessages(prev => [...prev, userMessage])
+    addMessage(userMessage)
     setIsLoading(true)
+    clearError()
 
     try {
-      // 簡易的なAI応答シミュレーション
-      // 実際の実装では API クライアントを使用
-      await new Promise(resolve => setTimeout(resolve, 1500)) // シミュレーション遅延
+      // API経由でメッセージを送信
+      const response = await apiClient.sendMessage(currentSessionId, message)
 
-      const aiResponse: ChatMessage = {
+      // AIメッセージを作成
+      const aiMessage: ChatMessage = {
         role: 'model',
-        parts: [{ text: `「${message}」について考えてみましょう。まず、どの部分が特に分からないでしょうか？問題を小さく分けて考えてみませんか？` }],
+        parts: [{ text: response.response }],
         timestamp: new Date()
       }
 
-      setMessages(prev => [...prev, aiResponse])
+      setMessages(prev => [...prev, aiMessage])
+      addMessage(aiMessage)
     } catch (error) {
       console.error('Error sending message:', error)
-      // エラーハンドリング
+      setError('メッセージの送信に失敗しました')
+      // エラーメッセージを追加
+      const errorMessage: ChatMessage = {
+        role: 'model',
+        parts: [{ text: '申し訳ありません。メッセージの送信に失敗しました。もう一度お試しください。' }],
+        timestamp: new Date()
+      }
+      setMessages(prev => [...prev, errorMessage])
     } finally {
       setIsLoading(false)
     }
@@ -71,8 +109,21 @@ export default function ChatPage() {
       <div className="max-w-4xl mx-auto bg-white shadow-sm">
         {/* ヘッダー */}
         <div className="border-b bg-white px-6 py-4">
-          <h1 className="text-xl font-semibold text-gray-800">AI学習サポート</h1>
-          <p className="text-sm text-gray-600">わからない問題を入力してください。AIがヒントを提供します。</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-semibold text-gray-800">AI学習サポート</h1>
+              <p className="text-sm text-gray-600">わからない問題を入力してください。AIがヒントを提供します。</p>
+            </div>
+            <a
+              href="/"
+              className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              ホーム
+            </a>
+          </div>
         </div>
 
         {/* チャット表示エリア */}
