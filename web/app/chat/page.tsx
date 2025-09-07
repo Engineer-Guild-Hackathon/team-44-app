@@ -1,107 +1,17 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import ChatView from '../../components/common/ChatView'
-import MessageInput from '../../components/common/MessageInput'
-import { ChatMessage } from '../../types/api'
-import { apiClient } from '../../lib/apiClient'
-import { useChatStore } from '../../store/chatStore'
-import { auth } from '../../lib/firebase'
+import { useState } from 'react'
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
+  const [message, setMessage] = useState('')
+  const [messages, setMessages] = useState<string[]>([])
 
-  const { currentSession, setCurrentSession, addMessage, setLoading, setError, clearError } = useChatStore()
-
-  useEffect(() => {
-    // 認証状態のチェック
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setIsAuthenticated(!!user)
-      if (user && !currentSessionId) {
-        // 新しいセッションを作成
-        createNewSession()
-      }
-    })
-
-    return () => unsubscribe()
-  }, [])
-
-  const createNewSession = async () => {
-    try {
-      setLoading(true)
-      clearError()
-      const response = await apiClient.createSession('AI学習サポート')
-      setCurrentSessionId(response.sessionId)
-      console.log('New session created:', response.sessionId)
-    } catch (error) {
-      console.error('Error creating session:', error)
-      setError('セッションの作成に失敗しました')
-    } finally {
-      setLoading(false)
+  const handleSendMessage = () => {
+    if (message.trim()) {
+      setMessages(prev => [...prev, `You: ${message}`])
+      setMessages(prev => [...prev, `AI: こんにちは！「${message}」についてお手伝いします。何か具体的な質問はありますか？`])
+      setMessage('')
     }
-  }
-
-  const handleSendMessage = async (message: string) => {
-    if (!message.trim() || !currentSessionId) return
-
-    // ユーザーメッセージを追加
-    const userMessage: ChatMessage = {
-      role: 'user',
-      parts: [{ text: message }],
-      timestamp: new Date()
-    }
-
-    setMessages(prev => [...prev, userMessage])
-    addMessage(userMessage)
-    setIsLoading(true)
-    clearError()
-
-    try {
-      // API経由でメッセージを送信
-      const response = await apiClient.sendMessage(currentSessionId, message)
-
-      // AIメッセージを作成
-      const aiMessage: ChatMessage = {
-        role: 'model',
-        parts: [{ text: response.response }],
-        timestamp: new Date()
-      }
-
-      setMessages(prev => [...prev, aiMessage])
-      addMessage(aiMessage)
-    } catch (error) {
-      console.error('Error sending message:', error)
-      setError('メッセージの送信に失敗しました')
-      // エラーメッセージを追加
-      const errorMessage: ChatMessage = {
-        role: 'model',
-        parts: [{ text: '申し訳ありません。メッセージの送信に失敗しました。もう一度お試しください。' }],
-        timestamp: new Date()
-      }
-      setMessages(prev => [...prev, errorMessage])
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">ログインが必要です</h2>
-          <p className="text-gray-600 mb-6">チャット機能を利用するにはログインしてください。</p>
-          <a
-            href="/auth"
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            ログインページへ
-          </a>
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -128,12 +38,33 @@ export default function ChatPage() {
 
         {/* チャット表示エリア */}
         <div className="h-[calc(100vh-200px)] flex flex-col">
-          <ChatView messages={messages} isLoading={isLoading} />
-          <MessageInput
-            onSendMessage={handleSendMessage}
-            disabled={isLoading}
-            placeholder="質問や問題を入力してください..."
-          />
+          <div className="flex-1 p-4 overflow-y-auto">
+            {messages.map((msg, index) => (
+              <div key={index} className="mb-4 p-3 bg-gray-100 rounded-lg">
+                {msg}
+              </div>
+            ))}
+          </div>
+
+          {/* メッセージ入力 */}
+          <div className="border-t p-4">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                placeholder="質問や問題を入力してください..."
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                onClick={handleSendMessage}
+                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                送信
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
