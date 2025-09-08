@@ -6,8 +6,15 @@ const reminderService = new ReminderService();
 
 /**
  * Firebase Auth トークンを検証してユーザー情報を取得する
+ * ローカル開発時は認証をスキップ
  */
 async function validateAuth(req: Request): Promise<string> {
+  // ローカル開発時は認証をスキップ
+  if (process.env.SKIP_AUTH === 'true') {
+    console.log('Skipping authentication for local development');
+    return process.env.LOCAL_USER_ID || 'demo-user-123';
+  }
+
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     throw new Error('認証トークンが必要です');
