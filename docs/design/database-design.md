@@ -4,9 +4,58 @@
 
 AI学習サポート機能で使用するFirestoreデータベースの設計書です。
 
-## 2. データベース選択理由
+## 2### 3.3 learningRecords コレクション
 
-### 2.1 Firestore採用理由
+**パス**: `/learningRecords/{recordId}`
+
+```javascript
+{
+  // ドキュメントID: 自動生成
+  "userId": "string",           // ユーザーID (必須)
+  "sessionId": "string",        // 関連セッションID (必須)
+  "subject": "string",          // 教科 (例: "math", "science") (必須)
+  "topic": "string",            // トピック (必須)
+  "summary": "string",          // AI生成要約 (必須)
+  "duration": "number",         // 学習時間（分） (必須)
+  "completedAt": "timestamp",   // 完了日時 (必須)
+  "createdAt": "timestamp",     // 作成日時 (必須)
+  "updatedAt": "timestamp"      // 更新日時 (必須)
+}
+```
+
+### 3.4 reminders コレクション
+
+**パス**: `/reminders/{reminderId}`
+
+```javascript
+{
+  // ドキュメントID: 自動生成
+  "userId": "string",           // ユーザーID (必須)
+  "recordId": "string",         // 関連学習記録ID (必須)
+  "scheduledAt": "timestamp",   // スケジュール日時 (必須)
+  "status": "string",           // ステータス ("pending", "sent", "completed") (必須)
+  "type": "string",             // タイプ ("review", "practice") (必須)
+  "createdAt": "timestamp",     // 作成日時 (必須)
+  "updatedAt": "timestamp"      // 更新日時 (必須)
+}
+```
+
+### 3.5 reminderSettings コレクション
+
+**パス**: `/reminderSettings/{userId}`
+
+```javascript
+{
+  // ドキュメントID: ユーザーID
+  "enabled": "boolean",         // リマインド有効/無効 (必須)
+  "notificationMethods": ["string"], // 通知方法 ["push", "email"] (必須)
+  "reviewIntervals": ["number"], // カスタム間隔（日数） [1, 3, 7, 14, 30] (必須)
+  "lastUpdated": "timestamp",   // 最終更新日時 (必須)
+  "createdAt": "timestamp"      // 作成日時 (必須)
+}
+```
+
+### 3.6 users コレクション（将来拡張用）1 Firestore採用理由
 
 - **リアルタイム同期**: チャット機能に適している
 - **スケーラビリティ**: 自動スケーリング
@@ -101,7 +150,7 @@ AI学習サポート機能で使用するFirestoreデータベースの設計書
   }
 ]
 
-// learningRecords コレクション（将来拡張）
+// learningRecords コレクション
 [
   {
     "collectionGroup": "learningRecords",
@@ -118,6 +167,27 @@ AI学習サポート機能で使用するFirestoreデータベースの設計書
       { "fieldPath": "userId", "order": "ASCENDING" },
       { "fieldPath": "subject", "order": "ASCENDING" },
       { "fieldPath": "completedAt", "order": "DESCENDING" }
+    ]
+  }
+]
+
+// reminders コレクション
+[
+  {
+    "collectionGroup": "reminders",
+    "queryScope": "COLLECTION",
+    "fields": [
+      { "fieldPath": "userId", "order": "ASCENDING" },
+      { "fieldPath": "scheduledAt", "order": "ASCENDING" }
+    ]
+  },
+  {
+    "collectionGroup": "reminders",
+    "queryScope": "COLLECTION",
+    "fields": [
+      { "fieldPath": "userId", "order": "ASCENDING" },
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "scheduledAt", "order": "ASCENDING" }
     ]
   }
 ]
@@ -145,12 +215,26 @@ service cloud.firestore {
         && request.auth.uid == userId;
     }
 
-    // learningRecords の読み書きルール（将来拡張）
+    // learningRecords の読み書きルール
     match /learningRecords/{recordId} {
       allow read, write: if request.auth != null
         && request.auth.uid == resource.data.userId;
       allow create: if request.auth != null
         && request.auth.uid == request.resource.data.userId;
+    }
+
+    // reminders の読み書きルール
+    match /reminders/{reminderId} {
+      allow read, write: if request.auth != null
+        && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.userId;
+    }
+
+    // reminderSettings の読み書きルール
+    match /reminderSettings/{userId} {
+      allow read, write: if request.auth != null
+        && request.auth.uid == userId;
     }
   }
 }

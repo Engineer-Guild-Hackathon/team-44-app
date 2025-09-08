@@ -42,3 +42,37 @@ export interface ApiError {
   code: string;
   message: string;
 }
+
+// Learning continuation support feature types
+export interface LearningRecord {
+  id: string;
+  userId: string;
+  sessionId: string;
+  subject: string;
+  topic: string;
+  summary: string;
+  duration: number; // minutes
+  completedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Reminder {
+  id: string;
+  userId: string;
+  recordId: string;
+  scheduledAt: Date;
+  status: 'pending' | 'sent' | 'completed';
+  type: 'review' | 'practice';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ReminderSettings {
+  userId: string;
+  enabled: boolean;
+  notificationMethods: ('push' | 'email')[];
+  reviewIntervals: number[]; // days
+  lastUpdated: Date;
+  createdAt: Date;
+}

@@ -37,14 +37,14 @@
       "port": 9099
     },
     "functions": {
-      "port": 5001
+      "port": 5002
     },
     "firestore": {
-      "port": 8080
+      "port": 8081
     },
     "ui": {
       "enabled": true,
-      "port": 4000
+      "port": 4001
     }
   }
 }
