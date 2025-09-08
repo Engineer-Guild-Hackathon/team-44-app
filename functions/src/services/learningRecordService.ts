@@ -56,7 +56,7 @@ export class LearningRecordService {
 
     // Firestoreに保存
     const docRef = await db.collection('learningRecords').add(learningRecord);
-    
+
     return {
       id: docRef.id,
       ...learningRecord
@@ -106,7 +106,7 @@ export class LearningRecordService {
 
     const diffMs = endTime.getTime() - startTime.getTime();
     const diffMinutes = Math.round(diffMs / (1000 * 60));
-    
+
     // 最小5分、最大180分（3時間）
     return Math.max(5, Math.min(180, diffMinutes));
   }
@@ -154,7 +154,7 @@ ${conversationText}
       };
     } catch (error) {
       console.error('Failed to generate summary:', error);
-      
+
       // フォールバック
       return {
         summary: '学習対話を行いました',

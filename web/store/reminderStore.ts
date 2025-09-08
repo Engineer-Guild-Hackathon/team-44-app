@@ -55,27 +55,27 @@ interface ReminderStore {
   setLearningRecords: (records: LearningRecord[]) => void
   setIsLoading: (loading: boolean) => void
   setError: (error: string | null) => void
-  
+
   // Reminder settings actions
   updateReminderSettings: (settings: Partial<ReminderSettings>) => void
-  
+
   // Reminder actions
   addReminder: (reminder: Reminder) => void
   updateReminder: (id: string, updates: Partial<Reminder>) => void
   removeReminder: (id: string) => void
   markReminderCompleted: (id: string) => void
-  
+
   // Learning record actions
   addLearningRecord: (record: LearningRecord) => void
   updateLearningRecord: (id: string, updates: Partial<LearningRecord>) => void
   removeLearningRecord: (id: string) => void
-  
+
   // Computed getters
   getPendingReminders: () => Reminder[]
   getCompletedReminders: () => Reminder[]
   getTodayReminders: () => Reminder[]
   getLearningRecordById: (id: string) => LearningRecord | undefined
-  
+
   // Reset function
   reset: () => void
 }
@@ -93,19 +93,19 @@ export const useReminderStore = create<ReminderStore>()(
     ...initialState,
 
     // Basic setters
-    setReminderSettings: (settings: ReminderSettings) => 
+    setReminderSettings: (settings: ReminderSettings) =>
       set({ reminderSettings: settings }),
-    
-    setReminders: (reminders: Reminder[]) => 
+
+    setReminders: (reminders: Reminder[]) =>
       set({ reminders }),
-    
-    setLearningRecords: (records: LearningRecord[]) => 
+
+    setLearningRecords: (records: LearningRecord[]) =>
       set({ learningRecords: records }),
-    
-    setIsLoading: (loading: boolean) => 
+
+    setIsLoading: (loading: boolean) =>
       set({ isLoading: loading }),
-    
-    setError: (error: string | null) => 
+
+    setError: (error: string | null) =>
       set({ error }),
 
     // Reminder settings actions
@@ -186,7 +186,7 @@ export const useReminderStore = create<ReminderStore>()(
     // Computed getters
     getPendingReminders: () => {
       const now = new Date()
-      return get().reminders.filter(reminder => 
+      return get().reminders.filter(reminder =>
         !reminder.completed && reminder.scheduledAt <= now
       )
     },
@@ -199,8 +199,8 @@ export const useReminderStore = create<ReminderStore>()(
       const today = new Date()
       const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate())
       const endOfDay = new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000)
-      
-      return get().reminders.filter(reminder => 
+
+      return get().reminders.filter(reminder =>
         reminder.scheduledAt >= startOfDay && reminder.scheduledAt < endOfDay
       )
     },

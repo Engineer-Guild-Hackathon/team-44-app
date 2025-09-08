@@ -25,21 +25,21 @@ export const generateLearningRecord = async (req: Request, res: Response): Promi
   try {
     const userId = await validateAuth(req);
     const { sessionId } = req.params;
-    
+
     if (!sessionId) {
       res.status(400).json({ error: 'Session ID is required' });
       return;
     }
 
     const learningRecord = await learningRecordService.generateRecord(sessionId, userId);
-    
+
     res.status(201).json({
       success: true,
       data: learningRecord
     });
   } catch (error) {
     console.error('Error generating learning record:', error);
-    
+
     if (error instanceof Error) {
       if (error.message === 'Session not found') {
         res.status(404).json({ error: 'Session not found' });
@@ -54,7 +54,7 @@ export const generateLearningRecord = async (req: Request, res: Response): Promi
         return;
       }
     }
-    
+
     res.status(500).json({ error: 'Failed to generate learning record' });
   }
 };
@@ -81,12 +81,12 @@ export const getUserLearningRecords = async (req: Request, res: Response): Promi
     });
   } catch (error) {
     console.error('Error fetching learning records:', error);
-    
+
     if (error instanceof Error && error.message === '認証トークンが必要です') {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
-    
+
     res.status(500).json({ error: 'Failed to fetch learning records' });
   }
 };
@@ -98,22 +98,22 @@ export const getLearningRecord = async (req: Request, res: Response): Promise<vo
   try {
     await validateAuth(req);
     const { recordId } = req.params;
-    
+
     // TODO: 実装 - 特定の学習記録を取得する処理
     console.log('Getting learning record:', recordId);
-    
+
     res.json({
       success: true,
       message: 'Get specific learning record - to be implemented'
     });
   } catch (error) {
     console.error('Error fetching learning record:', error);
-    
+
     if (error instanceof Error && error.message === '認証トークンが必要です') {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
-    
+
     res.status(500).json({ error: 'Failed to fetch learning record' });
   }
 };

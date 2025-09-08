@@ -52,7 +52,7 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
       //   headers: { 'Content-Type': 'application/json' },
       //   body: JSON.stringify(settings)
       // });
-      
+
       onSettingsChange?.(settings);
       alert('設定が保存されました');
     } catch (error) {
@@ -97,7 +97,7 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">リマインド設定</h2>
-      
+
       {/* リマインド有効/無効 */}
       <div className="mb-6">
         <label className="flex items-center space-x-3">
@@ -151,12 +151,12 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
                 デフォルトに戻す
               </button>
             </div>
-            
+
             <div className="bg-gray-50 p-4 rounded-lg">
               <p className="text-sm text-gray-600 mb-4">
                 エビングハウスの忘却曲線に基づく復習タイミングです
               </p>
-              
+
               <div className="space-y-3">
                 {settings.reviewIntervals.map((interval, index) => (
                   <div key={index} className="flex items-center space-x-3">

@@ -5,9 +5,9 @@ interface NotificationPromptProps {
   autoShow?: boolean;
 }
 
-export const NotificationPrompt: React.FC<NotificationPromptProps> = ({ 
+export const NotificationPrompt: React.FC<NotificationPromptProps> = ({
   onPermissionResult,
-  autoShow = false 
+  autoShow = false
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [permissionState, setPermissionState] = useState<NotificationPermission>('default');
@@ -16,7 +16,7 @@ export const NotificationPrompt: React.FC<NotificationPromptProps> = ({
     // 現在の通知許可状態を確認
     if ('Notification' in window) {
       setPermissionState(Notification.permission);
-      
+
       // 自動表示が有効で、まだ許可を求めていない場合に表示
       if (autoShow && Notification.permission === 'default') {
         setIsVisible(true);
@@ -35,7 +35,7 @@ export const NotificationPrompt: React.FC<NotificationPromptProps> = ({
       const permission = await Notification.requestPermission();
       setPermissionState(permission);
       setIsVisible(false);
-      
+
       const granted = permission === 'granted';
       onPermissionResult?.(granted);
 
@@ -81,17 +81,17 @@ export const NotificationPrompt: React.FC<NotificationPromptProps> = ({
         <div className="text-center">
           {/* アイコン */}
           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
-            <svg 
-              className="h-6 w-6 text-blue-600" 
-              fill="none" 
-              stroke="currentColor" 
+            <svg
+              className="h-6 w-6 text-blue-600"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
-                strokeWidth={2} 
-                d="M15 17h5l-5 5v-5zM11 17H6l5 5v-5zM12 3v4m0 4v4m0-8a4 4 0 100 8 4 4 0 000-8z" 
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 17h5l-5 5v-5zM11 17H6l5 5v-5zM12 3v4m0 4v4m0-8a4 4 0 100 8 4 4 0 000-8z"
               />
             </svg>
           </div>

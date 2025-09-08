@@ -16,7 +16,7 @@ export default function RemindersComponent() {
     // 通知権限の状態を確認
     if ('Notification' in window) {
       setNotificationPermission(Notification.permission)
-      
+
       // 権限が未設定の場合、プロンプトを表示
       if (Notification.permission === 'default') {
         setShowNotificationPrompt(true)
@@ -51,7 +51,7 @@ export default function RemindersComponent() {
           <h2 className="text-lg font-semibold mb-2">通知の状態</h2>
           <div className="flex items-center space-x-2">
             <div className={`w-3 h-3 rounded-full ${
-              notificationPermission === 'granted' ? 'bg-green-500' : 
+              notificationPermission === 'granted' ? 'bg-green-500' :
               notificationPermission === 'denied' ? 'bg-red-500' : 'bg-yellow-500'
             }`}></div>
             <span className="text-sm text-gray-600">

@@ -18,20 +18,20 @@ export class ReminderService {
   async scheduleReminders(userId: string, recordId: string): Promise<void> {
     // ユーザーのリマインド設定を取得
     const settings = await this.getUserReminderSettings(userId);
-    
+
     if (!settings.enabled) {
       return; // リマインドが無効の場合は何もしない
     }
 
-    const reviewIntervals = settings.reviewIntervals.length > 0 
-      ? settings.reviewIntervals 
+    const reviewIntervals = settings.reviewIntervals.length > 0
+      ? settings.reviewIntervals
       : this.DEFAULT_REVIEW_INTERVALS;
 
     // 各間隔でリマインドを作成
     const now = new Date();
     for (const intervalDays of reviewIntervals) {
       const scheduledAt = new Date(now.getTime() + (intervalDays * 24 * 60 * 60 * 1000));
-      
+
       const reminder: Omit<Reminder, 'id'> = {
         userId,
         recordId,
@@ -100,7 +100,7 @@ export class ReminderService {
    */
   async getUserReminderSettings(userId: string): Promise<ReminderSettings> {
     const doc = await db.collection('reminderSettings').doc(userId).get();
-    
+
     if (!doc.exists) {
       // デフォルト設定を作成
       const defaultSettings: Omit<ReminderSettings, 'userId'> = {

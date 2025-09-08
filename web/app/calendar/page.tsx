@@ -40,7 +40,7 @@ export default function CalendarPage() {
   const fetchLearningRecords = async () => {
     setIsLoading(true)
     setError(null)
-    
+
     try {
       // TODO: API呼び出しを実装
       console.log('Fetching learning records...')
@@ -50,7 +50,7 @@ export default function CalendarPage() {
       // if (data.success) {
       //   setLearningRecords(data.data)
       // }
-      
+
       // デモ用のダミーデータ
       setLearningRecords([])
     } catch (err) {
@@ -146,11 +146,11 @@ export default function CalendarPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              
+
               <h2 className="text-xl font-semibold text-gray-900">
                 {currentYear}年 {monthNames[currentMonth]}
               </h2>
-              
+
               <button
                 onClick={() => changeMonth(1)}
                 className="p-2 hover:bg-gray-100 rounded-lg"
@@ -189,7 +189,7 @@ export default function CalendarPage() {
                     } ${isToday ? 'text-blue-600' : ''}`}>
                       {day.getDate()}
                     </div>
-                    
+
                     {/* 学習記録表示 */}
                     <div className="space-y-1">
                       {records.slice(0, 3).map((record) => (
@@ -223,21 +223,21 @@ export default function CalendarPage() {
               </div>
               <div className="text-sm text-gray-600">総学習記録数</div>
             </div>
-            
+
             <div className="bg-white rounded-lg shadow p-6 text-center">
               <div className="text-2xl font-bold text-green-600">
                 {learningRecords.reduce((sum, record) => sum + record.duration, 0)}
               </div>
               <div className="text-sm text-gray-600">総学習時間（分）</div>
             </div>
-            
+
             <div className="bg-white rounded-lg shadow p-6 text-center">
               <div className="text-2xl font-bold text-purple-600">
                 {new Set(learningRecords.map(r => r.subject)).size}
               </div>
               <div className="text-sm text-gray-600">学習教科数</div>
             </div>
-            
+
             <div className="bg-white rounded-lg shadow p-6 text-center">
               <div className="text-2xl font-bold text-orange-600">
                 {Math.round(learningRecords.reduce((sum, record) => sum + record.duration, 0) / Math.max(learningRecords.length, 1))}

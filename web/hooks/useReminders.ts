@@ -53,7 +53,7 @@ export const useReminders = (): UseRemindersReturn => {
   const fetchReminders = async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const token = await getAuthToken();
       const response = await fetch(`${API_BASE_URL}/reminders`, {
@@ -86,7 +86,7 @@ export const useReminders = (): UseRemindersReturn => {
   const fetchSettings = async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const token = await getAuthToken();
       const response = await fetch(`${API_BASE_URL}/reminderSettings`, {
@@ -119,7 +119,7 @@ export const useReminders = (): UseRemindersReturn => {
   const updateSettings = async (newSettings: Partial<ReminderSettings>) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const token = await getAuthToken();
       const response = await fetch(`${API_BASE_URL}/reminderSettings`, {
@@ -171,9 +171,9 @@ export const useReminders = (): UseRemindersReturn => {
       const data = await response.json();
       if (data.success) {
         // ローカル状態を更新
-        setReminders(prev => 
-          prev.map(reminder => 
-            reminder.id === reminderId 
+        setReminders(prev =>
+          prev.map(reminder =>
+            reminder.id === reminderId
               ? { ...reminder, status: 'completed' as const, updatedAt: new Date() }
               : reminder
           )

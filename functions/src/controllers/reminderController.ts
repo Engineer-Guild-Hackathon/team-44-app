@@ -32,12 +32,12 @@ export const getReminders = async (req: Request, res: Response): Promise<void> =
     });
   } catch (error) {
     console.error('Error fetching reminders:', error);
-    
+
     if (error instanceof Error && error.message === '認証トークンが必要です') {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
-    
+
     res.status(500).json({ error: 'Failed to fetch reminders' });
   }
 };
@@ -56,12 +56,12 @@ export const getReminderSettings = async (req: Request, res: Response): Promise<
     });
   } catch (error) {
     console.error('Error fetching reminder settings:', error);
-    
+
     if (error instanceof Error && error.message === '認証トークンが必要です') {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
-    
+
     res.status(500).json({ error: 'Failed to fetch reminder settings' });
   }
 };
@@ -103,12 +103,12 @@ export const updateReminderSettings = async (req: Request, res: Response): Promi
     });
   } catch (error) {
     console.error('Error updating reminder settings:', error);
-    
+
     if (error instanceof Error && error.message === '認証トークンが必要です') {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
-    
+
     res.status(500).json({ error: 'Failed to update reminder settings' });
   }
 };
@@ -140,12 +140,12 @@ export const updateReminderStatus = async (req: Request, res: Response): Promise
     });
   } catch (error) {
     console.error('Error updating reminder status:', error);
-    
+
     if (error instanceof Error && error.message === '認証トークンが必要です') {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
-    
+
     res.status(500).json({ error: 'Failed to update reminder status' });
   }
 };
