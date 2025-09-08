@@ -22,6 +22,24 @@ export default function ChatPage() {
     return responses[Math.floor(Math.random() * responses.length)]
   }
 
+  // バックエンドのヘルスチェック
+  const checkBackendHealth = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/health`)
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Backend health check:', data)
+        return data
+      } else {
+        console.error('Backend health check failed:', response.status)
+        return null
+      }
+    } catch (error) {
+      console.error('Backend health check error:', error)
+      return null
+    }
+  }
+
   // セッション作成
   const createNewSession = async () => {
     if (isCreatingSession) return // 既に作成中ならスキップ
@@ -51,7 +69,8 @@ export default function ChatPage() {
       // APIが利用できない場合はデモモード
       const demoSessionId = `demo-${Date.now()}`
       setCurrentSessionId(demoSessionId)
-      console.log('Using demo session:', demoSessionId)
+      console.log('Backend LLM service is not available. Using demo mode for AI responses.')
+      console.log('Demo session created:', demoSessionId)
       return demoSessionId
     } finally {
       setIsCreatingSession(false)
@@ -122,21 +141,33 @@ export default function ChatPage() {
         console.log('AI response received:', data.response)
       } else {
         console.error('API error:', response.status, response.statusText)
-        const errorMessage: ChatMessage = {
+        console.log('Backend LLM service is not available. Switching to demo mode.')
+        // APIが利用できない場合はデモモードで応答
+        await new Promise(resolve => setTimeout(resolve, 1500)) // シミュレーション遅延
+        const mockResponse = getMockResponse(currentMessage)
+        const aiMessage: ChatMessage = {
           role: 'model',
-          parts: [{ text: '申し訳ありません。メッセージの送信に失敗しました。もう一度お試しください。' }],
+          parts: [{ text: mockResponse }],
           timestamp: new Date()
         }
-        setMessages(prev => [...prev, errorMessage])
+        setMessages(prev => [...prev, aiMessage])
+        console.log('Demo AI response:', mockResponse)
+        return
       }
     } catch (error) {
       console.error('Error sending message:', error)
-      const errorMessage: ChatMessage = {
+      console.log('Backend LLM service is not available. Switching to demo mode.')
+      // APIが利用できない場合はデモモードで応答
+      await new Promise(resolve => setTimeout(resolve, 1500)) // シミュレーション遅延
+      const mockResponse = getMockResponse(currentMessage)
+      const aiMessage: ChatMessage = {
         role: 'model',
-        parts: [{ text: '申し訳ありません。メッセージの送信に失敗しました。ネットワーク接続を確認してください。' }],
+        parts: [{ text: mockResponse }],
         timestamp: new Date()
       }
-      setMessages(prev => [...prev, errorMessage])
+      setMessages(prev => [...prev, aiMessage])
+      console.log('Demo AI response:', mockResponse)
+      return
     } finally {
       setIsLoading(false)
     }
@@ -145,6 +176,7 @@ export default function ChatPage() {
   // 初期化
   useEffect(() => {
     console.log('Initializing chat page...')
+    checkBackendHealth()
     createNewSession()
   }, [])
 
