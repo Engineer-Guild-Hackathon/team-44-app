@@ -2,6 +2,8 @@ import * as functions from "firebase-functions";
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { createSession, postMessage, getUserSessions, getSession } from "./controllers/chatController";
+import { generateLearningRecord, getUserLearningRecords, getLearningRecord } from "./controllers/learningRecordController";
+import { getReminders, getReminderSettings, updateReminderSettings, updateReminderStatus } from "./controllers/reminderController";
 
 const app = express();
 
@@ -22,6 +24,17 @@ app.post("/chatSessions", createSession);
 app.get("/chatSessions", getUserSessions);
 app.get("/chatSessions/:sessionId", getSession);
 app.post("/chatSessions/:sessionId/messages", postMessage);
+
+// Learning record routes
+app.post("/chatSessions/:sessionId/learningRecord", generateLearningRecord);
+app.get("/learningRecords", getUserLearningRecords);
+app.get("/learningRecords/:recordId", getLearningRecord);
+
+// Reminder routes
+app.get("/reminders", getReminders);
+app.get("/reminderSettings", getReminderSettings);
+app.put("/reminderSettings", updateReminderSettings);
+app.put("/reminders/:reminderId/status", updateReminderStatus);
 
 // ヘルスチェック用エンドポイント
 app.get("/health", (req: Request, res: Response) => {
