@@ -51,13 +51,13 @@ export default function HamburgerMenu() {
     const distance = touchStart - touchEnd
     const isRightSwipe = distance < -minSwipeDistance
     const isLeftSwipe = distance > minSwipeDistance
-    
+
     if (isLeftSwipe && isOpen) {
       closeMenu()
     } else if (isRightSwipe && !isOpen) {
       setIsOpen(true)
     }
-    
+
     // Reset touch state
     setTouchStart(null)
     setTouchEnd(null)
@@ -187,10 +187,10 @@ export default function HamburgerMenu() {
                 {isActiveRoute(item.href) && (
                   <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
                 )}
-                <svg 
-                  className="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors" 
-                  fill="none" 
-                  stroke="currentColor" 
+                <svg
+                  className="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors"
+                  fill="none"
+                  stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

@@ -66,11 +66,11 @@ module.exports = {
           to: { height: 0 },
         },
         "slide-in-right": {
-          from: { 
+          from: {
             opacity: "0",
             transform: "translateX(20px)"
           },
-          to: { 
+          to: {
             opacity: "1",
             transform: "translateX(0)"
           },
