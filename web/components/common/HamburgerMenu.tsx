@@ -57,6 +57,10 @@ export default function HamburgerMenu() {
     } else if (isRightSwipe && !isOpen) {
       setIsOpen(true)
     }
+    
+    // Reset touch state
+    setTouchStart(null)
+    setTouchEnd(null)
   }
 
   // ESCキーでメニューを閉じる
@@ -170,10 +174,6 @@ export default function HamburgerMenu() {
                     ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-600 shadow-sm'
                     : 'text-gray-700 hover:bg-gray-50 hover:text-blue-600 hover:shadow-sm'
                 }`}
-                style={{
-                  animationDelay: `${index * 50}ms`,
-                  animation: isOpen ? 'slideInRight 0.3s ease-out forwards' : 'none'
-                }}
               >
                 <span className="text-xl group-hover:scale-110 transition-transform duration-200">
                   {item.icon}
