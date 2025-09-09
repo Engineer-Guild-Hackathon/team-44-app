@@ -197,49 +197,51 @@ export default function HamburgerMenu() {
           </button>
         </div>
 
-        {/* メニューアイテム */}
-        <nav className="flex-1 px-4 py-6">
-          <div className="space-y-3">
-            {menuItems.map((item, index) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={closeMenu}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group ${
-                  isActiveRoute(item.href)
-                    ? "bg-blue-50 text-blue-700 border-l-4 border-blue-600 shadow-sm"
-                    : "text-gray-700 hover:bg-gray-50 hover:text-blue-600 hover:shadow-sm"
-                }`}
-              >
-                <span className="text-xl group-hover:scale-110 transition-transform duration-200">
-                  {item.icon}
-                </span>
-                <div className="flex-1">
-                  <div className="font-medium">{item.label}</div>
-                  <div className="text-xs text-gray-500 group-hover:text-blue-500 transition-colors">
-                    {item.description}
-                  </div>
-                </div>
-                {isActiveRoute(item.href) && (
-                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
-                )}
-                <svg
-                  className="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+        {/* メニューアイテム（ログイン時のみ表示） */}
+        {user && (
+          <nav className="flex-1 px-4 py-6">
+            <div className="space-y-3">
+              {menuItems.map((item, index) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={closeMenu}
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group ${
+                    isActiveRoute(item.href)
+                      ? "bg-blue-50 text-blue-700 border-l-4 border-blue-600 shadow-sm"
+                      : "text-gray-700 hover:bg-gray-50 hover:text-blue-600 hover:shadow-sm"
+                  }`}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </Link>
-            ))}
-          </div>
-        </nav>
+                  <span className="text-xl group-hover:scale-110 transition-transform duration-200">
+                    {item.icon}
+                  </span>
+                  <div className="flex-1">
+                    <div className="font-medium">{item.label}</div>
+                    <div className="text-xs text-gray-500 group-hover:text-blue-500 transition-colors">
+                      {item.description}
+                    </div>
+                  </div>
+                  {isActiveRoute(item.href) && (
+                    <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
+                  )}
+                  <svg
+                    className="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </Link>
+              ))}
+            </div>
+          </nav>
+        )}
 
         {/* フッター */}
         <div className="border-t p-4 space-y-4">
@@ -274,7 +276,7 @@ export default function HamburgerMenu() {
 
       {/* デスクトップメニュー（既存のナビゲーション用） */}
       <div className="hidden md:flex items-center space-x-4">
-        {menuItems.slice(0, -1).map((item) => (
+        {user && menuItems.slice(0, -1).map((item) => (
           <Link
             key={item.href}
             href={item.href}
@@ -287,7 +289,7 @@ export default function HamburgerMenu() {
             {item.label}
           </Link>
         ))}
-        {!loading && user ? (
+        {!loading && user && (
           <button
             onClick={async () => {
               if (window.confirm("本当にログアウトしますか？")) {
@@ -299,13 +301,6 @@ export default function HamburgerMenu() {
           >
             ログアウト
           </button>
-        ) : (
-          <Link
-            href="/auth"
-            className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
-          >
-            ログイン
-          </Link>
         )}
       </div>
     </>
