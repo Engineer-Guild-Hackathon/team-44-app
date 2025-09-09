@@ -46,8 +46,10 @@ export default function AuthPage() {
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               {isLogin ? 'ログイン' : 'アカウント作成'}
             </h1>
-            <p className="text-gray-600">
-              AI学習サポートで効率的な学習を始めましょう
+            <p className={`mb-4 ${isLogin ? 'text-gray-600' : 'text-green-700 font-semibold'}`}>
+              {isLogin
+                ? '登録済みの方はこちらからログインしてください'
+                : 'はじめての方はアカウントを作成してください'}
             </p>
           </div>
 
@@ -93,7 +95,11 @@ export default function AuthPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className={`w-full py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors
+                ${isLogin
+                  ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
+                  : 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'}
+              `}
             >
               {loading ? '処理中...' : (isLogin ? 'ログイン' : 'アカウント作成')}
             </button>
@@ -126,12 +132,6 @@ export default function AuthPage() {
             </div>
           )}
 
-          {/* Firebase Authで認証 */}
-          <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-md">
-            <p className="text-sm text-blue-800">
-              <strong>Firebase認証:</strong> メールアドレスとパスワードでアカウント作成・ログインできます。
-            </p>
-          </div>
         </div>
       </div>
     </div>

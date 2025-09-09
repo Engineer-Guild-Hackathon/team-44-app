@@ -1,3 +1,21 @@
+// Firebaseエラーコードを日本語メッセージに変換
+const getErrorMessage = (error: any) => {
+  const code = error.code || '';
+  switch (code) {
+    case 'auth/email-already-in-use':
+      return 'このメールアドレスは既に使用されています';
+    case 'auth/invalid-email':
+      return 'メールアドレスの形式が正しくありません';
+    case 'auth/user-not-found':
+      return 'ユーザーが見つかりません';
+    case 'auth/wrong-password':
+      return 'パスワードが間違っています';
+    case 'auth/weak-password':
+      return 'パスワードは6文字以上で入力してください';
+    default:
+      return error.message || '認証に失敗しました';
+  }
+};
 import { useState, useEffect } from 'react';
 import type { User } from 'firebase/auth';
 import { getAuthClient } from '../lib/firebase';
@@ -52,7 +70,7 @@ export const useAuth = () => {
       setAuthState(prev => ({
         ...prev,
         loading: false,
-        error: error instanceof Error ? error.message : 'ログインに失敗しました'
+        error: getErrorMessage(error)
       }));
     }
   };
@@ -67,7 +85,7 @@ export const useAuth = () => {
       setAuthState(prev => ({
         ...prev,
         loading: false,
-        error: error instanceof Error ? error.message : 'アカウント作成に失敗しました'
+        error: getErrorMessage(error)
       }));
     }
   };
@@ -80,7 +98,7 @@ export const useAuth = () => {
     } catch (error) {
       setAuthState(prev => ({
         ...prev,
-        error: error instanceof Error ? error.message : 'ログアウトに失敗しました'
+        error: getErrorMessage(error)
       }));
     }
   };
