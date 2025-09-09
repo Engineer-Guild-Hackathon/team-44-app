@@ -19,8 +19,8 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className={inter.className}>
-        {/* ナビゲーションバー */}
-        <nav className="bg-white shadow-sm border-b">
+  {/* ナビゲーションバー */}
+  <nav className="bg-white shadow-sm border-b fixed top-0 left-0 w-full z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               {/* ロゴ */}
@@ -42,7 +42,7 @@ export default function RootLayout({
           </div>
         </nav>
 
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen bg-background pt-16">
           <main className="container mx-auto px-4 py-8">
             {children}
           </main>

@@ -154,14 +154,14 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
 
             <div className="bg-gray-50 p-4 rounded-lg">
               <p className="text-sm text-gray-600 mb-4">
-                エビングハウスの忘却曲線に基づく復習タイミングです
+                ※デフォルトの値はエビングハウスの忘却曲線に基づく復習タイミングです。
               </p>
 
               <div className="space-y-3">
                 {settings.reviewIntervals.map((interval, index) => (
                   <div key={index} className="flex items-center space-x-3">
-                    <span className="w-16 text-sm text-gray-600">
-                      {INTERVAL_LABELS[index] || `${index + 1}回目`}:
+                    <span className="w-20 text-sm text-gray-600">
+                      {index + 1}回目:
                     </span>
                     <input
                       type="number"
