@@ -17,8 +17,8 @@ const getErrorMessage = (error: any) => {
   }
 };
 import { useState, useEffect } from 'react';
-import { User, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import type { User } from 'firebase/auth';
+import { getAuthClient } from '../lib/firebase';
 
 export interface AuthState {
   user: User | null;
@@ -34,21 +34,38 @@ export const useAuth = () => {
   });
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setAuthState({
-        user,
-        loading: false,
-        error: null
-      });
-    });
+    let unsubscribe: (() => void) | undefined;
+    let mounted = true;
 
-    return unsubscribe;
+    (async () => {
+      if (typeof window === 'undefined') {
+        if (mounted) setAuthState(prev => ({ ...prev, loading: false }));
+        return;
+      }
+      try {
+        const auth = await getAuthClient();
+        const { onAuthStateChanged } = await import('firebase/auth');
+        unsubscribe = onAuthStateChanged(auth, (user) => {
+          if (!mounted) return;
+          setAuthState({ user, loading: false, error: null });
+        });
+      } catch (e) {
+        if (mounted) setAuthState(prev => ({ ...prev, loading: false, error: e instanceof Error ? e.message : String(e) }));
+      }
+    })();
+
+    return () => {
+      mounted = false;
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
-      setAuthState(prev => ({ ...prev, loading: true, error: null }));
-      await signInWithEmailAndPassword(auth, email, password);
+  setAuthState(prev => ({ ...prev, loading: true, error: null }));
+  const auth = await getAuthClient();
+  const { signInWithEmailAndPassword } = await import('firebase/auth');
+  await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
       setAuthState(prev => ({
         ...prev,
@@ -60,8 +77,10 @@ export const useAuth = () => {
 
   const signUp = async (email: string, password: string) => {
     try {
-      setAuthState(prev => ({ ...prev, loading: true, error: null }));
-      await createUserWithEmailAndPassword(auth, email, password);
+  setAuthState(prev => ({ ...prev, loading: true, error: null }));
+  const auth = await getAuthClient();
+  const { createUserWithEmailAndPassword } = await import('firebase/auth');
+  await createUserWithEmailAndPassword(auth, email, password);
     } catch (error) {
       setAuthState(prev => ({
         ...prev,
@@ -73,7 +92,9 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
-      await signOut(auth);
+  const auth = await getAuthClient();
+  const { signOut } = await import('firebase/auth');
+  await signOut(auth);
     } catch (error) {
       setAuthState(prev => ({
         ...prev,

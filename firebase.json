@@ -1,4 +1,7 @@
 {
+  "projects": {
+    "default": "ai-learning-support-project"
+  },
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
