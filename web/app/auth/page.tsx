@@ -1,34 +1,39 @@
 'use client'
 
-import { useState } from 'react'
+
+import { useState, useEffect } from 'react'
+import { useAuth } from '../../hooks/useAuth'
+
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
+  const { user, loading, error, signIn, signUp, logout, clearError } = useAuth()
+  const [localError, setLocalError] = useState('')
+
+  useEffect(() => {
+    if (!loading && user) {
+      window.location.href = '/chat'
+    }
+  }, [user, loading])
+
+  useEffect(() => {
+    setLocalError(error || '')
+  }, [error])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
-    setError('')
-
-    try {
-      // 簡易的な認証シミュレーション
-      // 実際の実装では useAuth フックを使用
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      if (email && password) {
-        // 成功時の処理
-        window.location.href = '/chat'
-      } else {
-        setError('メールアドレスとパスワードを入力してください')
-      }
-    } catch (error) {
-      setError('認証に失敗しました')
-    } finally {
-      setIsLoading(false)
+    setLocalError('')
+    clearError()
+    if (!email || !password) {
+      setLocalError('メールアドレスとパスワードを入力してください')
+      return
+    }
+    if (isLogin) {
+      await signIn(email, password)
+    } else {
+      await signUp(email, password)
     }
   }
 
@@ -41,15 +46,17 @@ export default function AuthPage() {
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               {isLogin ? 'ログイン' : 'アカウント作成'}
             </h1>
-            <p className="text-gray-600">
-              AI学習サポートで効率的な学習を始めましょう
+            <p className={`mb-4 ${isLogin ? 'text-gray-600' : 'text-green-700 font-semibold'}`}>
+              {isLogin
+                ? '登録済みの方はこちらからログインしてください'
+                : 'はじめての方はアカウントを作成してください'}
             </p>
           </div>
 
           {/* エラーメッセージ */}
-          {error && (
+          {localError && (
             <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-              {error}
+              {localError}
             </div>
           )}
 
@@ -87,10 +94,14 @@ export default function AuthPage() {
 
             <button
               type="submit"
-              disabled={isLoading}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              disabled={loading}
+              className={`w-full py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors
+                ${isLogin
+                  ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
+                  : 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'}
+              `}
             >
-              {isLoading ? '処理中...' : (isLogin ? 'ログイン' : 'アカウント作成')}
+              {loading ? '処理中...' : (isLogin ? 'ログイン' : 'アカウント作成')}
             </button>
           </form>
 
@@ -108,13 +119,19 @@ export default function AuthPage() {
             </button>
           </div>
 
-          {/* デモ用の注意書き */}
-          <div className="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-            <p className="text-sm text-yellow-800">
-              <strong>デモ版:</strong> 任意のメールアドレスとパスワードでログインできます。
-              実際の認証は実装されていません。
-            </p>
-          </div>
+          {/* 既にログイン済みの場合のログアウトボタン */}
+          {!loading && user && (
+            <div className="mt-4 text-center">
+              <button
+                type="button"
+                onClick={logout}
+                className="text-red-600 hover:text-red-800 text-sm"
+              >
+                ログアウトして別アカウントでログイン
+              </button>
+            </div>
+          )}
+
         </div>
       </div>
     </div>
