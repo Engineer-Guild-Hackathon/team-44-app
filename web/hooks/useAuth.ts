@@ -1,6 +1,24 @@
+// Firebaseエラーコードを日本語メッセージに変換
+const getErrorMessage = (error: any) => {
+  const code = error.code || '';
+  switch (code) {
+    case 'auth/email-already-in-use':
+      return 'このメールアドレスは既に使用されています';
+    case 'auth/invalid-email':
+      return 'メールアドレスの形式が正しくありません';
+    case 'auth/user-not-found':
+      return 'ユーザーが見つかりません';
+    case 'auth/wrong-password':
+      return 'パスワードが間違っています';
+    case 'auth/weak-password':
+      return 'パスワードは6文字以上で入力してください';
+    default:
+      return error.message || '認証に失敗しました';
+  }
+};
 import { useState, useEffect } from 'react';
-import { User, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../lib/firebase';
+import type { User } from 'firebase/auth';
+import { getAuthClient } from '../lib/firebase';
 
 export interface AuthState {
   user: User | null;
@@ -16,50 +34,71 @@ export const useAuth = () => {
   });
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setAuthState({
-        user,
-        loading: false,
-        error: null
-      });
-    });
+    let unsubscribe: (() => void) | undefined;
+    let mounted = true;
 
-    return unsubscribe;
+    (async () => {
+      if (typeof window === 'undefined') {
+        if (mounted) setAuthState(prev => ({ ...prev, loading: false }));
+        return;
+      }
+      try {
+        const auth = await getAuthClient();
+        const { onAuthStateChanged } = await import('firebase/auth');
+        unsubscribe = onAuthStateChanged(auth, (user) => {
+          if (!mounted) return;
+          setAuthState({ user, loading: false, error: null });
+        });
+      } catch (e) {
+        if (mounted) setAuthState(prev => ({ ...prev, loading: false, error: e instanceof Error ? e.message : String(e) }));
+      }
+    })();
+
+    return () => {
+      mounted = false;
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
-      setAuthState(prev => ({ ...prev, loading: true, error: null }));
-      await signInWithEmailAndPassword(auth, email, password);
+  setAuthState(prev => ({ ...prev, loading: true, error: null }));
+  const auth = await getAuthClient();
+  const { signInWithEmailAndPassword } = await import('firebase/auth');
+  await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
       setAuthState(prev => ({
         ...prev,
         loading: false,
-        error: error instanceof Error ? error.message : 'ログインに失敗しました'
+        error: getErrorMessage(error)
       }));
     }
   };
 
   const signUp = async (email: string, password: string) => {
     try {
-      setAuthState(prev => ({ ...prev, loading: true, error: null }));
-      await createUserWithEmailAndPassword(auth, email, password);
+  setAuthState(prev => ({ ...prev, loading: true, error: null }));
+  const auth = await getAuthClient();
+  const { createUserWithEmailAndPassword } = await import('firebase/auth');
+  await createUserWithEmailAndPassword(auth, email, password);
     } catch (error) {
       setAuthState(prev => ({
         ...prev,
         loading: false,
-        error: error instanceof Error ? error.message : 'アカウント作成に失敗しました'
+        error: getErrorMessage(error)
       }));
     }
   };
 
   const logout = async () => {
     try {
-      await signOut(auth);
+  const auth = await getAuthClient();
+  const { signOut } = await import('firebase/auth');
+  await signOut(auth);
     } catch (error) {
       setAuthState(prev => ({
         ...prev,
-        error: error instanceof Error ? error.message : 'ログアウトに失敗しました'
+        error: getErrorMessage(error)
       }));
     }
   };

@@ -121,12 +121,6 @@ export default function CalendarPage() {
               学習カレンダー
             </h1>
             <nav className="flex space-x-4">
-              <a href="/chat" className="text-gray-600 hover:text-gray-900">
-                チャット
-              </a>
-              <a href="/reminders" className="text-gray-600 hover:text-gray-900">
-                リマインド設定
-              </a>
             </nav>
           </div>
         </div>
