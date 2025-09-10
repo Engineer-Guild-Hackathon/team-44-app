@@ -14,7 +14,6 @@ const getLLMProviderInstance = () => {
   try {
     // テスト環境ではモックプロバイダーを使用
     if (process.env.USE_TEST_LLM_MOCK === "true") {
-      console.log("Using test LLM mock");
       return {
         generateResponse: async () => "Mock AI response for testing"
       };
@@ -29,6 +28,12 @@ const getLLMProviderInstance = () => {
 };
 
 export class ChatService {
+  private db: FirebaseFirestore.Firestore;
+
+  constructor(dbInstance?: FirebaseFirestore.Firestore) {
+    this.db = dbInstance || db;
+  }
+
   /**
    * 新しいチャットセッションを作成する
    */
@@ -42,8 +47,7 @@ export class ChatService {
         messages: []
       };
 
-      const docRef = await db.collection("chatSessions").add(sessionData);
-      console.log("Created chat session:", docRef.id);
+      const docRef = await this.db.collection("chatSessions").add(sessionData);
       return docRef.id;
     } catch (error) {
       console.error("Error creating chat session:", error);
@@ -56,7 +60,7 @@ export class ChatService {
    */
   async getSession(sessionId: string, userId: string): Promise<ChatSession | null> {
     try {
-      const doc = await db.collection("chatSessions").doc(sessionId).get();
+      const doc = await this.db.collection("chatSessions").doc(sessionId).get();
 
       if (!doc.exists) {
         return null;
@@ -77,6 +81,10 @@ export class ChatService {
       };
     } catch (error) {
       console.error("Error getting chat session:", error);
+      // 権限エラーはそのまま再スロー
+      if (error instanceof Error && error.message === "このセッションにアクセスする権限がありません") {
+        throw error;
+      }
       throw new Error("チャットセッションの取得に失敗しました");
     }
   }
@@ -112,7 +120,7 @@ export class ChatService {
 
       // セッションを更新
       const updatedMessages = [...session.messages, userMessage, aiMessage];
-      await db.collection("chatSessions").doc(sessionId).update({
+      await this.db.collection("chatSessions").doc(sessionId).update({
         messages: updatedMessages,
         updatedAt: new Date()
       });
@@ -120,6 +128,13 @@ export class ChatService {
       return response;
     } catch (error) {
       console.error("Error sending message:", error);
+      // セッション関連のエラーやLLMエラーはそのまま再スロー
+      if (error instanceof Error) {
+        if (error.message === "チャットセッションが見つかりません" ||
+            error.message === "このセッションにアクセスする権限がありません") {
+          throw error;
+        }
+      }
       throw new Error("メッセージの送信に失敗しました");
     }
   }
@@ -129,7 +144,7 @@ export class ChatService {
    */
   async getUserSessions(userId: string): Promise<ChatSession[]> {
     try {
-      const snapshot = await db
+      const snapshot = await this.db
         .collection("chatSessions")
         .where("userId", "==", userId)
         .orderBy("updatedAt", "desc")

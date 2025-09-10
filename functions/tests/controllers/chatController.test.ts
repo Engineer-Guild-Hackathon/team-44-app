@@ -1,3 +1,5 @@
+// @ts-nocheck
+import { jest, describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { Request, Response } from 'express';
 import { createSession, postMessage, setChatServiceForTesting, resetChatServiceForTesting } from '../../src/controllers/chatController';
 
@@ -5,6 +7,42 @@ import { createSession, postMessage, setChatServiceForTesting, resetChatServiceF
 jest.mock('firebase-admin', () => ({
   apps: [],
   initializeApp: jest.fn(),
+  firestore: jest.fn(() => ({
+    collection: jest.fn().mockImplementation(() => ({
+      add: jest.fn().mockResolvedValue({ id: "test-session-123" }),
+      doc: jest.fn().mockImplementation(() => ({
+        get: jest.fn().mockResolvedValue({
+          exists: true,
+          id: "test-session-123",
+          data: () => ({
+            userId: "test-user-123",
+            title: "Test Session",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            messages: []
+          }),
+        }),
+        set: jest.fn().mockResolvedValue(undefined),
+        update: jest.fn().mockResolvedValue(undefined),
+      })),
+      where: jest.fn().mockImplementation(() => ({
+        orderBy: jest.fn().mockImplementation(() => ({
+          get: jest.fn().mockResolvedValue({
+            docs: [{
+              id: "test-session-123",
+              data: () => ({
+                userId: "test-user-123",
+                title: "Test Session",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                messages: []
+              })
+            }]
+          })
+        }))
+      }))
+    })),
+  })),
   auth: jest.fn(() => ({
     verifyIdToken: jest.fn().mockResolvedValue({ uid: 'test-user-123' }),
   })),
