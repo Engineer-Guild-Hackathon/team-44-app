@@ -1,5 +1,5 @@
-import * as admin from 'firebase-admin';
-import { Reminder, ReminderSettings, LearningRecord } from '../models/types';
+import * as admin from "firebase-admin";
+import { Reminder, ReminderSettings, LearningRecord } from "../models/types";
 
 // Firebase Admin の初期化
 if (!admin.apps.length) {
@@ -32,17 +32,17 @@ export class ReminderService {
     for (const intervalDays of reviewIntervals) {
       const scheduledAt = new Date(now.getTime() + (intervalDays * 24 * 60 * 60 * 1000));
 
-      const reminder: Omit<Reminder, 'id'> = {
+      const reminder: Omit<Reminder, "id"> = {
         userId,
         recordId,
         scheduledAt,
-        status: 'pending',
-        type: 'review',
+        status: "pending",
+        type: "review",
         createdAt: now,
         updatedAt: now
       };
 
-      await db.collection('reminders').add(reminder);
+      await db.collection("reminders").add(reminder);
     }
   }
 
@@ -51,10 +51,10 @@ export class ReminderService {
    */
   async getPendingReminders(): Promise<Reminder[]> {
     const now = new Date();
-    const snapshot = await db.collection('reminders')
-      .where('status', '==', 'pending')
-      .where('scheduledAt', '<=', now)
-      .orderBy('scheduledAt', 'asc')
+    const snapshot = await db.collection("reminders")
+      .where("status", "==", "pending")
+      .where("scheduledAt", "<=", now)
+      .orderBy("scheduledAt", "asc")
       .limit(100)
       .get();
 
@@ -72,11 +72,11 @@ export class ReminderService {
     const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
 
-    const snapshot = await db.collection('reminders')
-      .where('userId', '==', userId)
-      .where('scheduledAt', '>=', startOfDay)
-      .where('scheduledAt', '<=', endOfDay)
-      .orderBy('scheduledAt', 'asc')
+    const snapshot = await db.collection("reminders")
+      .where("userId", "==", userId)
+      .where("scheduledAt", ">=", startOfDay)
+      .where("scheduledAt", "<=", endOfDay)
+      .orderBy("scheduledAt", "asc")
       .get();
 
     return snapshot.docs.map((doc: admin.firestore.QueryDocumentSnapshot) => ({
@@ -88,8 +88,8 @@ export class ReminderService {
   /**
    * リマインドのステータスを更新
    */
-  async updateReminderStatus(reminderId: string, status: 'pending' | 'sent' | 'completed'): Promise<void> {
-    await db.collection('reminders').doc(reminderId).update({
+  async updateReminderStatus(reminderId: string, status: "pending" | "sent" | "completed"): Promise<void> {
+    await db.collection("reminders").doc(reminderId).update({
       status,
       updatedAt: new Date()
     });
@@ -99,19 +99,19 @@ export class ReminderService {
    * ユーザーのリマインド設定を取得
    */
   async getUserReminderSettings(userId: string): Promise<ReminderSettings> {
-    const doc = await db.collection('reminderSettings').doc(userId).get();
+    const doc = await db.collection("reminderSettings").doc(userId).get();
 
     if (!doc.exists) {
       // デフォルト設定を作成
-      const defaultSettings: Omit<ReminderSettings, 'userId'> = {
+      const defaultSettings: Omit<ReminderSettings, "userId"> = {
         enabled: true,
-        notificationMethods: ['push'],
+        notificationMethods: ["push"],
         reviewIntervals: this.DEFAULT_REVIEW_INTERVALS,
         lastUpdated: new Date(),
         createdAt: new Date()
       };
 
-      await db.collection('reminderSettings').doc(userId).set({
+      await db.collection("reminderSettings").doc(userId).set({
         ...defaultSettings,
         userId
       });
@@ -137,7 +137,7 @@ export class ReminderService {
       lastUpdated: new Date()
     };
 
-    await db.collection('reminderSettings').doc(userId).update(updateData);
+    await db.collection("reminderSettings").doc(userId).update(updateData);
   }
 
   /**
@@ -145,9 +145,9 @@ export class ReminderService {
    * 簡単な実装：最近学習したものから優先的に選択
    */
   async selectHighPriorityRecords(userId: string, limit = 5): Promise<LearningRecord[]> {
-    const snapshot = await db.collection('learningRecords')
-      .where('userId', '==', userId)
-      .orderBy('completedAt', 'desc')
+    const snapshot = await db.collection("learningRecords")
+      .where("userId", "==", userId)
+      .orderBy("completedAt", "desc")
       .limit(limit)
       .get();
 
@@ -167,14 +167,14 @@ export class ReminderService {
     data: any;
   }> {
     // 関連する学習記録を取得
-    const recordDoc = await db.collection('learningRecords').doc(reminder.recordId).get();
+    const recordDoc = await db.collection("learningRecords").doc(reminder.recordId).get();
     const record = recordDoc.data() as LearningRecord;
 
     return {
-      title: '学習リマインド',
+      title: "学習リマインド",
       body: `${record.subject}: ${record.topic} の復習時間です`,
       data: {
-        type: 'reminder',
+        type: "reminder",
         recordId: reminder.recordId,
         reminderId: reminder.id
       }

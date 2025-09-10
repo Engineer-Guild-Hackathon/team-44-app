@@ -1,6 +1,6 @@
 // データモデルと型定義
 export interface ChatMessage {
-  role: 'user' | 'model';
+  role: "user" | "model";
   parts: { text: string }[];
   timestamp?: Date;
 }
@@ -62,8 +62,8 @@ export interface Reminder {
   userId: string;
   recordId: string;
   scheduledAt: Date;
-  status: 'pending' | 'sent' | 'completed';
-  type: 'review' | 'practice';
+  status: "pending" | "sent" | "completed";
+  type: "review" | "practice";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -71,7 +71,7 @@ export interface Reminder {
 export interface ReminderSettings {
   userId: string;
   enabled: boolean;
-  notificationMethods: ('push' | 'email')[];
+  notificationMethods: ("push" | "email")[];
   reviewIntervals: number[]; // days
   lastUpdated: Date;
   createdAt: Date;

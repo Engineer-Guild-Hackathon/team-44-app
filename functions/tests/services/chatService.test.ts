@@ -36,8 +36,11 @@ describe('ChatService', () => {
     chatService = new ChatService();
     jest.clearAllMocks();
     
-    // Setup default LLM response
-    mockLLMFactory.getLLMProvider().generateResponse.mockResolvedValue('Mock AI response');
+    // Reset and setup LLM mock
+    const mockProvider = mockLLMFactory.getLLMProvider();
+    if (mockProvider && mockProvider.generateResponse) {
+      mockProvider.generateResponse.mockResolvedValue('Mock AI response');
+    }
   });
 
   describe('createSession', () => {

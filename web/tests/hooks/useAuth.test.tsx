@@ -1,5 +1,5 @@
-import { renderHook, act, waitFor } from '@testing-library/react';
-import { useAuth } from '../../hooks/useAuth';
+import { renderHook, act, waitFor } from "@testing-library/react";
+
 // Mock Firebase auth methods
 const mockSignInWithEmailAndPassword = jest.fn();
 const mockCreateUserWithEmailAndPassword = jest.fn();
@@ -15,9 +15,11 @@ const mockAuth = {
 };
 
 // Mock the firebase client
-jest.mock('../../lib/firebase', () => ({
+jest.mock("../../lib/firebase", () => ({
   getAuthClient: jest.fn().mockReturnValue(mockAuth),
 }));
+
+import { useAuth } from "../../hooks/useAuth";
 
 beforeEach(() => {
   mockAuth.signInWithEmailAndPassword = mockSignInWithEmailAndPassword;

@@ -1,16 +1,16 @@
 // Simple test setup without Firebase emulator dependency for initial testing
 
 // Mock Firebase Admin BEFORE any imports
-jest.mock('firebase-admin', () => ({
-  apps: { length: 0 },
+jest.mock("firebase-admin", () => ({
+  apps: [],
   initializeApp: jest.fn(),
   firestore: jest.fn(() => ({
     collection: jest.fn(() => ({
-      add: jest.fn().mockResolvedValue({ id: 'test-id' }),
+      add: jest.fn().mockResolvedValue({ id: "test-id" }),
       doc: jest.fn(() => ({
         get: jest.fn().mockResolvedValue({
           exists: true,
-          data: () => ({ test: 'data' }),
+          data: () => ({ test: "data" }),
         }),
         set: jest.fn(),
         update: jest.fn(),
@@ -18,7 +18,7 @@ jest.mock('firebase-admin', () => ({
     })),
   })),
   auth: jest.fn(() => ({
-    verifyIdToken: jest.fn().mockResolvedValue({ uid: 'test-user' }),
+    verifyIdToken: jest.fn().mockResolvedValue({ uid: "test-user" }),
   })),
 }));
 
