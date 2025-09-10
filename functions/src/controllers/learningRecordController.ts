@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { LearningRecordService } from '../services/learningRecordService';
-import * as admin from 'firebase-admin';
+import { Request, Response } from "express";
+import { LearningRecordService } from "../services/learningRecordService";
+import * as admin from "firebase-admin";
 
 const learningRecordService = new LearningRecordService();
 
@@ -10,17 +10,17 @@ const learningRecordService = new LearningRecordService();
  */
 async function validateAuth(req: Request): Promise<string> {
   // ローカル開発時は認証をスキップ
-  if (process.env.SKIP_AUTH === 'true') {
-    console.log('Skipping authentication for local development');
-    return process.env.LOCAL_USER_ID || 'demo-user-123';
+  if (process.env.SKIP_AUTH === "true") {
+    console.log("Skipping authentication for local development");
+    return process.env.LOCAL_USER_ID || "demo-user-123";
   }
 
   const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new Error('認証トークンが必要です');
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    throw new Error("認証トークンが必要です");
   }
 
-  const token = authHeader.split('Bearer ')[1];
+  const token = authHeader.split("Bearer ")[1];
   const decodedToken = await admin.auth().verifyIdToken(token);
   return decodedToken.uid;
 }
@@ -34,7 +34,7 @@ export const generateLearningRecord = async (req: Request, res: Response): Promi
     const { sessionId } = req.params;
 
     if (!sessionId) {
-      res.status(400).json({ error: 'Session ID is required' });
+      res.status(400).json({ error: "Session ID is required" });
       return;
     }
 
@@ -45,24 +45,24 @@ export const generateLearningRecord = async (req: Request, res: Response): Promi
       data: learningRecord
     });
   } catch (error) {
-    console.error('Error generating learning record:', error);
+    console.error("Error generating learning record:", error);
 
     if (error instanceof Error) {
-      if (error.message === 'Session not found') {
-        res.status(404).json({ error: 'Session not found' });
+      if (error.message === "Session not found") {
+        res.status(404).json({ error: "Session not found" });
         return;
       }
-      if (error.message === 'Unauthorized access to session') {
-        res.status(403).json({ error: 'Unauthorized access to session' });
+      if (error.message === "Unauthorized access to session") {
+        res.status(403).json({ error: "Unauthorized access to session" });
         return;
       }
-      if (error.message === '認証トークンが必要です') {
-        res.status(401).json({ error: 'Unauthorized' });
+      if (error.message === "認証トークンが必要です") {
+        res.status(401).json({ error: "Unauthorized" });
         return;
       }
     }
 
-    res.status(500).json({ error: 'Failed to generate learning record' });
+    res.status(500).json({ error: "Failed to generate learning record" });
   }
 };
 
@@ -87,14 +87,14 @@ export const getUserLearningRecords = async (req: Request, res: Response): Promi
       data: records
     });
   } catch (error) {
-    console.error('Error fetching learning records:', error);
+    console.error("Error fetching learning records:", error);
 
-    if (error instanceof Error && error.message === '認証トークンが必要です') {
-      res.status(401).json({ error: 'Unauthorized' });
+    if (error instanceof Error && error.message === "認証トークンが必要です") {
+      res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
-    res.status(500).json({ error: 'Failed to fetch learning records' });
+    res.status(500).json({ error: "Failed to fetch learning records" });
   }
 };
 
@@ -107,20 +107,20 @@ export const getLearningRecord = async (req: Request, res: Response): Promise<vo
     const { recordId } = req.params;
 
     // TODO: 実装 - 特定の学習記録を取得する処理
-    console.log('Getting learning record:', recordId);
+    console.log("Getting learning record:", recordId);
 
     res.json({
       success: true,
-      message: 'Get specific learning record - to be implemented'
+      message: "Get specific learning record - to be implemented"
     });
   } catch (error) {
-    console.error('Error fetching learning record:', error);
+    console.error("Error fetching learning record:", error);
 
-    if (error instanceof Error && error.message === '認証トークンが必要です') {
-      res.status(401).json({ error: 'Unauthorized' });
+    if (error instanceof Error && error.message === "認証トークンが必要です") {
+      res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
-    res.status(500).json({ error: 'Failed to fetch learning record' });
+    res.status(500).json({ error: "Failed to fetch learning record" });
   }
 };

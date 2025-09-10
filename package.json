@@ -8,7 +8,10 @@
     "build": "npm run build --prefix=web && npm run build --prefix=functions",
     "start": "npm run start --prefix=web",
     "lint": "npm run lint --prefix=web && npm run lint --prefix=functions",
-    "test": "npm run test --prefix=web && npm run test --prefix=functions"
+    "test": "npm run test --prefix=web && npm run test --prefix=functions",
+    "test:watch": "npm run test:watch --prefix=web",
+    "test:coverage": "npm run test:coverage --prefix=web && npm run test:coverage --prefix=functions",
+    "test:ci": "npm run test:ci --prefix=web && npm run test:ci --prefix=functions"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

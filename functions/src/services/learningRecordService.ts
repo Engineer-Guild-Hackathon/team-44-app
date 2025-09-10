@@ -1,6 +1,6 @@
-import * as admin from 'firebase-admin';
-import { LearningRecord, ChatSession } from '../models/types';
-import { getLLMProvider } from './llm/llmFactory';
+import * as admin from "firebase-admin";
+import { LearningRecord, ChatSession } from "../models/types";
+import { getLLMProvider } from "./llm/llmFactory";
 
 // Firebase Admin の初期化
 if (!admin.apps.length) {
@@ -17,20 +17,20 @@ export class LearningRecordService {
    */
   async generateRecord(sessionId: string, userId: string): Promise<LearningRecord> {
     // セッションを取得
-    const sessionDoc = await db.collection('chatSessions').doc(sessionId).get();
+    const sessionDoc = await db.collection("chatSessions").doc(sessionId).get();
     if (!sessionDoc.exists) {
-      throw new Error('Session not found');
+      throw new Error("Session not found");
     }
 
     const session = sessionDoc.data() as ChatSession;
     if (session.userId !== userId) {
-      throw new Error('Unauthorized access to session');
+      throw new Error("Unauthorized access to session");
     }
 
     // セッションからメッセージを抽出
     const messages = session.messages || [];
     if (messages.length === 0) {
-      throw new Error('No messages found in session');
+      throw new Error("No messages found in session");
     }
 
     // 学習時間を計算（最初と最後のメッセージの時間差）
@@ -42,7 +42,7 @@ export class LearningRecordService {
     const { summary, subject, topic } = await this.generateSummaryAndCategories(messages);
 
     // 学習記録を作成
-    const learningRecord: Omit<LearningRecord, 'id'> = {
+    const learningRecord: Omit<LearningRecord, "id"> = {
       userId,
       sessionId,
       subject,
@@ -55,7 +55,7 @@ export class LearningRecordService {
     };
 
     // Firestoreに保存
-    const docRef = await db.collection('learningRecords').add(learningRecord);
+    const docRef = await db.collection("learningRecords").add(learningRecord);
 
     return {
       id: docRef.id,
@@ -67,9 +67,9 @@ export class LearningRecordService {
    * ユーザーの学習記録一覧を取得
    */
   async getUserLearningRecords(userId: string, limit = 20): Promise<LearningRecord[]> {
-    const snapshot = await db.collection('learningRecords')
-      .where('userId', '==', userId)
-      .orderBy('completedAt', 'desc')
+    const snapshot = await db.collection("learningRecords")
+      .where("userId", "==", userId)
+      .orderBy("completedAt", "desc")
       .limit(limit)
       .get();
 
@@ -83,10 +83,10 @@ export class LearningRecordService {
    * 教科別の学習記録を取得
    */
   async getLearningRecordsBySubject(userId: string, subject: string): Promise<LearningRecord[]> {
-    const snapshot = await db.collection('learningRecords')
-      .where('userId', '==', userId)
-      .where('subject', '==', subject)
-      .orderBy('completedAt', 'desc')
+    const snapshot = await db.collection("learningRecords")
+      .where("userId", "==", userId)
+      .where("subject", "==", subject)
+      .orderBy("completedAt", "desc")
       .limit(10)
       .get();
 
@@ -121,8 +121,8 @@ export class LearningRecordService {
   }> {
     // メッセージをテキストに変換
     const conversationText = messages
-      .map(msg => `${msg.role}: ${msg.parts[0]?.text || ''}`)
-      .join('\n');
+      .map(msg => `${msg.role}: ${msg.parts[0]?.text || ""}`)
+      .join("\n");
 
     const prompt = `
 以下の学習対話から、学習記録を生成してください。
@@ -144,22 +144,22 @@ ${conversationText}
 
     try {
       const response = await this.llm.generateResponse([], prompt);
-      const cleanedResponse = response.replace(/```json|```/g, '').trim();
+      const cleanedResponse = response.replace(/```json|```/g, "").trim();
       const parsed = JSON.parse(cleanedResponse);
 
       return {
-        summary: parsed.summary || '学習対話を行いました',
-        subject: parsed.subject || 'general',
-        topic: parsed.topic || '一般的な質問・回答'
+        summary: parsed.summary || "学習対話を行いました",
+        subject: parsed.subject || "general",
+        topic: parsed.topic || "一般的な質問・回答"
       };
     } catch (error) {
-      console.error('Failed to generate summary:', error);
+      console.error("Failed to generate summary:", error);
 
       // フォールバック
       return {
-        summary: '学習対話を行いました',
-        subject: 'general',
-        topic: '一般的な質問・回答'
+        summary: "学習対話を行いました",
+        subject: "general",
+        topic: "一般的な質問・回答"
       };
     }
   }
