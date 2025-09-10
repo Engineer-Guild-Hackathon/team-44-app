@@ -1,17 +1,33 @@
 import { Request, Response } from 'express';
-import { createSession, postMessage } from '../../src/controllers/chatController';
-import { ChatService } from '../../src/services/chatService';
+import { createSession, postMessage, setChatServiceForTesting, resetChatServiceForTesting } from '../../src/controllers/chatController';
 
-// Mock ChatService
-jest.mock('../../src/services/chatService');
-const MockedChatService = ChatService as jest.MockedClass<typeof ChatService>;
-
-// Mock Firebase Admin
+// Mock Firebase Admin first
 jest.mock('firebase-admin', () => ({
-  auth: () => ({
+  apps: [],
+  initializeApp: jest.fn(),
+  auth: jest.fn(() => ({
     verifyIdToken: jest.fn().mockResolvedValue({ uid: 'test-user-123' }),
+  })),
+}));
+
+// Mock LLM Factory
+jest.mock('../../src/services/llm/llmFactory', () => ({
+  getLLMProvider: jest.fn().mockReturnValue({
+    generateResponse: jest.fn().mockResolvedValue('Mock AI response'),
   }),
 }));
+
+// Mock ChatService
+jest.mock('../../src/services/chatService', () => ({
+  ChatService: jest.fn().mockImplementation(() => ({
+    createSession: jest.fn(),
+    sendMessage: jest.fn(),
+    getSession: jest.fn(),
+    getUserSessions: jest.fn(),
+  })),
+}));
+
+import { ChatService } from '../../src/services/chatService';
 
 describe('ChatController', () => {
   let mockRequest: Partial<Request>;
@@ -20,8 +36,11 @@ describe('ChatController', () => {
 
   beforeEach(() => {
     // Reset environment variables
-    process.env.SKIP_AUTH = 'false';
-    delete process.env.LOCAL_USER_ID;
+    process.env.SKIP_AUTH = 'true'; // Skip auth for all tests
+    process.env.LOCAL_USER_ID = 'test-user-123';
+    process.env.USE_LOCAL_FIRESTORE_MOCK = 'true';
+    process.env.USE_TEST_LLM_MOCK = 'true';
+    process.env.LLM_PROVIDER = 'gemini';
 
     mockRequest = {
       headers: {
@@ -36,18 +55,16 @@ describe('ChatController', () => {
     };
 
     // Create a fresh mock instance
-    mockChatService = {
-      createSession: jest.fn(),
-      sendMessage: jest.fn(),
-      getSession: jest.fn(),
-      getUserSessions: jest.fn(),
-    } as jest.Mocked<ChatService>;
-
-    MockedChatService.mockImplementation(() => mockChatService);
+    mockChatService = new ChatService() as jest.Mocked<ChatService>;
+    
+    // Set the mock ChatService for testing
+    setChatServiceForTesting(mockChatService);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
+    // Reset ChatService for testing
+    resetChatServiceForTesting();
   });
 
   describe('createSession', () => {

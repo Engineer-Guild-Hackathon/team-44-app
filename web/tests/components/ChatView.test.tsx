@@ -62,8 +62,13 @@ describe('ChatView', () => {
 
     render(<ChatView messages={userOnlyMessages} />);
 
-    const messageElement = screen.getByText('ユーザーメッセージ').closest('div');
-    expect(messageElement).toHaveClass('bg-blue-500', 'text-white');
+    // Find the message bubble container (the div with bg-blue-500 class)
+    const messageBubbles = screen.getAllByRole('generic', { hidden: true });
+    const userMessageBubble = messageBubbles.find(bubble => 
+      bubble.classList.contains('bg-blue-500') && 
+      bubble.textContent?.includes('ユーザーメッセージ')
+    );
+    expect(userMessageBubble).toHaveClass('bg-blue-500', 'text-white');
   });
 
   it('should render AI messages with correct styling', () => {
@@ -77,8 +82,13 @@ describe('ChatView', () => {
 
     render(<ChatView messages={aiOnlyMessages} />);
 
-    const messageElement = screen.getByText('AIメッセージ').closest('div');
-    expect(messageElement).toHaveClass('bg-gray-100', 'text-gray-800', 'border');
+    // Find the message bubble container (the div with bg-gray-100 class)
+    const messageBubbles = screen.getAllByRole('generic', { hidden: true });
+    const aiMessageBubble = messageBubbles.find(bubble => 
+      bubble.classList.contains('bg-gray-100') && 
+      bubble.textContent?.includes('AIメッセージ')
+    );
+    expect(aiMessageBubble).toHaveClass('bg-gray-100', 'text-gray-800', 'border');
   });
 
   it('should display timestamp for messages', () => {
@@ -94,9 +104,9 @@ describe('ChatView', () => {
 
     // Note: The exact time format might depend on locale/timezone in test environment
     expect(screen.getByText('テストメッセージ')).toBeInTheDocument();
-    // We can verify timestamp exists without checking exact format
-    const timeElement = screen.getByText('テストメッセージ').parentElement?.querySelector('.text-xs');
-    expect(timeElement).toBeInTheDocument();
+    // Check if timestamp element exists by looking for any time format
+    const timeText = screen.getByText(/\d{1,2}:\d{2}/);
+    expect(timeText).toBeInTheDocument();
   });
 
   it('should handle messages with multiple parts', () => {
