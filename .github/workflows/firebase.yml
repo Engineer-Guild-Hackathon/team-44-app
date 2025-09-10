@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - 'functions/**'
-      - 'web/**'
       - '.github/workflows/**'
   workflow_dispatch:
 
@@ -33,14 +32,6 @@ jobs:
         run: npm ci
         working-directory: functions
 
-      - name: Install web dependencies
-        run: npm ci
-        working-directory: web
-
-      - name: Build web application
-        run: npm run build
-        working-directory: web
-
       - name: Create .env file
         run: |
           echo "LLM_PROVIDER=${{ secrets.LLM_PROVIDER || 'gemini' }}" > .env
@@ -61,7 +52,7 @@ jobs:
         run: |
           npx firebase-tools deploy \
             --project ${{ secrets.FIREBASE_PROJECT_ID }} \
-            --only hosting,functions,firestore:rules \
+            --only functions,firestore:rules \
             --non-interactive \
             --force
         env:
