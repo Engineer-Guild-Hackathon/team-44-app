@@ -16,6 +16,11 @@ jobs:
       run:
         working-directory: functions
 
+    env:
+      LLM_PROVIDER: ${{ secrets.LLM_PROVIDER || 'gemini' }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -28,6 +33,7 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
       - name: Authenticate with Google Cloud
         uses: 'google-github-actions/auth@v2'
         with:
@@ -40,7 +46,3 @@ jobs:
             --only hosting,functions,firestore:rules \
             --non-interactive \
             --force
-        env:
-          LLM_PROVIDER: ${{ secrets.LLM_PROVIDER || 'gemini' }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
