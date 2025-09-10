@@ -4,43 +4,33 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'functions/**'
-      - '.github/workflows/**'
   workflow_dispatch:
 
 jobs:
-  deploy:
+  build_and_deploy:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
-
-      - name: Install dependencies for functions
-        run: npm --prefix functions install
-
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v1
+        run: npm ci
+      - name: Authenticate with Google Cloud
+        uses: 'google-github-actions/auth@v2'
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
+          credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}'
 
       - name: Deploy to Firebase
         run: |
-          gcloud auth activate-service-account --key-file=<(echo "$GCP_SA_KEY")
-          firebase deploy --only hosting,functions
-        env:
-          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          npx firebase-tools deploy \
+            --project ${{ secrets.FIREBASE_PROJECT_ID }} \
+            --only hosting,functions,firestore:rules \
+            --non-interactive \
+            --force
