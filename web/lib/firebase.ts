@@ -1,15 +1,28 @@
 import { initializeApp, getApps, FirebaseApp } from "firebase/app";
 
+
 let app: FirebaseApp | undefined;
 
+// Use direct process.env.<NAME> so Next.js can inline the values at build time.
+// Trim surrounding quotes if present (some env files include extra quotes).
+const strip = (v?: string) => (v ?? '').trim().replace(/^['\"]+|['\"]+$/g, '');
+
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+  apiKey: strip(process.env.NEXT_PUBLIC_FIREBASE_API_KEY),
+  authDomain: strip(process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN),
+  projectId: strip(process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID),
+  storageBucket: strip(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET),
+  messagingSenderId: strip(process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID),
+  appId: strip(process.env.NEXT_PUBLIC_FIREBASE_APP_ID)
 };
+
+// Runtime sanity check: fail fast with a clear message if API key is missing/empty.
+if (!firebaseConfig.apiKey) {
+  // NEXT_PUBLIC_* keys are safe to log (public), but keep message concise.
+  // This helps detect incorrect environment variable setup on hosting (Vercel).
+  // eslint-disable-next-line no-console
+  console.error('FIREBASE_INIT_ERROR: NEXT_PUBLIC_FIREBASE_API_KEY is missing or empty. Check your environment variables (Vercel / .env).');
+}
 
 function ensureApp(): FirebaseApp {
   if (app) return app;
