@@ -1,7 +1,7 @@
-import * as admin from 'firebase-admin';
-import { LearningRecord, ChatSession } from '../models/types';
-import { getLLMProvider } from './llm/llmFactory';
-import { ReminderService } from './reminderService';
+import * as admin from "firebase-admin";
+import { LearningRecord, ChatSession } from "../models/types";
+import { getLLMProvider } from "./llm/llmFactory";
+import { ReminderService } from "./reminderService";
 
 // Firebase Admin の初期化
 if (!admin.apps.length) {
@@ -69,7 +69,7 @@ export class LearningRecordService {
       await this.reminderService.scheduleReminders(userId, docRef.id);
       console.log(`Reminders scheduled for learning record: ${docRef.id}`);
     } catch (error) {
-      console.error('Failed to schedule reminders:', error);
+      console.error("Failed to schedule reminders:", error);
       // リマインドのスケジューリングが失敗しても学習記録の作成は成功とする
     }
 
