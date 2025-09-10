@@ -71,27 +71,46 @@ export const generateLearningRecord = async (req: Request, res: Response): Promi
  */
 export const getUserLearningRecords = async (req: Request, res: Response): Promise<void> => {
   try {
+    console.log("getUserLearningRecords called with query:", req.query);
+
     const userId = await validateAuth(req);
+    console.log(`Authenticated user: ${userId}`);
+
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
     const subject = req.query.subject as string;
 
+    console.log(`Fetching records with limit: ${limit}, subject: ${subject}`);
+
     let records;
     if (subject) {
+      console.log(`Fetching records by subject: ${subject}`);
       records = await learningRecordService.getLearningRecordsBySubject(userId, subject);
     } else {
+      console.log("Fetching all user records");
       records = await learningRecordService.getUserLearningRecords(userId, limit);
     }
+
+    console.log(`Returning ${records.length} records`);
 
     res.json({
       success: true,
       data: records
     });
   } catch (error) {
-    console.error("Error fetching learning records:", error);
+    console.error("Error in getUserLearningRecords controller:", error);
 
-    if (error instanceof Error && error.message === "認証トークンが必要です") {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
+    if (error instanceof Error) {
+      if (error.message === "認証トークンが必要です") {
+        res.status(401).json({ error: "Unauthorized" });
+        return;
+      }
+
+      // Firestore 関連のエラーをより詳細に処理
+      if (error.message.includes("index")) {
+        console.error("Index error detected:", error.message);
+        res.status(500).json({ error: "Database index error. Please check Firestore indexes." });
+        return;
+      }
     }
 
     res.status(500).json({ error: "Failed to fetch learning records" });

@@ -80,16 +80,37 @@ export class LearningRecordService {
    * ユーザーの学習記録一覧を取得
    */
   async getUserLearningRecords(userId: string, limit = 20): Promise<LearningRecord[]> {
-    const snapshot = await db.collection("learningRecords")
-      .where("userId", "==", userId)
-      .orderBy("completedAt", "desc")
-      .limit(limit)
-      .get();
+    try {
+      console.log(`Fetching learning records for user: ${userId}, limit: ${limit}`);
 
-    return snapshot.docs.map((doc: admin.firestore.QueryDocumentSnapshot) => ({
-      id: doc.id,
-      ...doc.data()
-    } as LearningRecord));
+      const snapshot = await db.collection("learningRecords")
+        .where("userId", "==", userId)
+        .orderBy("completedAt", "desc")
+        .limit(limit)
+        .get();
+
+      console.log(`Found ${snapshot.docs.length} learning records`);
+
+      return snapshot.docs.map((doc: admin.firestore.QueryDocumentSnapshot) => {
+        const data = doc.data();
+        console.log(`Processing document ${doc.id}:`, data);
+
+        return {
+          id: doc.id,
+          userId: data.userId,
+          sessionId: data.sessionId,
+          subject: data.subject,
+          topic: data.topic,
+          summary: data.summary,
+          duration: data.duration,
+          completedAt: data.completedAt?.toDate ? data.completedAt.toDate() : data.completedAt,
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt
+        } as LearningRecord;
+      });
+    } catch (error) {
+      console.error("Error in getUserLearningRecords:", error);
+      throw error;
+    }
   }
 
   /**
