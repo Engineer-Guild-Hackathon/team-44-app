@@ -110,6 +110,35 @@ export class LearningRecordService {
   }
 
   /**
+   * 特定の学習記録を取得
+   */
+  async getLearningRecord(recordId: string, userId: string): Promise<LearningRecord | null> {
+    const doc = await db.collection("learningRecords").doc(recordId).get();
+
+    if (!doc.exists) {
+      return null;
+    }
+
+    const data = doc.data();
+
+    if (!data || data.userId !== userId) {
+      throw new Error("Unauthorized access to learning record");
+    }
+
+    return {
+      id: doc.id,
+      userId: data.userId,
+      sessionId: data.sessionId,
+      subject: data.subject,
+      topic: data.topic,
+      summary: data.summary,
+      duration: data.duration,
+      completedAt: data.completedAt,
+      createdAt: data.createdAt
+    } as LearningRecord;
+  }
+
+  /**
    * 学習時間を計算（分単位）
    */
   private calculateDuration(startTime?: Date, endTime?: Date): number {

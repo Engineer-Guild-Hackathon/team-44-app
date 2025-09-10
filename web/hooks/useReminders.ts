@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getAuthClient } from '../lib/firebase';
 
 interface Reminder {
   id: string;
@@ -42,11 +43,26 @@ export const useReminders = (): UseRemindersReturn => {
 
   // 認証トークンを取得する関数 (Firebase Auth を使用)
   const getAuthToken = async (): Promise<string> => {
-    // TODO: Firebase Auth からトークンを取得
-    // const user = auth.currentUser;
-    // if (!user) throw new Error('User not authenticated');
-    // return await user.getIdToken();
-    return 'dummy-token'; // 一時的なダミートークン
+    // ローカル開発時は認証をスキップ
+    if (process.env.NEXT_PUBLIC_SKIP_AUTH === "true") {
+      console.log("Skipping authentication for local development");
+      return process.env.NEXT_PUBLIC_LOCAL_USER_ID || "demo-user-123";
+    }
+
+    try {
+      const auth = await getAuthClient();
+      const { getIdToken } = await import('firebase/auth');
+
+      if (!auth.currentUser) {
+        throw new Error('ユーザーが認証されていません');
+      }
+
+      const token = await getIdToken(auth.currentUser);
+      return token;
+    } catch (error) {
+      console.error('Failed to get auth token:', error);
+      throw new Error('認証トークンの取得に失敗しました');
+    }
   };
 
   // リマインド一覧を取得

@@ -103,22 +103,37 @@ export const getUserLearningRecords = async (req: Request, res: Response): Promi
  */
 export const getLearningRecord = async (req: Request, res: Response): Promise<void> => {
   try {
-    await validateAuth(req);
+    const userId = await validateAuth(req);
     const { recordId } = req.params;
 
-    // TODO: 実装 - 特定の学習記録を取得する処理
-    console.log("Getting learning record:", recordId);
+    if (!recordId) {
+      res.status(400).json({ error: "Record ID is required" });
+      return;
+    }
+
+    const learningRecord = await learningRecordService.getLearningRecord(recordId, userId);
+
+    if (!learningRecord) {
+      res.status(404).json({ error: "Learning record not found" });
+      return;
+    }
 
     res.json({
       success: true,
-      message: "Get specific learning record - to be implemented"
+      data: learningRecord
     });
   } catch (error) {
     console.error("Error fetching learning record:", error);
 
-    if (error instanceof Error && error.message === "認証トークンが必要です") {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
+    if (error instanceof Error) {
+      if (error.message === "認証トークンが必要です") {
+        res.status(401).json({ error: "Unauthorized" });
+        return;
+      }
+      if (error.message === "Unauthorized access to learning record") {
+        res.status(403).json({ error: "Forbidden" });
+        return;
+      }
     }
 
     res.status(500).json({ error: "Failed to fetch learning record" });
