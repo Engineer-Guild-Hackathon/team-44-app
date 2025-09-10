@@ -4,11 +4,17 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'functions/**'
+      - '.github/workflows/**'
   workflow_dispatch:
 
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
 
     steps:
       - name: Checkout repository
