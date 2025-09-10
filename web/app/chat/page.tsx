@@ -47,7 +47,12 @@ export default function ChatPage() {
     setIsCreatingSession(true)
     try {
       console.log('Creating new session...')
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/chatSessions`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/health`)
+      if (!response.ok) {
+        throw new Error('Backend not available')
+      }
+
+      const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/chatSessions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -55,14 +60,14 @@ export default function ChatPage() {
         body: JSON.stringify({ title: 'AI学習サポート' }),
       })
 
-      if (response.ok) {
-        const data = await response.json()
+      if (sessionResponse.ok) {
+        const data = await sessionResponse.json()
         setCurrentSessionId(data.sessionId)
         console.log('New session created:', data.sessionId)
         return data.sessionId
       } else {
-        console.error('Failed to create session:', response.status, response.statusText)
-        throw new Error(`セッション作成に失敗しました (${response.status})`)
+        console.error('Failed to create session:', sessionResponse.status, sessionResponse.statusText)
+        throw new Error(`セッション作成に失敗しました (${sessionResponse.status})`)
       }
     } catch (error) {
       console.error('Error creating session:', error)
@@ -75,7 +80,7 @@ export default function ChatPage() {
     } finally {
       setIsCreatingSession(false)
     }
-  }, [isCreatingSession])
+  }, [])
 
     // メッセージ送信
   const handleSendMessage = async () => {
@@ -178,7 +183,7 @@ export default function ChatPage() {
     console.log('Initializing chat page...')
     checkBackendHealth()
     createNewSession()
-  }, [checkBackendHealth, createNewSession])
+  }, []) // 依存関係を空にして一度だけ実行
 
   // デバッグ用：状態確認
   useEffect(() => {
