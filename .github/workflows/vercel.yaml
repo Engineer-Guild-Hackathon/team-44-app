@@ -38,8 +38,36 @@ jobs:
       - name: Build Project Artifacts (preview)
         run: vercel build --token="$VERCEL_TOKEN"
 
-      - name: Deploy Project Artifacts to Vercel (preview)
-        run: vercel deploy --prebuilt --token="$VERCEL_TOKEN"
+      - id: vercel_deploy
+        name: Deploy Project Artifacts to Vercel (preview)
+        run: |
+          set -o pipefail
+          # run deploy and capture output
+          vercel deploy --prebuilt --token="$VERCEL_TOKEN" 2>&1 | tee vercel-output.txt
+          # try to extract a Vercel preview URL from output
+          PREVIEW_URL=$(grep -Eo 'https?://[^[:space:]]+' vercel-output.txt | grep -E 'vercel.app|now.sh' | head -n1 || true)
+          if [ -z "$PREVIEW_URL" ]; then
+            PREVIEW_URL=$(grep -Eo 'https?://[^[:space:]]+' vercel-output.txt | head -n1 || true)
+          fi
+          echo "preview_url=$PREVIEW_URL" >> $GITHUB_OUTPUT
+
+      - name: Comment PR with preview URL
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        env:
+          PREVIEW_URL: ${{ steps.vercel_deploy.outputs.preview_url }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const url = process.env.PREVIEW_URL || '';
+            const pr = context.payload.pull_request;
+            if (!pr) {
+              core.info('No pull request found in context; skipping comment.');
+            } else if (!url) {
+              github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: pr.number, body: 'Vercel preview deployed, but could not parse the URL from the CLI output.' });
+            } else {
+              github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: pr.number, body: `Vercel preview deployed: ${url}` });
+            }
 
   Deploy-Production:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
