@@ -1,6 +1,7 @@
 import * as admin from 'firebase-admin';
 import { LearningRecord, ChatSession } from '../models/types';
 import { getLLMProvider } from './llm/llmFactory';
+import { ReminderService } from './reminderService';
 
 // Firebase Admin の初期化
 if (!admin.apps.length) {
@@ -11,6 +12,7 @@ const db = admin.firestore();
 
 export class LearningRecordService {
   private llm = getLLMProvider();
+  private reminderService = new ReminderService();
 
   /**
    * チャットセッションから学習記録を自動生成
@@ -57,10 +59,21 @@ export class LearningRecordService {
     // Firestoreに保存
     const docRef = await db.collection('learningRecords').add(learningRecord);
 
-    return {
+    const savedRecord = {
       id: docRef.id,
       ...learningRecord
     };
+
+    // 学習記録が作成されたら、自動的にリマインドもスケジュール
+    try {
+      await this.reminderService.scheduleReminders(userId, docRef.id);
+      console.log(`Reminders scheduled for learning record: ${docRef.id}`);
+    } catch (error) {
+      console.error('Failed to schedule reminders:', error);
+      // リマインドのスケジューリングが失敗しても学習記録の作成は成功とする
+    }
+
+    return savedRecord;
   }
 
   /**

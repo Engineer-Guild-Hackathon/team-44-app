@@ -42,20 +42,34 @@ export default function CalendarPage() {
     setError(null)
 
     try {
-      // TODO: API呼び出しを実装
-      console.log('Fetching learning records...')
-      // const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
-      // const response = await fetch(`${API_BASE_URL}/learningRecords`)
-      // const data = await response.json()
-      // if (data.success) {
-      //   setLearningRecords(data.data)
-      // }
-
-      // デモ用のダミーデータ
-      setLearningRecords([])
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/learningRecords`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch learning records')
+      }
+      
+      const data = await response.json()
+      if (data.success) {
+        // Date strings をDate objectsに変換
+        const records = data.data.map((record: any) => ({
+          ...record,
+          completedAt: new Date(record.completedAt),
+          createdAt: new Date(record.createdAt),
+          updatedAt: new Date(record.updatedAt)
+        }))
+        setLearningRecords(records)
+      } else {
+        setLearningRecords([])
+      }
     } catch (err) {
       setError('学習記録の取得に失敗しました')
       console.error('Error fetching learning records:', err)
+      // Fallback to empty array for demo
+      setLearningRecords([])
     } finally {
       setIsLoading(false)
     }

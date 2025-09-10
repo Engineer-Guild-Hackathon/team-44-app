@@ -2,6 +2,40 @@ import axios, { AxiosInstance } from "axios";
 import { getAuthClient } from "./firebase";
 import { ChatSession, CreateSessionResponse, PostMessageResponse } from "../types/api";
 
+// Additional types for learning records and reminders
+interface LearningRecord {
+  id: string;
+  userId: string;
+  sessionId: string;
+  subject: string;
+  topic: string;
+  summary: string;
+  duration: number;
+  completedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface Reminder {
+  id: string;
+  userId: string;
+  recordId: string;
+  scheduledAt: Date;
+  status: 'pending' | 'sent' | 'completed';
+  type: 'review' | 'practice';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface ReminderSettings {
+  userId: string;
+  enabled: boolean;
+  notificationMethods: ('push' | 'email')[];
+  reviewIntervals: number[];
+  lastUpdated: Date;
+  createdAt: Date;
+}
+
 class ApiClient {
   private client: AxiosInstance;
 
@@ -70,6 +104,60 @@ class ApiClient {
   async getSession(sessionId: string): Promise<ChatSession> {
     const response = await this.client.get(`/chatSessions/${sessionId}`);
     return response.data.session;
+  }
+
+  /**
+   * 学習記録を生成
+   */
+  async generateLearningRecord(sessionId: string): Promise<LearningRecord> {
+    const response = await this.client.post(`/chatSessions/${sessionId}/learningRecord`);
+    return response.data.data;
+  }
+
+  /**
+   * ユーザーの学習記録一覧を取得
+   */
+  async getUserLearningRecords(): Promise<LearningRecord[]> {
+    const response = await this.client.get('/learningRecords');
+    return response.data.data;
+  }
+
+  /**
+   * 特定の学習記録を取得
+   */
+  async getLearningRecord(recordId: string): Promise<LearningRecord> {
+    const response = await this.client.get(`/learningRecords/${recordId}`);
+    return response.data.data;
+  }
+
+  /**
+   * ユーザーのリマインド一覧を取得
+   */
+  async getReminders(): Promise<Reminder[]> {
+    const response = await this.client.get('/reminders');
+    return response.data.data;
+  }
+
+  /**
+   * リマインド設定を取得
+   */
+  async getReminderSettings(): Promise<ReminderSettings> {
+    const response = await this.client.get('/reminderSettings');
+    return response.data.data;
+  }
+
+  /**
+   * リマインド設定を更新
+   */
+  async updateReminderSettings(settings: Partial<ReminderSettings>): Promise<void> {
+    await this.client.put('/reminderSettings', settings);
+  }
+
+  /**
+   * リマインドのステータスを更新
+   */
+  async updateReminderStatus(reminderId: string, status: 'pending' | 'sent' | 'completed'): Promise<void> {
+    await this.client.put(`/reminders/${reminderId}/status`, { status });
   }
 
   /**

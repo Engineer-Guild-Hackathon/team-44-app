@@ -6,6 +6,7 @@ import HamburgerMenu from '../components/common/HamburgerMenu'
 export const metadata: Metadata = {
   title: 'AI学習サポート',
   description: 'AIとの対話を通じて、ユーザーが「自力で解けた」という達成感を得られる学習サポートアプリ',
+  manifest: '/manifest.json',
 }
 
 export default function RootLayout({
