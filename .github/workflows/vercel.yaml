@@ -4,6 +4,11 @@ env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
   VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 on:
   push:
     branches:
@@ -51,8 +56,15 @@ jobs:
           fi
           echo "preview_url=$PREVIEW_URL" >> $GITHUB_OUTPUT
 
+      - name: Add preview URL to job summary
+        run: |
+          echo "## Vercel Preview" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "URL: ${{ steps.vercel_deploy.outputs.preview_url }}" >> $GITHUB_STEP_SUMMARY
+
       - name: Comment PR with preview URL
         if: github.event_name == 'pull_request'
+        continue-on-error: true
         uses: actions/github-script@v6
         env:
           PREVIEW_URL: ${{ steps.vercel_deploy.outputs.preview_url }}
