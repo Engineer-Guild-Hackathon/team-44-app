@@ -80,7 +80,7 @@ export default function ChatPage() {
     } finally {
       setIsCreatingSession(false)
     }
-  }, [])
+  }, [isCreatingSession])
 
     // メッセージ送信
   const handleSendMessage = async () => {
@@ -183,7 +183,7 @@ export default function ChatPage() {
     console.log('Initializing chat page...')
     checkBackendHealth()
     createNewSession()
-  }, []) // 依存関係を空にして一度だけ実行
+  }, [checkBackendHealth, createNewSession]) // 依存関係を空にして一度だけ実行
 
   // デバッグ用：状態確認
   useEffect(() => {

@@ -28,9 +28,9 @@ const getLLMProviderInstance = () => {
 };
 
 export class ChatService {
-  private db: FirebaseFirestore.Firestore;
+  private db: admin.firestore.Firestore;
 
-  constructor(dbInstance?: FirebaseFirestore.Firestore) {
+  constructor(dbInstance?: admin.firestore.Firestore) {
     this.db = dbInstance || db;
   }
 
