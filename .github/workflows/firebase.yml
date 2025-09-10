@@ -40,3 +40,7 @@ jobs:
             --only hosting,functions,firestore:rules \
             --non-interactive \
             --force
+        env:
+          LLM_PROVIDER: ${{ secrets.LLM_PROVIDER }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
