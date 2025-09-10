@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { ChatMessage } from '../../types/api'
 
 export default function ChatPage() {
@@ -23,7 +23,7 @@ export default function ChatPage() {
   }
 
   // バックエンドのヘルスチェック
-  const checkBackendHealth = async () => {
+  const checkBackendHealth = useCallback(async () => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/health`)
       if (response.ok) {
@@ -38,10 +38,10 @@ export default function ChatPage() {
       console.error('Backend health check error:', error)
       return null
     }
-  }
+  }, [])
 
   // セッション作成
-  const createNewSession = async () => {
+  const createNewSession = useCallback(async () => {
     if (isCreatingSession) return // 既に作成中ならスキップ
 
     setIsCreatingSession(true)
@@ -75,7 +75,7 @@ export default function ChatPage() {
     } finally {
       setIsCreatingSession(false)
     }
-  }
+  }, [isCreatingSession])
 
     // メッセージ送信
   const handleSendMessage = async () => {
@@ -178,7 +178,7 @@ export default function ChatPage() {
     console.log('Initializing chat page...')
     checkBackendHealth()
     createNewSession()
-  }, [])
+  }, [checkBackendHealth, createNewSession])
 
   // デバッグ用：状態確認
   useEffect(() => {

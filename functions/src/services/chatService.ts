@@ -16,10 +16,10 @@ const localSessions: Map<string, LocalSession> = new Map();
 const getLLMProviderInstance = () => {
   try {
     // テスト環境ではモックプロバイダーを使用
-    if (process.env.USE_TEST_LLM_MOCK === 'true') {
-      console.log('Using test LLM mock');
+    if (process.env.USE_TEST_LLM_MOCK === "true") {
+      console.log("Using test LLM mock");
       return {
-        generateResponse: async () => 'Mock AI response for testing'
+        generateResponse: async () => "Mock AI response for testing"
       };
     }
     return getLLMProvider();
