@@ -51,11 +51,11 @@ describe('ChatService', () => {
   beforeEach(() => {
     chatService = new ChatService();
     jest.clearAllMocks();
-    
+
     // Enable local mock for testing
     process.env.USE_LOCAL_FIRESTORE_MOCK = 'true';
     process.env.USE_TEST_LLM_MOCK = 'true'; // Enable test mode for LLM provider
-    
+
     // Reset and setup LLM mock
     mockLLMFactory.getLLMProvider.mockClear();
     const mockProvider = mockLLMFactory.getLLMProvider();
@@ -95,7 +95,7 @@ describe('ChatService', () => {
     it('should send message and get AI response', async () => {
       // First create a session
       const sessionId = await chatService.createSession(mockUserId);
-      
+
       const response = await chatService.sendMessage(
         sessionId,
         mockUserId,
@@ -120,7 +120,7 @@ describe('ChatService', () => {
     it('should retrieve a chat session', async () => {
       // First create a session
       const sessionId = await chatService.createSession('test-user');
-      
+
       const session = await chatService.getSession(sessionId, 'test-user');
 
       expect(session).toBeDefined();

@@ -64,8 +64,8 @@ describe('ChatView', () => {
 
     // Find the message bubble container (the div with bg-blue-500 class)
     const messageBubbles = screen.getAllByRole('generic', { hidden: true });
-    const userMessageBubble = messageBubbles.find(bubble => 
-      bubble.classList.contains('bg-blue-500') && 
+    const userMessageBubble = messageBubbles.find(bubble =>
+      bubble.classList.contains('bg-blue-500') &&
       bubble.textContent?.includes('ユーザーメッセージ')
     );
     expect(userMessageBubble).toHaveClass('bg-blue-500', 'text-white');
@@ -84,8 +84,8 @@ describe('ChatView', () => {
 
     // Find the message bubble container (the div with bg-gray-100 class)
     const messageBubbles = screen.getAllByRole('generic', { hidden: true });
-    const aiMessageBubble = messageBubbles.find(bubble => 
-      bubble.classList.contains('bg-gray-100') && 
+    const aiMessageBubble = messageBubbles.find(bubble =>
+      bubble.classList.contains('bg-gray-100') &&
       bubble.textContent?.includes('AIメッセージ')
     );
     expect(aiMessageBubble).toHaveClass('bg-gray-100', 'text-gray-800', 'border');
