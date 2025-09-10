@@ -3,7 +3,7 @@ import { GeminiProvider } from "./geminiProvider";
 import { OpenAIProvider } from "./openaiProvider";
 
 export const getLLMProvider = (): LLMProvider => {
-  const providerType = process.env.LLM_PROVIDER;
+  const providerType = process.env.LLM_PROVIDER || 'gemini';
 
   switch (providerType) {
     case 'gemini':
