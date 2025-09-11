@@ -6,8 +6,10 @@ import ChatView from '../../components/common/ChatView'
 import MessageInput from '../../components/common/MessageInput'
 import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
+import { NotificationPrompt } from '../../components/common/NotificationPrompt'
 import { useAuth } from '../../hooks/useAuth'
 import { getAuthClient } from '../../lib/firebase'
+import { notificationService } from '../../lib/notificationService'
 
 export default function ChatPage() {
   const [message, setMessage] = useState('')
@@ -16,6 +18,7 @@ export default function ChatPage() {
   const [isNavOpen, setIsNavOpen] = useState(true)
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [isCreatingSession, setIsCreatingSession] = useState(false)
+  const [showNotificationPrompt, setShowNotificationPrompt] = useState(false)
   const { user, loading: authLoading } = useAuth()
 
   // 認証トークンを取得する関数
@@ -60,6 +63,57 @@ export default function ChatPage() {
       return null
     }
   }, [])
+
+  // 通知の初期化
+  const initializeNotifications = useCallback(async () => {
+    try {
+      if (!notificationService.isSupported()) {
+        console.log('Notifications not supported in this browser');
+        return;
+      }
+
+      const permission = notificationService.getPermissionStatus();
+      if (permission === 'default' && user) {
+        // Show notification prompt for logged-in users
+        setTimeout(() => {
+          setShowNotificationPrompt(true);
+        }, 2000); // Show after 2 seconds to not interrupt initial loading
+      } else if (permission === 'granted') {
+        // Initialize notifications if already granted
+        await notificationService.initialize();
+        const token = await notificationService.requestPermissionAndGetToken();
+        if (token) {
+          console.log('FCM token obtained:', token);
+          // Here you would typically save the token to the backend
+        }
+      }
+    } catch (error) {
+      console.error('Failed to initialize notifications:', error);
+    }
+  }, [user]);
+
+  // 通知許可の結果ハンドラー
+  const handleNotificationPermission = useCallback(async (granted: boolean) => {
+    if (granted) {
+      try {
+        await notificationService.initialize();
+        const token = await notificationService.requestPermissionAndGetToken();
+        if (token) {
+          console.log('FCM token obtained:', token);
+          // Here you would save the token to the backend for sending notifications
+          
+          // Send a test notification to confirm it's working
+          notificationService.sendLocalNotification('通知設定完了', {
+            body: '学習リマインドの通知が有効になりました',
+            tag: 'setup-complete'
+          });
+        }
+      } catch (error) {
+        console.error('Failed to setup notifications:', error);
+      }
+    }
+    setShowNotificationPrompt(false);
+  }, []);
 
   // セッション作成
   const createNewSession = useCallback(async () => {
@@ -232,6 +286,13 @@ export default function ChatPage() {
     createNewSession()
   }, [])
 
+  // 通知の初期化（ユーザーログイン後）
+  useEffect(() => {
+    if (user && !authLoading) {
+      initializeNotifications();
+    }
+  }, [user, authLoading, initializeNotifications]);
+
   // デバッグ用：状態確認
   useEffect(() => {
     console.log('Current state:', {
@@ -298,6 +359,14 @@ export default function ChatPage() {
             </div>
         </div>
       </div>
+      
+      {/* Notification Permission Prompt */}
+      {showNotificationPrompt && (
+        <NotificationPrompt
+          onPermissionResult={handleNotificationPermission}
+          autoShow={false}
+        />
+      )}
     </div>
   )
 }

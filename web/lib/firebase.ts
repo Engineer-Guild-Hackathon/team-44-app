@@ -49,5 +49,14 @@ export async function getFirestoreClient() {
   return mod.getFirestore(a);
 }
 
+export async function getMessagingClient() {
+  if (typeof window === 'undefined') {
+    throw new Error('getMessagingClient must be called in a browser environment');
+  }
+  const a = ensureApp();
+  const mod = await import('firebase/messaging');
+  return mod.getMessaging(a);
+}
+
 // 互換性のために同期的に app をエクスポート（初期化は行わない）
 export { app as default };
