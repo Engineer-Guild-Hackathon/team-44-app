@@ -225,12 +225,65 @@ export default function ChatPage() {
     }
   }
 
-  // 初期化
+  // セッション完了処理
+  const completeCurrentSession = useCallback(async () => {
+    if (!currentSessionId || currentSessionId.startsWith('demo-')) return
+
+    try {
+      const token = await getAuthToken()
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/chatSessions/${currentSessionId}/complete`, {
+        method: 'POST',
+        headers,
+      })
+
+      if (response.ok) {
+        console.log('Session completed successfully')
+      } else {
+        console.error('Failed to complete session:', response.status)
+      }
+    } catch (error) {
+      console.error('Error completing session:', error)
+    }
+  }, [currentSessionId, getAuthToken])
+
+  // ページ離脱時にセッションを完了
   useEffect(() => {
-    console.log('Initializing chat page...')
-    checkBackendHealth()
-    createNewSession()
-  }, [])
+    const handleBeforeUnload = async (e: BeforeUnloadEvent) => {
+      if (currentSessionId && !currentSessionId.startsWith('demo-')) {
+        // 同期的に完了処理を実行
+        try {
+          const token = await getAuthToken()
+          if (token) {
+            fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/chatSessions/${currentSessionId}/complete`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              },
+              keepalive: true // ページ離脱後もリクエストを完了させる
+            })
+          }
+        } catch (error) {
+          console.error('Error completing session on unload:', error)
+        }
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      // コンポーネントアンマウント時にも完了処理
+      completeCurrentSession()
+    }
+  }, [completeCurrentSession, currentSessionId, getAuthToken])
 
   // デバッグ用：状態確認
   useEffect(() => {
@@ -245,8 +298,8 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-light)] flex">
-  <Header user={user} onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
-  {user && <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />}
+      <Header user={user} onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
+      {user && <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />}
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
@@ -283,19 +336,19 @@ export default function ChatPage() {
           </div>
 
           {/* Fixed Message Input at Bottom */}
-            <div className="fixed left-0 right-0 bottom-0 z-40 border-t border-[var(--color-border)] bg-[var(--color-bg-light)]">
-              <div className={`max-w-4xl mx-auto px-4 py-4`}>
-                <MessageInput
-                  onSendMessage={handleSendMessage}
-                  disabled={isLoading || authLoading || !user}
-                  placeholder={
-                    !user
-                      ? "ログインしてチャットを開始してください"
-                      : "質問や問題を入力してください..."
-                  }
-                />
-              </div>
+          <div className="fixed left-0 right-0 bottom-0 z-40 border-t border-[var(--color-border)] bg-[var(--color-bg-light)]">
+            <div className={`max-w-4xl mx-auto px-4 py-4`}>
+              <MessageInput
+                onSendMessage={handleSendMessage}
+                disabled={isLoading || authLoading || !user}
+                placeholder={
+                  !user
+                    ? "ログインしてチャットを開始してください"
+                    : "質問や問題を入力してください..."
+                }
+              />
             </div>
+          </div>
         </div>
       </div>
     </div>

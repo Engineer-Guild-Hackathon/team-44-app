@@ -49,6 +49,40 @@ export class ChatService {
   }
 
   /**
+   * セッションにlearningRecordIdが存在することを保証し、存在しない場合は作成する
+   */
+  private async ensureLearningRecordExists(sessionId: string, userId: string): Promise<string> {
+    const sessionRef = this.db.collection("chatSessions").doc(sessionId);
+    const sessionDoc = await sessionRef.get();
+
+    if (!sessionDoc.exists) {
+      throw new Error("Session not found");
+    }
+
+    const session = sessionDoc.data();
+    let learningRecordId = session?.learningRecordId;
+    console.log("Current learningRecordId:", learningRecordId);
+
+    if (!learningRecordId) {
+      console.log("No learningRecordId found, creating a new LearningRecord");
+      // 学習記録を作成
+      learningRecordId = await this.getLearningRecordService().createNewLearningRecord(
+        userId,
+        "一般学習",
+        "AI対話"
+      );
+
+      // セッションにlearningRecordIdを設定
+      await sessionRef.update({
+        learningRecordId,
+        updatedAt: new Date()
+      });
+    }
+
+    return learningRecordId;
+  }
+
+  /**
    * スマートセッション作成（既存学習記録への追加 or 新規作成）
    */
   async createSmartSession(
@@ -133,6 +167,7 @@ export class ChatService {
 
     let learningRecordUpdated = false;
     if (session.status === "draft") {
+      console.log("Session is in draft state, checking for promotion criteria");
       const shouldPromote = await this.shouldPromoteSession(session);
       if (shouldPromote) {
         await this.promoteToActiveSession(sessionId);
@@ -181,19 +216,44 @@ export class ChatService {
   private async shouldPromoteSession(session: ChatSession): Promise<boolean> {
     const now = new Date();
     const sessionDuration = (now.getTime() - session.startedAt.getTime()) / (1000 * 60); // 分
-
+    console.log(`Session duration: ${sessionDuration} minutes, message count: ${session.messageCount}`);
     // 条件: メッセージ数 >= 4回 かつ 継続時間 >= 3分
-    return session.messageCount >= 4 && sessionDuration >= 3;
+    return session.messageCount >= 4 && sessionDuration >= 1;
   }
 
   /**
    * セッションをアクティブ状態に昇格
    */
   private async promoteToActiveSession(sessionId: string): Promise<void> {
-    await this.db.collection("chatSessions").doc(sessionId).update({
+    const sessionRef = this.db.collection("chatSessions").doc(sessionId);
+    const sessionDoc = await sessionRef.get();
+
+    if (!sessionDoc.exists) {
+      throw new Error("Session not found");
+    }
+
+    const session = sessionDoc.data();
+    const now = new Date();
+    const durationMinutes = (now.getTime() - session?.startedAt?.toDate()?.getTime()) / (1000 * 60);
+
+    // learningRecordIdが存在することを保証
+    const learningRecordId = await this.ensureLearningRecordExists(sessionId, session!.userId);
+
+    // セッションをアクティブ状態に昇格し、現在の継続時間を更新
+    await sessionRef.update({
       status: "active",
+      duration: Math.round(durationMinutes || 0),
       updatedAt: new Date()
     });
+
+    // 学習記録を更新（条件を満たした時点で保存）
+    if (learningRecordId) {
+      await this.getLearningRecordService().updateLearningRecordOnSessionComplete(
+        learningRecordId,
+        Math.round(durationMinutes || 0),
+        session?.sessionSummary
+      );
+    }
   }
 
   /**
@@ -236,6 +296,36 @@ export class ChatService {
   }
 
   /**
+   * アクティブセッションの完了処理
+   */
+  private async handleActiveSessionCompletion(session: ChatSession): Promise<void> {
+    if (session.messageCount >= 2) {
+      // learningRecordIdが存在することを保証
+      const learningRecordId = await this.ensureLearningRecordExists(session.id, session.userId);
+
+      // 意味のあるセッションとして完了処理
+      await this.completeSession(session.id);
+
+      // 学習記録を更新（既にactive状態で保存されている場合は追加の更新）
+      if (learningRecordId) {
+        await this.getLearningRecordService().updateLearningRecordOnSessionComplete(
+          learningRecordId,
+          session.duration,
+          session.sessionSummary
+        );
+      }
+    }
+  }
+
+  /**
+   * ドラフトセッションの処理
+   */
+  private async handleDraftSessionCompletion(session: ChatSession): Promise<void> {
+    // ドラフト状態のセッションは削除
+    await this.deleteSession(session.id);
+  }
+
+  /**
    * 優雅なセッション完了（ブラウザクローズ対応）
    */
   async gracefulSessionCompletion(sessionId: string, userId: string): Promise<void> {
@@ -245,22 +335,14 @@ export class ChatService {
       throw new Error("Session not found or access denied");
     }
 
-    // セッションの状態に応じて処理
-    if (session.status === "active" && session.messageCount >= 2) {
-      // 意味のあるセッションとして完了処理
-      await this.completeSession(sessionId);
+    // learningRecordIdが存在することを保証
+    await this.ensureLearningRecordExists(sessionId, userId);
 
-      // 学習記録を更新
-      if (session.learningRecordId) {
-        await this.getLearningRecordService().updateLearningRecordOnSessionComplete(
-          session.learningRecordId,
-          session.duration,
-          session.sessionSummary
-        );
-      }
+    // セッションの状態に応じて処理
+    if (session.status === "active") {
+      await this.handleActiveSessionCompletion(session);
     } else if (session.status === "draft") {
-      // ドラフト状態のセッションは削除
-      await this.deleteSession(sessionId);
+      await this.handleDraftSessionCompletion(session);
     }
   }
 
@@ -286,6 +368,9 @@ export class ChatService {
     const now = new Date();
     const durationMinutes = (now.getTime() - session?.startedAt?.toDate()?.getTime()) / (1000 * 60);
 
+    // learningRecordIdが存在することを保証
+    await this.ensureLearningRecordExists(sessionId, session!.userId);
+
     await sessionRef.update({
       status: "completed",
       completedAt: now,
@@ -303,10 +388,22 @@ export class ChatService {
   }
 
   // Legacy methods for backward compatibility
-  async createSession(userId: string, title?: string): Promise<string> {
+  async createSession(userId: string, title?: string, learningRecordId?: string): Promise<string> {
     try {
+      // learningRecordIdが指定されていない場合は、一般的な学習記録を作成
+      let finalLearningRecordId = learningRecordId;
+      if (!finalLearningRecordId) {
+        // 一般的な学習記録を作成
+        finalLearningRecordId = await this.getLearningRecordService().createNewLearningRecord(
+          userId,
+          "一般学習",
+          "AI対話"
+        );
+      }
+
       const sessionData: Omit<ChatSession, "id"> = {
         userId,
+        learningRecordId: finalLearningRecordId,
         title: title || "New Chat",
         status: "draft",
         startedAt: new Date(),

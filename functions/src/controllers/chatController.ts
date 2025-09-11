@@ -44,9 +44,9 @@ async function validateAuth(req: Request): Promise<string> {
 export async function createSession(req: Request, res: Response): Promise<void> {
   try {
     const userId = await validateAuth(req);
-    const { title }: CreateSessionRequest = req.body;
+    const { title, learningRecordId }: CreateSessionRequest = req.body;
 
-    const sessionId = await chatServiceInstance.createSession(userId, title);
+    const sessionId = await chatServiceInstance.createSession(userId, title, learningRecordId);
 
     res.status(201).json({
       sessionId,
