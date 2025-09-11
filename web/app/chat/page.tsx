@@ -88,7 +88,7 @@ export default function ChatPage() {
   }, [isCreatingSession])
 
     // メッセージ送信
-  const handleSendMessage = async () => {
+  const handleSendMessage = async (message: string) => {
     if (!message.trim()) return
 
     // セッションが存在しない場合は作成
