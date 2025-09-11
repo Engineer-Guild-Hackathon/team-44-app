@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { ChatMessage } from '../../types/api'
 
 interface ChatViewProps {
@@ -47,7 +48,25 @@ export default function ChatView({ messages, isLoading = false }: ChatViewProps)
           >
             <div className="whitespace-pre-wrap text-sm leading-relaxed">
               {message.parts.map((part, partIndex) => (
-                <span key={partIndex}>{part.text}</span>
+                <span key={partIndex}>
+                  <ReactMarkdown
+                    components={{
+                      p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                      ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                      ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                      li: ({ children }) => <li className="ml-4">{children}</li>,
+                      code: ({ children }) => <code className="bg-[var(--color-accent)] bg-opacity-10 px-1 py-0.5 rounded text-xs font-mono">{children}</code>,
+                      pre: ({ children }) => <pre className="bg-[var(--color-accent)] bg-opacity-10 p-3 rounded-md overflow-x-auto text-xs font-mono mb-2">{children}</pre>,
+                      strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                      em: ({ children }) => <em className="italic">{children}</em>,
+                      h1: ({ children }) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
+                      h2: ({ children }) => <h2 className="text-base font-bold mb-2">{children}</h2>,
+                      h3: ({ children }) => <h3 className="text-sm font-bold mb-1">{children}</h3>,
+                    }}
+                  >
+                    {part.text}
+                  </ReactMarkdown>
+                </span>
               ))}
             </div>
             {message.timestamp && (

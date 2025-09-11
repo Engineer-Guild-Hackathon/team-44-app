@@ -23,6 +23,10 @@ const customJestConfig = {
     '<rootDir>/node_modules/',
     '<rootDir>/.next/'
   ],
+  transformIgnorePatterns: ['/node_modules/(?!react-markdown)/'],
+  moduleNameMapper: {
+    '^react-markdown$': '<rootDir>/tests/mocks/react-markdown.js',
+  },
   clearMocks: true,
   resetMocks: true,
   restoreMocks: true

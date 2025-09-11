@@ -82,25 +82,25 @@ export default function DayRecordsModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div 
-        className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden animate-in fade-in-0 zoom-in-95 duration-300"
+      <div
+        className="bg-[var(--color-bg-light)] rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden animate-in fade-in-0 zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ヘッダー */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-[var(--color-border)]">
           <div>
-            <h3 className="text-xl font-semibold text-gray-900">
+            <h3 className="text-xl font-semibold text-[var(--color-text-light)]">
               {date.getFullYear()}年{date.getMonth() + 1}月{date.getDate()}日の学習記録
             </h3>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-[var(--color-text-secondary)] mt-1">
               {records.length}件の学習記録
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-[var(--color-accent)] hover:bg-opacity-10 rounded-lg transition-colors"
           >
-            <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-[var(--color-text-light)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -110,15 +110,15 @@ export default function DayRecordsModal({
         <div className="p-6 overflow-y-auto max-h-[60vh]">
           {records.length === 0 ? (
             <div className="text-center py-8">
-              <div className="text-gray-400 text-4xl mb-4">📚</div>
-              <p className="text-gray-500">この日の学習記録はありません</p>
+              <div className="text-[var(--color-text-secondary)] text-4xl mb-4">📚</div>
+              <p className="text-[var(--color-text-secondary)]">この日の学習記録はありません</p>
             </div>
           ) : (
             <div className="space-y-4">
               {records.map((record) => (
                 <div
                   key={record.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                  className="border border-[var(--color-border)] rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer bg-[var(--color-bg-light)]"
                   onClick={() => onRecordSelect(record.id)}
                 >
                   {/* ヘッダー */}
@@ -126,7 +126,7 @@ export default function DayRecordsModal({
                     <div className="flex items-center space-x-3">
                       <span className="text-2xl">{getSubjectIcon(record.subject)}</span>
                       <div>
-                        <h4 className="font-medium text-gray-900">
+                        <h4 className="font-medium text-[var(--color-text-light)]">
                           {record.topic}
                         </h4>
                         <div className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getSubjectColor(record.subject)}`}>
@@ -134,7 +134,7 @@ export default function DayRecordsModal({
                         </div>
                       </div>
                     </div>
-                    <div className="text-right text-sm text-gray-500">
+                    <div className="text-right text-sm text-[var(--color-text-secondary)]">
                       <div>レベル{record.difficulty}</div>
                       <div>{new Date(record.lastStudiedAt).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })}</div>
                     </div>
@@ -142,7 +142,7 @@ export default function DayRecordsModal({
 
                   {/* サマリー */}
                   {record.summary && (
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                    <p className="text-sm text-[var(--color-text-secondary)] mb-3 line-clamp-2">
                       {record.summary}
                     </p>
                   )}
@@ -150,18 +150,18 @@ export default function DayRecordsModal({
                   {/* キーポイント */}
                   {record.keyPoints && record.keyPoints.length > 0 && (
                     <div className="mb-3">
-                      <div className="text-xs text-gray-500 mb-1">学習ポイント:</div>
+                      <div className="text-xs text-[var(--color-text-secondary)] mb-1">学習ポイント:</div>
                       <div className="flex flex-wrap gap-1">
                         {record.keyPoints.slice(0, 3).map((point, index) => (
                           <span
                             key={index}
-                            className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-gray-100 text-gray-700"
+                            className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-[var(--color-accent)] bg-opacity-10 text-[var(--color-text-light)]"
                           >
                             {point}
                           </span>
                         ))}
                         {record.keyPoints.length > 3 && (
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-[var(--color-text-secondary)]">
                             +{record.keyPoints.length - 3}個
                           </span>
                         )}
@@ -171,11 +171,11 @@ export default function DayRecordsModal({
 
                   {/* 統計 */}
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                    <div className="flex items-center space-x-4 text-sm text-[var(--color-text-secondary)]">
                       <span>⏱️ {formatDuration(record.totalDuration)}</span>
                       <span>💬 {record.sessionCount}セッション</span>
                     </div>
-                    <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                    <button className="text-[var(--color-accent)] hover:text-[var(--color-primary)] text-sm font-medium">
                       詳細を見る →
                     </button>
                   </div>
@@ -187,12 +187,12 @@ export default function DayRecordsModal({
 
         {/* フッター */}
         {records.length > 0 && (
-          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+          <div className="px-6 py-4 border-t border-[var(--color-border)] bg-[var(--color-bg-light)] bg-opacity-50">
             <div className="flex items-center justify-between text-sm">
-              <div className="text-gray-600">
+              <div className="text-[var(--color-text-secondary)]">
                 <span className="font-medium">この日の統計:</span>
               </div>
-              <div className="flex items-center space-x-4 text-gray-600">
+              <div className="flex items-center space-x-4 text-[var(--color-text-secondary)]">
                 <span>総時間: {formatDuration(dayStats.totalTime)}</span>
                 <span>記録数: {dayStats.totalRecords}件</span>
                 <span>セッション数: {dayStats.totalSessions}回</span>
