@@ -27,29 +27,55 @@ export default function MessageInput({ onSendMessage, disabled = false, placehol
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 p-4 border-t">
-      <textarea
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        onKeyPress={handleKeyPress}
-        placeholder={placeholder}
-        disabled={disabled}
-        rows={1}
-        className="flex-1 resize-none border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
-        style={{ minHeight: '40px', maxHeight: '120px' }}
-        onInput={(e) => {
-          const target = e.target as HTMLTextAreaElement
-          target.style.height = 'auto'
-          target.style.height = `${Math.min(target.scrollHeight, 120)}px`
-        }}
-      />
-      <button
-        type="submit"
-        disabled={disabled || !message.trim()}
-        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-      >
-        送信
-      </button>
-    </form>
+    <div className="border-t border-[var(--color-border)] bg-[var(--color-bg-light)] p-4">
+      <form onSubmit={handleSubmit} className="flex gap-3 items-end">
+        <div className="flex-1 relative">
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder={placeholder}
+            disabled={disabled}
+            rows={1}
+            className="input-field resize-none w-full pr-12"
+            style={{ minHeight: '48px', maxHeight: '120px' }}
+            onInput={(e) => {
+              const target = e.target as HTMLTextAreaElement
+              target.style.height = 'auto'
+              target.style.height = `${Math.min(target.scrollHeight, 120)}px`
+            }}
+          />
+          {message.length > 0 && (
+            <div className="absolute bottom-2 right-2 text-xs text-[var(--color-muted-foreground)]">
+              {message.length}
+            </div>
+          )}
+        </div>
+        <button
+          type="submit"
+          disabled={disabled || !message.trim()}
+          className={`btn-primary flex items-center justify-center ${
+            disabled || !message.trim()
+              ? 'opacity-50 cursor-not-allowed'
+              : 'hover:scale-105'
+          }`}
+          style={{ width: '48px', height: '48px' }}
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+            />
+          </svg>
+        </button>
+      </form>
+    </div>
   )
 }
