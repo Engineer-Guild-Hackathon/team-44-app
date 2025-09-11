@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../hooks/useAuth';
+import apiClient from '../../lib/apiClient';
 
 interface ReminderSettings {
   enabled: boolean;
@@ -9,7 +11,6 @@ interface ReminderSettings {
 interface ReminderSettingsProps {
   onSettingsChange?: (settings: ReminderSettings) => void;
 }
-
 export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsChange }) => {
   const [settings, setSettings] = useState<ReminderSettings>({
     enabled: true,
@@ -18,34 +19,26 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const { user, loading } = useAuth();
 
   // デフォルトの忘却曲線スケジュール
   const DEFAULT_INTERVALS = [1, 3, 7, 14, 30];
   const INTERVAL_LABELS = ['1日後', '3日後', '1週間後', '2週間後', '1ヶ月後'];
 
   useEffect(() => {
-    fetchSettings();
-  }, []);
+    if (!loading && user) {
+      fetchSettings();
+    }
+  }, [loading, user]);
 
   const fetchSettings = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/reminderSettings`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setSettings(data.data);
-        }
-      } else {
-        console.log('Using default settings');
-      }
+      const data = await apiClient.getReminderSettings();
+      setSettings(data);
     } catch (error) {
       console.error('Failed to fetch settings:', error);
+      console.log('Using default settings');
     } finally {
       setIsLoading(false);
     }
@@ -54,20 +47,9 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
   const saveSettings = async () => {
     setIsSaving(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/reminderSettings`, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(settings)
-      });
-
-      if (response.ok) {
-        onSettingsChange?.(settings);
-        alert('設定が保存されました');
-      } else {
-        throw new Error('Failed to save settings');
-      }
+      await apiClient.updateReminderSettings(settings);
+      if (onSettingsChange) onSettingsChange(settings);
+      alert('設定が保存されました');
     } catch (error) {
       console.error('Failed to save settings:', error);
       alert('設定の保存に失敗しました');
@@ -207,4 +189,4 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
       )}
     </div>
   );
-};
+}

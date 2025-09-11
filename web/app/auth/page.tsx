@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import Header from '../../components/common/Header'
-import Navigation from '../../components/common/Navigation'
+
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -11,7 +10,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState('')
   const { user, loading, error, signIn, signUp, logout, clearError } = useAuth()
   const [localError, setLocalError] = useState('')
-  const [isNavOpen, setIsNavOpen] = useState(false)
+
 
   useEffect(() => {
     if (!loading && user) {
@@ -40,8 +39,7 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-light)]">
-      <Header onMenuClick={() => setIsNavOpen(true)} />
-      <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
+
 
       <div className="pt-16 pb-20 md:pb-6 px-4 py-8 flex items-center justify-center min-h-screen">
         <div className="w-full max-w-md">

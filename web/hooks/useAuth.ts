@@ -92,9 +92,11 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
-  const auth = await getAuthClient();
-  const { signOut } = await import('firebase/auth');
-  await signOut(auth);
+      const auth = await getAuthClient();
+      const { signOut } = await import('firebase/auth');
+      await signOut(auth);
+      // 明示的に状態リセット
+      setAuthState({ user: null, loading: false, error: null });
     } catch (error) {
       setAuthState(prev => ({
         ...prev,

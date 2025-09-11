@@ -163,6 +163,7 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
                 onClick={() => {
                   logout()
                   onClose()
+                  window.location.href = '/auth'
                 }}
                 className="flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 min-w-0 flex-1 text-[var(--color-muted-foreground)] hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)]"
               >
@@ -183,6 +184,7 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
               onClick={() => {
                 logout()
                 onClose()
+                window.location.href = '/auth'
               }}
               className="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-[var(--color-text-light)] hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)] w-full text-left"
             >

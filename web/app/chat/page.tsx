@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { getAuthClient } from '../../lib/firebase'
 import { ChatMessage } from '../../types/api'
 import ChatView from '../../components/common/ChatView'
 import MessageInput from '../../components/common/MessageInput'
 import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
+import { useAuth } from '../../hooks/useAuth'
 
 export default function ChatPage() {
   const [message, setMessage] = useState('')
@@ -14,6 +16,7 @@ export default function ChatPage() {
   const [isNavOpen, setIsNavOpen] = useState(false)
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [isCreatingSession, setIsCreatingSession] = useState(false)
+  const { user, loading } = useAuth();
 
   // モック応答を生成する関数
   const getMockResponse = (userMessage: string): string => {
@@ -48,19 +51,22 @@ export default function ChatPage() {
   // セッション作成
   const createNewSession = useCallback(async () => {
     if (isCreatingSession) return // 既に作成中ならスキップ
+    if (loading) return // ローディング中は何もしない
+    if (!user) {
+      alert('ログインしてください');
+      return;
+    }
 
     setIsCreatingSession(true)
     try {
-      console.log('Creating new session...')
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/health`)
-      if (!response.ok) {
-        throw new Error('Backend not available')
-      }
+      // Firebase IDトークン取得
+      const token = await user.getIdToken()
 
       const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/chatSessions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ title: 'AI学習サポート' }),
       })
@@ -85,7 +91,7 @@ export default function ChatPage() {
     } finally {
       setIsCreatingSession(false)
     }
-  }, [isCreatingSession])
+  }, [isCreatingSession, user, loading])
 
     // メッセージ送信
   const handleSendMessage = async (message: string) => {
