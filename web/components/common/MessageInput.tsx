@@ -27,7 +27,7 @@ export default function MessageInput({ onSendMessage, disabled = false, placehol
   }
 
   return (
-    <div className="border-t border-[var(--color-border)] bg-[var(--color-bg-light)] p-4">
+    <div className="bg-[var(--color-bg-light)] p-4">
       <form onSubmit={handleSubmit} className="flex gap-3 items-end">
         <div className="flex-1 relative">
           <textarea
