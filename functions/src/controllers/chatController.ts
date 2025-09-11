@@ -73,7 +73,7 @@ export async function createSmartSession(req: Request, res: Response): Promise<v
       return;
     }
 
-    // 初期メッセージからAI分析で学習分野を推定（昇格時に使用）
+    // 初期メッセージからAI分析で学習分野を推定
     const learningRecordService = new LearningRecordService();
     const estimation = await learningRecordService.estimateSubjectAndTopic(initialMessage);
 
@@ -83,7 +83,8 @@ export async function createSmartSession(req: Request, res: Response): Promise<v
     res.json({
       success: true,
       sessionId,
-      estimation
+      subject: estimation.subject,
+      topic: estimation.topic
     });
   } catch (error) {
     console.error("Error creating smart session:", error);

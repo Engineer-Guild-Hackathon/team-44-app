@@ -181,10 +181,6 @@ ${recordsText}
           sessionCount: 1,
           difficulty: 3,
           lastStudiedAt: new Date(),
-          estimatedSubject: estimation.subject,
-          estimatedTopic: estimation.topic,
-          estimationConfidence: estimation.confidence,
-          estimationMethod: "llm_session_metadata",
           createdAt: new Date(),
           updatedAt: new Date()
         };

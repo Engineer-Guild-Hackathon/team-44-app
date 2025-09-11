@@ -87,8 +87,8 @@ export class ChatService {
    */
   async createSmartSession(
     userId: string,
-    estimatedSubject: string,
-    estimatedTopic: string,
+    subject: string,
+    topic: string,
     // initialMessage is currently unused here but kept in signature for future use
     _initialMessage: string
   ): Promise<SmartSessionResult> {
@@ -98,8 +98,8 @@ export class ChatService {
       // 既存のアクティブな学習記録を検索
       const existingRecord = await this.getLearningRecordService().findActiveLearningRecord(
         userId,
-        estimatedSubject,
-        estimatedTopic
+        subject,
+        topic
       );
 
       let learningRecordId: string;
@@ -113,8 +113,8 @@ export class ChatService {
         // 新しい学習記録を作成
         learningRecordId = await this.getLearningRecordService().createNewLearningRecord(
           userId,
-          estimatedSubject,
-          estimatedTopic
+          subject,
+          topic
         );
         isNewLearningRecord = true;
       }
@@ -124,7 +124,7 @@ export class ChatService {
       const sessionData: Omit<ChatSession, "id"> = {
         userId,
         learningRecordId,
-        title: `${estimatedTopic}に関する対話`,
+        title: `${topic}に関する対話`,
         status: "draft",
         startedAt: new Date(),
         messageCount: 0,
