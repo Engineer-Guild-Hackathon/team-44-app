@@ -7,23 +7,26 @@ interface HeaderProps {
   onMenuClick: () => void
   isNavOpen?: boolean
   onToggleNav?: () => void
+  user?: any
 }
 
-export default function Header({ onMenuClick, isNavOpen, onToggleNav }: HeaderProps) {
+export default function Header({ onMenuClick, isNavOpen, onToggleNav, user }: HeaderProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[var(--color-bg-light)] border-b border-[var(--color-border)] shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Title */}
           <div className="flex items-center space-x-4">
-            <button
-              onClick={onMenuClick}
-              className="p-2 hover:bg-[var(--color-accent)] hover:bg-opacity-10 rounded-lg transition-colors md:hidden"
-            >
-              <svg className="w-6 h-6 text-[var(--color-text-light)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
+            {user && (
+              <button
+                onClick={onMenuClick}
+                className="p-2 hover:bg-[var(--color-accent)] hover:bg-opacity-10 rounded-lg transition-colors md:hidden"
+              >
+                <svg className="w-6 h-6 text-[var(--color-text-light)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+            )}
 
             {/* Desktop Menu Toggle */}
             {onToggleNav && (

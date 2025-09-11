@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useAuth } from '../../hooks/useAuth'
 import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
 import { ReminderSettings } from '../../components/common/ReminderSettings'
@@ -11,6 +12,7 @@ interface ReminderPageProps {
 }
 
 export default function RemindersComponent() {
+  const { user } = useAuth();
   const [showNotificationPrompt, setShowNotificationPrompt] = useState(false)
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default')
   const [isNavOpen, setIsNavOpen] = useState(true)
@@ -39,8 +41,8 @@ export default function RemindersComponent() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-light)] flex">
-      <Header onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
-      <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
+  <Header user={user} onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
+  {user && <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />}
 
       {/* Main Content */}
       <div className="flex-1">
@@ -73,9 +75,11 @@ export default function RemindersComponent() {
               </div>
 
               {/* リマインド設定コンポーネント */}
-              <div className="bg-[var(--color-bg-light)] border border-[var(--color-border)] rounded-xl shadow-lg p-6">
-                <ReminderSettings />
-              </div>
+              {user && (
+                <div className="bg-[var(--color-bg-light)] border border-[var(--color-border)] rounded-xl shadow-lg p-6">
+                  <ReminderSettings />
+                </div>
+              )}
 
               {/* 通知許可プロンプト */}
               {showNotificationPrompt && (

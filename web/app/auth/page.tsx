@@ -41,8 +41,12 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-light)] flex">
-      <Header onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
+  {user && (
+    <>
+      <Header user={user} onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
       <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
+    </>
+  )}
 
       <div className="flex-1 flex flex-col">
         <div className={`pt-16 pb-20 md:pb-6 px-4 py-8 flex items-center justify-center min-h-screen ${isNavOpen ? '' : 'md:max-w-md md:mx-auto'}`}>
