@@ -136,65 +136,22 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
                 </li>
               )
             })}
-          </ul>
-
-          {/* Mobile Bottom Navigation */}
-          <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--color-bg-light)] border-t border-[var(--color-border)] px-2 py-2 z-50">
-            <div className="flex justify-around items-center">
-              {menuItems.map((item) => {
-                const isActive = pathname === item.href
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => onClose()}
-                    className={`flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 min-w-0 flex-1 ${isActive
-                        ? 'bg-[var(--color-primary)] text-[var(--color-text-dark)]'
-                        : 'text-[var(--color-muted-foreground)] hover:bg-[var(--color-accent)] hover:bg-opacity-10 hover:text-[var(--color-accent)]'
-                      }`}
-                  >
-                    <span className="flex-shrink-0 mb-1">{item.icon}</span>
-                    <span className="text-xs font-medium truncate">{item.label}</span>
-                  </Link>
-                )
-              })}
-              {/* Logout Button for Mobile */}
+            <li>
               <button
                 onClick={() => {
                   logout()
                   onClose()
                 }}
-                className="flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 min-w-0 flex-1 text-[var(--color-muted-foreground)] hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)]"
+                className="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-[var(--color-text-light)] hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)] w-full text-left"
               >
-                <LogoutIcon className="w-5 h-5 flex-shrink-0 mb-1 text-[var(--color-error)]" />
-                <span className="text-xs font-medium truncate">ログアウト</span>
+                <LogoutIcon className="w-5 h-5 flex-shrink-0 text-[var(--color-error)]" />
+                <span className="font-medium">ログアウト</span>
               </button>
-            </div>
-          </div>
-
+            </li>
+          </ul>
           {/* Divider */}
-          <div className="my-6 border-t border-[var(--color-border)] md:block hidden"></div>
-
-          {/* Logout Button */}
-          <div className={`md:block hidden ${!isOpen ? 'md:hidden' : ''}`}>
-            <button
-              onClick={() => {
-                logout()
-                onClose()
-              }}
-              className="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-[var(--color-text-light)] hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)] w-full text-left"
-            >
-              <LogoutIcon className="w-5 h-5 flex-shrink-0 text-[var(--color-error)]" />
-              <span className="font-medium">ログアウト</span>
-            </button>
-          </div>
-
-          {/* Additional Info */}
-          <div className={`text-center md:block hidden ${!isOpen ? 'md:hidden' : ''}`}>
-            <p className="text-sm text-[var(--color-muted-foreground)]">
-              あなたの知識の図書館
-            </p>
-          </div>
+          <div className="my-6 border-t border-[var(--color-border)]"></div>
+          {/* Additional Info 削除 */}
         </div>
       </nav>
     </>
