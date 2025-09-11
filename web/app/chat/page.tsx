@@ -22,7 +22,18 @@ export default function ChatPage() {
   }, [pathname]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [isCreatingSession, setIsCreatingSession] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<ChatMessage | null>(null)
+
+  // エラーメッセージをチャット形式で追加
+  const addErrorMessage = (errorText: string) => {
+    const errorMsg: ChatMessage = {
+      role: 'model',
+      parts: [{ text: `⚠️ ${errorText}` }],
+      timestamp: new Date()
+    }
+    setMessages(prev => [...prev, errorMsg])
+    setErrorMessage(errorMsg)
+  }
   const { user, loading: authLoading } = useAuth()
 
   // 認証トークンを取得する関数
@@ -200,12 +211,12 @@ export default function ChatPage() {
         console.log('AI response received:', data.response)
       } else {
         console.error('API error:', response.status, response.statusText)
-        setError('AI応答の取得に失敗しました。しばらく経ってから再度お試しください。')
+        addErrorMessage('AI応答の取得に失敗しました。しばらく経ってから再度お試しください。')
         return
       }
     } catch (error) {
       console.error('Error sending message:', error)
-      setError('メッセージの送信に失敗しました。ネットワーク接続を確認してください。')
+      addErrorMessage('メッセージの送信に失敗しました。ネットワーク接続を確認してください。')
       return
     } finally {
       setIsLoading(false)
@@ -285,7 +296,11 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-light)] flex">
-      <Header user={user} onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
+      <Header user={user} onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} onNewChat={() => {
+        setMessages([])
+        setCurrentSessionId(null)
+        setErrorMessage(null)
+      }} showNewChatButton={messages.length > 0} />
       {user && <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />}
 
       {/* Main Content */}
@@ -319,38 +334,6 @@ export default function ChatPage() {
               </div>
             ) : (
               <div>
-                {error && (
-                  <div className="mx-4 mb-4 p-4 bg-[var(--color-error)] bg-opacity-10 border border-[var(--color-error)] rounded-lg">
-                    <div className="flex items-center">
-                      <svg className="w-5 h-5 text-[var(--color-error)] mr-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                      </svg>
-                      <p className="text-[var(--color-error)] text-sm">{error}</p>
-                      <button
-                        onClick={() => setError(null)}
-                        className="ml-auto text-[var(--color-error)] hover:text-[var(--color-error)] opacity-70"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                )}
-                {messages.length > 0 && (
-                  <div className="fixed top-20 right-4 z-50">
-                    <button
-                      onClick={() => {
-                        setMessages([])
-                        setCurrentSessionId(null)
-                        setError(null)
-                      }}
-                      className="bg-[var(--color-primary)] text-[var(--color-text-dark)] px-4 py-2 rounded-lg hover:bg-[var(--color-accent)] transition-colors text-sm font-medium shadow-lg"
-                    >
-                      新しいチャットを開始
-                    </button>
-                  </div>
-                )}
                 <div className="pb-24">
                   <ChatView messages={messages} isLoading={isLoading} />
                 </div>
