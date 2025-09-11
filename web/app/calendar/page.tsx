@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react'
 import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
+import { useAuth } from '../../hooks/useAuth'
 import apiClient from '../../lib/apiClient'
 import { LearningRecord } from '../../types/api'
 
 export default function CalendarPage() {
+  const { user } = useAuth();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [learningRecords, setLearningRecords] = useState<LearningRecord[]>([])
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null)
@@ -122,8 +124,8 @@ export default function CalendarPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-light)] flex">
-      <Header onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
-      <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
+  <Header user={user} onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
+  {user && <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />}
 
       {/* Main Content */}
       {/* Main Content */}

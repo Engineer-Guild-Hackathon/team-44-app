@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../hooks/useAuth';
 
 interface ReminderSettings {
   enabled: boolean;
@@ -11,6 +12,7 @@ interface ReminderSettingsProps {
 }
 
 export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsChange }) => {
+  const { user } = useAuth();
   const [settings, setSettings] = useState<ReminderSettings>({
     enabled: true,
     notificationMethods: ['push'],
@@ -24,18 +26,23 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
   const INTERVAL_LABELS = ['1日後', '3日後', '1週間後', '2週間後', '1ヶ月後'];
 
   useEffect(() => {
-    fetchSettings();
-  }, []);
+    if (user) {
+      fetchSettings();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const fetchSettings = async () => {
+    if (!user) return;
     setIsLoading(true);
     try {
+      const token = await user.getIdToken();
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/reminderSettings`, {
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
       });
-      
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
