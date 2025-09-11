@@ -47,7 +47,7 @@ export default function ChatPage() {
     setIsCreatingSession(true)
     try {
       console.log('Creating new session...')
-      
+
       // ヘルスチェック
       const healthResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/health`)
       if (!healthResponse.ok) {
@@ -190,7 +190,7 @@ export default function ChatPage() {
     console.log('Initializing chat page...')
     checkBackendHealth()
     createNewSession()
-  }, [checkBackendHealth, createNewSession])
+  }, [])
 
   // デバッグ用：状態確認
   useEffect(() => {
