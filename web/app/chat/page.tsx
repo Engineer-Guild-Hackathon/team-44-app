@@ -6,6 +6,8 @@ import ChatView from '../../components/common/ChatView'
 import MessageInput from '../../components/common/MessageInput'
 import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
+import { useAuth } from '../../hooks/useAuth'
+import { getAuthClient } from '../../lib/firebase'
 
 export default function ChatPage() {
   const [message, setMessage] = useState('')
@@ -14,6 +16,20 @@ export default function ChatPage() {
   const [isNavOpen, setIsNavOpen] = useState(false)
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [isCreatingSession, setIsCreatingSession] = useState(false)
+  const { user, loading: authLoading } = useAuth()
+
+  // 認証トークンを取得する関数
+  const getAuthToken = useCallback(async (): Promise<string | null> => {
+    if (!user) return null
+    try {
+      const auth = await getAuthClient()
+      const token = await user.getIdToken()
+      return token
+    } catch (error) {
+      console.error('Failed to get auth token:', error)
+      return null
+    }
+  }, [user])
 
   // モック応答を生成する関数
   const getMockResponse = (userMessage: string): string => {
@@ -57,11 +73,17 @@ export default function ChatPage() {
         throw new Error('Backend not available')
       }
 
+      const token = await getAuthToken()
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
       const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/chatSessions`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({ title: 'AI学習サポート' }),
       })
 
@@ -85,7 +107,7 @@ export default function ChatPage() {
     } finally {
       setIsCreatingSession(false)
     }
-  }, [isCreatingSession])
+  }, [isCreatingSession, getAuthToken])
 
     // メッセージ送信
   const handleSendMessage = async (message: string) => {
@@ -132,11 +154,17 @@ export default function ChatPage() {
         return
       }
 
+      const token = await getAuthToken()
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/chatSessions/${sessionId}/messages`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({ message: currentMessage }),
       })
 
