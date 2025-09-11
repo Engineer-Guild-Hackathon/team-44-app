@@ -47,11 +47,16 @@ export default function ChatPage() {
     setIsCreatingSession(true)
     try {
       console.log('Creating new session...')
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/health`)
-      if (!response.ok) {
+      
+      // ヘルスチェック
+      const healthResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/health`)
+      if (!healthResponse.ok) {
         throw new Error('Backend not available')
       }
+      const healthData = await healthResponse.json()
+      console.log('Backend health:', healthData)
 
+      // セッション作成
       const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/chatSessions`, {
         method: 'POST',
         headers: {
@@ -66,8 +71,9 @@ export default function ChatPage() {
         console.log('New session created:', data.sessionId)
         return data.sessionId
       } else {
-        console.error('Failed to create session:', sessionResponse.status, sessionResponse.statusText)
-        throw new Error(`セッション作成に失敗しました (${sessionResponse.status})`)
+        const errorText = await sessionResponse.text()
+        console.error('Failed to create session:', sessionResponse.status, sessionResponse.statusText, errorText)
+        throw new Error(`セッション作成に失敗しました (${sessionResponse.status}): ${errorText}`)
       }
     } catch (error) {
       console.error('Error creating session:', error)
@@ -145,8 +151,9 @@ export default function ChatPage() {
         setMessages(prev => [...prev, aiMessage])
         console.log('AI response received:', data.response)
       } else {
-        console.error('API error:', response.status, response.statusText)
-        console.log('Backend LLM service is not available. Switching to demo mode.')
+        const errorText = await response.text()
+        console.error('API error:', response.status, response.statusText, errorText)
+        console.log('Backend LLM service error. Switching to demo mode.')
         // APIが利用できない場合はデモモードで応答
         await new Promise(resolve => setTimeout(resolve, 1500)) // シミュレーション遅延
         const mockResponse = getMockResponse(currentMessage)
@@ -183,7 +190,7 @@ export default function ChatPage() {
     console.log('Initializing chat page...')
     checkBackendHealth()
     createNewSession()
-  }, [])
+  }, [checkBackendHealth, createNewSession])
 
   // デバッグ用：状態確認
   useEffect(() => {
