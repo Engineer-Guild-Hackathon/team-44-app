@@ -1,21 +1,15 @@
 import axios, { AxiosInstance } from "axios";
 import { getAuthClient } from "./firebase";
-import { ChatSession, CreateSessionResponse, PostMessageResponse } from "../types/api";
+import { 
+  ChatSession, 
+  CreateSessionResponse, 
+  PostMessageResponse,
+  SmartSessionResponse,
+  LearningRecord,
+  LearningRecordsResponse
+} from "../types/api";
 
-// Additional types for learning records and reminders
-interface LearningRecord {
-  id: string;
-  userId: string;
-  sessionId: string;
-  subject: string;
-  topic: string;
-  summary: string;
-  duration: number;
-  completedAt: Date;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
+// Additional types for reminders
 interface Reminder {
   id: string;
   userId: string;
@@ -83,10 +77,26 @@ class ApiClient {
   }
 
   /**
+   * スマートセッション作成（AI分析による学習記録統合）
+   */
+  async createSmartSession(initialMessage: string): Promise<SmartSessionResponse> {
+    const response = await this.client.post('/chatSessions/smart', { initialMessage });
+    return response.data;
+  }
+
+  /**
    * メッセージを送信
    */
   async sendMessage(sessionId: string, message: string): Promise<PostMessageResponse> {
     const response = await this.client.post(`/chatSessions/${sessionId}/messages`, { message });
+    return response.data;
+  }
+
+  /**
+   * セッション完了処理
+   */
+  async completeSession(sessionId: string): Promise<{ success: boolean; message: string }> {
+    const response = await this.client.post(`/chatSessions/${sessionId}/complete`);
     return response.data;
   }
 
@@ -120,6 +130,32 @@ class ApiClient {
   async getUserLearningRecords(): Promise<LearningRecord[]> {
     const response = await this.client.get('/learningRecords');
     return response.data.data;
+  }
+
+  /**
+   * 期間指定で学習記録を取得（カレンダー用）
+   */
+  async getLearningRecordsForPeriod(startDate: Date, endDate: Date): Promise<LearningRecord[]> {
+    const response = await this.client.get('/learningRecords/period', {
+      params: {
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString()
+      }
+    });
+    return response.data.records;
+  }
+
+  /**
+   * 手動学習記録作成
+   */
+  async createManualLearningRecord(data: {
+    subject: string;
+    topic: string;
+    summary?: string;
+    keyPoints?: string[];
+  }): Promise<{ success: boolean; recordId: string }> {
+    const response = await this.client.post('/learningRecords/manual', data);
+    return response.data;
   }
 
   /**
