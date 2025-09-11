@@ -118,7 +118,7 @@ export function ChatHistoryModal({ learningRecordId, onClose }: ChatHistoryModal
 
           <div className="flex-1 overflow-y-auto">
             {sessions.length === 0 ? (
-              <div className="p-4 text-center text-gray-500">
+              <div className="p-4 text-center text-[var(--color-text-secondary)]">
                 セッションがありません
               </div>
             ) : (
@@ -127,19 +127,18 @@ export function ChatHistoryModal({ learningRecordId, onClose }: ChatHistoryModal
                   <button
                     key={session.id}
                     onClick={() => setSelectedSession(session)}
-                    className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                      selectedSession?.id === session.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                    }`}
+                    className={`w-full text-left p-3 rounded-lg border transition-colors ${selectedSession?.id === session.id
+                        ? 'border-[var(--color-primary)] bg-[var(--color-primary)] bg-opacity-10'
+                        : 'border-[var(--color-border)] hover:border-[var(--color-border)] hover:bg-[var(--color-bg-light)] hover:bg-opacity-50'
+                      }`}
                   >
-                    <div className="font-medium text-sm truncate mb-1">
+                    <div className="font-medium text-sm truncate mb-1 text-[var(--color-text-light)]">
                       {session.title || '無題のセッション'}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-[var(--color-text-secondary)]">
                       {formatDate(session.startedAt)} {formatTime(session.startedAt)}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-[var(--color-text-secondary)]">
                       {session.duration}分 • {session.messageCount}メッセージ
                     </div>
                   </button>
@@ -214,19 +213,17 @@ export function ChatHistoryModal({ learningRecordId, onClose }: ChatHistoryModal
                         className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`max-w-[80%] p-3 rounded-lg ${
-                            message.role === 'user'
+                          className={`max-w-[80%] p-3 rounded-lg ${message.role === 'user'
                               ? 'bg-blue-500 text-white'
                               : 'bg-gray-100 text-gray-900'
-                          }`}
+                            }`}
                         >
                           <div className="text-sm whitespace-pre-wrap">
                             {message.parts[0]?.text || ''}
                           </div>
                           {message.timestamp && (
-                            <div className={`text-xs mt-1 ${
-                              message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
-                            }`}>
+                            <div className={`text-xs mt-1 ${message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
+                              }`}>
                               {formatTime(message.timestamp)}
                             </div>
                           )}
