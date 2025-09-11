@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import { ChatMessage } from '../../types/api'
 
 interface ChatViewProps {
@@ -8,8 +9,18 @@ interface ChatViewProps {
 }
 
 export default function ChatView({ messages, isLoading = false }: ChatViewProps) {
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // Auto-scroll to bottom when new messages are added
+  useEffect(() => {
+    if (messagesEndRef.current && typeof messagesEndRef.current.scrollIntoView === 'function') {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [messages, isLoading])
+
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-6">
+    <div ref={containerRef} className="flex-1 overflow-y-auto p-4 space-y-6">
       {messages.length === 0 && !isLoading && (
         <div className="text-center text-[var(--color-muted-foreground)] py-12">
           <div className="mb-4">
@@ -65,6 +76,9 @@ export default function ChatView({ messages, isLoading = false }: ChatViewProps)
           </div>
         </div>
       )}
+
+      {/* Invisible element to scroll to */}
+      <div ref={messagesEndRef} />
     </div>
   )
 }

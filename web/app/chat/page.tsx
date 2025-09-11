@@ -284,7 +284,7 @@ export default function ChatPage() {
 
           {/* Fixed Message Input at Bottom */}
           <div className="flex-shrink-0 border-t border-[var(--color-border)] bg-[var(--color-bg-light)]">
-            <div className={`max-w-4xl px-4 py-4 ${isNavOpen ? 'mx-auto' : 'md:mx-auto'}`}>
+            <div className={`max-w-4xl ${isNavOpen ? 'mx-auto' : 'md:mx-auto'}`}>
               <MessageInput
                 onSendMessage={handleSendMessage}
                 disabled={isLoading || authLoading || !user}
