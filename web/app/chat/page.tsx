@@ -323,7 +323,7 @@ export default function ChatPage() {
                   <div className="mx-4 mb-4 p-4 bg-[var(--color-error)] bg-opacity-10 border border-[var(--color-error)] rounded-lg">
                     <div className="flex items-center">
                       <svg className="w-5 h-5 text-[var(--color-error)] mr-2" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                       </svg>
                       <p className="text-[var(--color-error)] text-sm">{error}</p>
                       <button
@@ -338,20 +338,22 @@ export default function ChatPage() {
                   </div>
                 )}
                 {messages.length > 0 && (
-                  <div className="mx-4 mb-4 flex justify-center">
+                  <div className="fixed top-20 right-4 z-50">
                     <button
                       onClick={() => {
                         setMessages([])
                         setCurrentSessionId(null)
                         setError(null)
                       }}
-                      className="bg-[var(--color-primary)] text-[var(--color-text-dark)] px-4 py-2 rounded-lg hover:bg-[var(--color-accent)] transition-colors text-sm font-medium"
+                      className="bg-[var(--color-primary)] text-[var(--color-text-dark)] px-4 py-2 rounded-lg hover:bg-[var(--color-accent)] transition-colors text-sm font-medium shadow-lg"
                     >
                       新しいチャットを開始
                     </button>
                   </div>
                 )}
-                <ChatView messages={messages} isLoading={isLoading} />
+                <div className="pb-24">
+                  <ChatView messages={messages} isLoading={isLoading} />
+                </div>
               </div>
             )}
           </div>
