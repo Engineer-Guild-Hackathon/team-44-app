@@ -183,7 +183,7 @@ export default function ChatPage() {
     console.log('Initializing chat page...')
     checkBackendHealth()
     createNewSession()
-  }, [checkBackendHealth, createNewSession]) // 依存関係を空にして一度だけ実行
+  }, [])
 
   // デバッグ用：状態確認
   useEffect(() => {
