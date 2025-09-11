@@ -105,7 +105,7 @@ describe('ChatController', () => {
 
       await createSession(mockRequest as Request, mockResponse as Response);
 
-      expect(mockChatService.createSession).toHaveBeenCalledWith('test-user-123', 'Test Session');
+      expect(mockChatService.createSession).toHaveBeenCalledWith('test-user-123', 'Test Session', undefined);
       expect(mockResponse.status).toHaveBeenCalledWith(201);
       expect(mockResponse.json).toHaveBeenCalledWith({
         sessionId: 'session-123',
@@ -119,7 +119,7 @@ describe('ChatController', () => {
 
       await createSession(mockRequest as Request, mockResponse as Response);
 
-      expect(mockChatService.createSession).toHaveBeenCalledWith('test-user-123', undefined);
+      expect(mockChatService.createSession).toHaveBeenCalledWith('test-user-123', undefined, undefined);
       expect(mockResponse.status).toHaveBeenCalledWith(201);
     });
 
@@ -156,7 +156,7 @@ describe('ChatController', () => {
 
       await createSession(mockRequest as Request, mockResponse as Response);
 
-      expect(mockChatService.createSession).toHaveBeenCalledWith('local-user-123', 'Local Test');
+      expect(mockChatService.createSession).toHaveBeenCalledWith('local-user-123', 'Local Test', undefined);
       expect(mockResponse.status).toHaveBeenCalledWith(201);
     });
   });

@@ -55,6 +55,10 @@ describe('ChatService', () => {
   let chatService: ChatService;
 
   beforeEach(() => {
+    // Set up environment variables for tests
+    process.env.GEMINI_API_KEY = 'test-api-key';
+    process.env.LLM_PROVIDER = 'gemini';
+
     chatService = new ChatService();
     // Override the db property with our mock
     (chatService as any).db = mockFirestoreInstance;

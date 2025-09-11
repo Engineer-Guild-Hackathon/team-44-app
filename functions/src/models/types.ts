@@ -24,6 +24,7 @@ export interface ChatSession {
 export interface CreateSessionRequest {
   userId: string;
   title?: string;
+  learningRecordId?: string;
 }
 
 export interface CreateSessionResponse {
