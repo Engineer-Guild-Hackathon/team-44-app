@@ -76,9 +76,9 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
       {/* Navigation Panel */}
       <nav className={`fixed top-0 left-0 h-full w-80 bg-[var(--color-bg-light)] border-r border-[var(--color-border)] shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
-      } md:translate-x-0 md:static md:h-auto md:w-auto md:shadow-none md:border-r-0`}>
+      } md:translate-x-0 md:static md:h-screen md:w-80 md:shadow-lg`}>
 
-        {/* Header */}
+        {/* Mobile Close Button */}
         <div className="flex items-center justify-between p-6 border-b border-[var(--color-border)] md:hidden">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-[var(--color-primary)] rounded-lg flex items-center justify-center">
@@ -96,6 +96,16 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
+        </div>
+
+        {/* Desktop Header */}
+        <div className="hidden md:flex items-center space-x-3 p-6 border-b border-[var(--color-border)]">
+          <div className="w-8 h-8 bg-[var(--color-primary)] rounded-lg flex items-center justify-center">
+            <svg className="w-5 h-5 text-[var(--color-text-dark)]" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </div>
+          <span className="text-lg font-bold text-[var(--color-text-light)]">Libraria</span>
         </div>
 
         {/* Menu Items */}

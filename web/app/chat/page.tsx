@@ -37,24 +37,27 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-light)] flex flex-col">
+    <div className="min-h-screen bg-[var(--color-bg-light)] flex">
       <Header onMenuClick={() => setIsNavOpen(true)} />
       <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 
-      {/* Chat Content */}
-      <div className="flex-1 flex flex-col pt-16 min-h-0">
-        <div className="flex-1 overflow-hidden">
-          <ChatView messages={messages} isLoading={isLoading} />
-        </div>
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col md:ml-80">
+        {/* Chat Content */}
+        <div className="flex-1 flex flex-col pt-16 min-h-0">
+          <div className="flex-1 overflow-hidden">
+            <ChatView messages={messages} isLoading={isLoading} />
+          </div>
 
-        {/* Fixed Message Input at Bottom */}
-        <div className="flex-shrink-0 border-t border-[var(--color-border)] bg-[var(--color-bg-light)]">
-          <div className="max-w-4xl mx-auto px-4 py-4">
-            <MessageInput
-              onSendMessage={handleSendMessage}
-              disabled={isLoading}
-              placeholder="質問や問題を入力してください..."
-            />
+          {/* Fixed Message Input at Bottom */}
+          <div className="flex-shrink-0 border-t border-[var(--color-border)] bg-[var(--color-bg-light)]">
+            <div className="max-w-4xl mx-auto px-4 py-4">
+              <MessageInput
+                onSendMessage={handleSendMessage}
+                disabled={isLoading}
+                placeholder="質問や問題を入力してください..."
+              />
+            </div>
           </div>
         </div>
       </div>
