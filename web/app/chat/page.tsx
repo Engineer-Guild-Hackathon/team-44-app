@@ -65,6 +65,20 @@ export default function ChatPage() {
   const createNewSession = useCallback(async () => {
     if (isCreatingSession) return // 既に作成中ならスキップ
 
+    // 認証状態を確認
+    if (authLoading) {
+      console.log('Auth is still loading, skipping session creation')
+      return
+    }
+
+    if (!user) {
+      console.log('User not authenticated, using demo mode')
+      const demoSessionId = `demo-${Date.now()}`
+      setCurrentSessionId(demoSessionId)
+      console.log('Demo session created:', demoSessionId)
+      return demoSessionId
+    }
+
     setIsCreatingSession(true)
     try {
       console.log('Creating new session...')
@@ -107,7 +121,7 @@ export default function ChatPage() {
     } finally {
       setIsCreatingSession(false)
     }
-  }, [isCreatingSession, getAuthToken])
+  }, [isCreatingSession, getAuthToken, user, authLoading])
 
     // メッセージ送信
   const handleSendMessage = async (message: string) => {
@@ -239,7 +253,33 @@ export default function ChatPage() {
         {/* Chat Content */}
         <div className="flex-1 flex flex-col pt-16 min-h-0">
           <div className="flex-1 overflow-hidden">
-            <ChatView messages={messages} isLoading={isLoading} />
+            {authLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary)] mx-auto mb-4"></div>
+                  <p className="text-[var(--color-text-secondary)]">認証状態を確認中...</p>
+                </div>
+              </div>
+            ) : !user ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center max-w-md mx-auto px-4">
+                  <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-4">
+                    ログインが必要です
+                  </h2>
+                  <p className="text-[var(--color-text-secondary)] mb-6">
+                    チャット機能を利用するには、ログインしてください。
+                  </p>
+                  <a
+                    href="/auth"
+                    className="inline-block bg-[var(--color-primary)] text-white px-6 py-2 rounded-lg hover:bg-[var(--color-primary-dark)] transition-colors"
+                  >
+                    ログインする
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <ChatView messages={messages} isLoading={isLoading} />
+            )}
           </div>
 
           {/* Fixed Message Input at Bottom */}
@@ -247,8 +287,12 @@ export default function ChatPage() {
             <div className="max-w-4xl mx-auto px-4 py-4">
               <MessageInput
                 onSendMessage={handleSendMessage}
-                disabled={isLoading}
-                placeholder="質問や問題を入力してください..."
+                disabled={isLoading || authLoading || !user}
+                placeholder={
+                  !user
+                    ? "ログインしてチャットを開始してください"
+                    : "質問や問題を入力してください..."
+                }
               />
             </div>
           </div>
