@@ -1,0 +1,61 @@
+name: Deploy to Firebase
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'functions/**'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      LLM_PROVIDER: ${{ secrets.LLM_PROVIDER || 'gemini' }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install functions dependencies
+        run: npm ci
+        working-directory: functions
+
+      - name: Create .env file
+        run: |
+          echo "LLM_PROVIDER=${{ secrets.LLM_PROVIDER || 'gemini' }}" > .env
+          if [ -n "${{ secrets.OPENAI_API_KEY }}" ]; then
+            echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+          fi
+          if [ -n "${{ secrets.GEMINI_API_KEY }}" ]; then
+            echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
+          fi
+        working-directory: functions
+
+      - name: Authenticate with Google Cloud
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}'
+
+      - name: Deploy to Firebase
+        run: |
+          npx firebase-tools deploy \
+            --project ${{ secrets.FIREBASE_PROJECT_ID }} \
+            --only functions,firestore:rules \
+            --non-interactive \
+            --force
+        env:
+          LLM_PROVIDER: ${{ secrets.LLM_PROVIDER || 'gemini' }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}

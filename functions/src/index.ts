@@ -5,8 +5,8 @@ import dotenv from "dotenv";
 
 // .envファイルを読み込む
 dotenv.config();
-import { createSession, postMessage, getUserSessions, getSession } from "./controllers/chatController";
-import { generateLearningRecord, getUserLearningRecords, getLearningRecord } from "./controllers/learningRecordController";
+import { createSession, createSmartSession, postMessage, getUserSessions, getSession, completeSession } from "./controllers/chatController";
+import { generateLearningRecord, getUserLearningRecords, getLearningRecord, getLearningRecordsForPeriod, createManualLearningRecord } from "./controllers/learningRecordController";
 import { getReminders, getReminderSettings, updateReminderSettings, updateReminderStatus } from "./controllers/reminderController";
 
 const app = express();
@@ -25,14 +25,18 @@ app.use((error: Error, req: Request, res: Response, next: express.NextFunction) 
 
 // ルーティング
 app.post("/chatSessions", createSession);
+app.post("/chatSessions/smart", createSmartSession);
 app.get("/chatSessions", getUserSessions);
 app.get("/chatSessions/:sessionId", getSession);
 app.post("/chatSessions/:sessionId/messages", postMessage);
+app.post("/chatSessions/:sessionId/complete", completeSession);
 
 // Learning record routes
 app.post("/chatSessions/:sessionId/learningRecord", generateLearningRecord);
 app.get("/learningRecords", getUserLearningRecords);
+app.get("/learningRecords/period", getLearningRecordsForPeriod);
 app.get("/learningRecords/:recordId", getLearningRecord);
+app.post("/learningRecords/manual", createManualLearningRecord);
 
 // Reminder routes
 app.get("/reminders", getReminders);
