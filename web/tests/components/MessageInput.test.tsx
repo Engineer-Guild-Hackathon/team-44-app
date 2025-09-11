@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '../setup/testUtils';
 import userEvent from '@testing-library/user-event';
 import { act } from 'react';
-import MessageInput from '../../components/common/MessageInput';
+import MessageInput from '../../app/chat/components/MessageInput';
 
 // Mock Next.js router
 jest.mock('next/navigation', () => ({

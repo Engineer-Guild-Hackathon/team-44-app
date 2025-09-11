@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
-import { ReminderSettings } from '../../components/common/ReminderSettings'
-import { NotificationPrompt } from '../../components/common/NotificationPrompt'
+import { ReminderSettings } from './components/ReminderSettings'
+import { NotificationPrompt } from './components/NotificationPrompt'
 
 interface ReminderPageProps {
   // 必要に応じてpropsを追加
