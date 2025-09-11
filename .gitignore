@@ -84,3 +84,5 @@ desktop.ini
 *.war
 *.jar
 *.iml
+
+firestore-data
