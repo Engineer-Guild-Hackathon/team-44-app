@@ -158,7 +158,7 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
                 }}
                 className="flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 min-w-0 flex-1 text-[var(--color-muted-foreground)] hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)]"
               >
-                <LogoutIcon className="w-5 h-5 flex-shrink-0 mb-1" />
+                <LogoutIcon className="w-5 h-5 flex-shrink-0 mb-1 text-[var(--color-error)]" />
                 <span className="text-xs font-medium truncate">ログアウト</span>
               </button>
             </div>
@@ -176,7 +176,7 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
               }}
               className="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-[var(--color-text-light)] hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)] w-full text-left"
             >
-              <LogoutIcon className="w-5 h-5 flex-shrink-0" />
+              <LogoutIcon className="w-5 h-5 flex-shrink-0 text-[var(--color-error)]" />
               <span className="font-medium">ログアウト</span>
             </button>
           </div>
