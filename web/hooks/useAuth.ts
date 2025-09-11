@@ -92,9 +92,13 @@ export const useAuth = () => {
 
   const logout = async () => {
     try {
-  const auth = await getAuthClient();
-  const { signOut } = await import('firebase/auth');
-  await signOut(auth);
+      const auth = await getAuthClient();
+      const { signOut } = await import('firebase/auth');
+      await signOut(auth);
+      // ログアウト後に/authページにリダイレクト
+      if (typeof window !== 'undefined') {
+        window.location.href = '/auth';
+      }
     } catch (error) {
       setAuthState(prev => ({
         ...prev,
