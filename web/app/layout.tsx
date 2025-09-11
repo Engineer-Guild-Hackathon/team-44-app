@@ -1,17 +1,18 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import { Inter, Noto_Sans_JP } from 'next/font/google'
+// Temporarily disabled Google Fonts due to network access restrictions
+// import { Inter, Noto_Sans_JP } from 'next/font/google'
 
-const notoSansJP = Noto_Sans_JP({
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  variable: '--font-noto-sans-jp'
-})
+// const notoSansJP = Noto_Sans_JP({
+//   subsets: ['latin'],
+//   weight: ['400', '500', '700'],
+//   variable: '--font-noto-sans-jp'
+// })
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter'
-})
+// const inter = Inter({
+//   subsets: ['latin'],
+//   variable: '--font-inter'
+// })
 
 export const metadata: Metadata = {
   title: 'Libraria - あなたの知識の図書館',
@@ -42,7 +43,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ja" className={`${notoSansJP.variable} ${inter.variable}`}>
+    <html lang="ja">
       <head>
         <link rel="apple-touch-icon" href="/icon-192.png" />
         <link rel="icon" href="/favicon.ico" />

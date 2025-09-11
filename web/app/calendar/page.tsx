@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react'
 import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
+import { CalendarGrid } from '../../components/calendar/CalendarGrid'
+import { LearningRecordList } from '../../components/calendar/LearningRecordList'
+import { ChatHistoryModal } from '../../components/calendar/ChatHistoryModal'
 import { useAuth } from '../../hooks/useAuth'
 import apiClient from '../../lib/apiClient'
 import { LearningRecord } from '../../types/api'
@@ -15,45 +18,6 @@ export default function CalendarPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isNavOpen, setIsNavOpen] = useState(true)
-
-  // カレンダー関連の定数
-  const currentMonth = selectedDate.getMonth()
-  const currentYear = selectedDate.getFullYear()
-  const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
-  const dayNames = ['日', '月', '火', '水', '木', '金', '土']
-
-  // カレンダーの日付配列を生成
-  const generateCalendarDays = () => {
-    const firstDayOfMonth = new Date(currentYear, currentMonth, 1)
-    const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0)
-    const startDate = new Date(firstDayOfMonth)
-    startDate.setDate(startDate.getDate() - firstDayOfMonth.getDay())
-
-    const days = []
-    for (let i = 0; i < 42; i++) {
-      const date = new Date(startDate)
-      date.setDate(date.getDate() + i)
-      days.push(date)
-    }
-    return days
-  }
-
-  const days = generateCalendarDays()
-
-  // 月を変更する関数
-  const changeMonth = (direction: number) => {
-    const newDate = new Date(selectedDate)
-    newDate.setMonth(newDate.getMonth() + direction)
-    setSelectedDate(newDate)
-  }
-
-  // 日付の学習記録を取得
-  const getRecordsForDate = (date: Date) => {
-    return learningRecords.filter(record => {
-      const recordDate = new Date(record.lastStudiedAt)
-      return recordDate.toDateString() === date.toDateString()
-    })
-  }
 
   // 月の学習記録を取得
   const fetchMonthlyRecords = async (date: Date) => {
@@ -94,17 +58,8 @@ export default function CalendarPage() {
     setSelectedDate(date)
   }
 
-  // 教科別の色分け（Librariaテーマ対応）
-  const getSubjectColor = (subject: string): string => {
-    const colors: { [key: string]: string } = {
-      'math': 'bg-[var(--color-accent)] bg-opacity-20 text-[var(--color-accent)] border border-[var(--color-accent)] border-opacity-30',
-      'science': 'bg-[var(--color-primary)] bg-opacity-20 text-[var(--color-primary)] border border-[var(--color-primary)] border-opacity-30',
-      'english': 'bg-[var(--color-secondary)] bg-opacity-20 text-[var(--color-secondary)] border border-[var(--color-secondary)] border-opacity-30',
-      'history': 'bg-[var(--color-tertiary)] bg-opacity-20 text-[var(--color-tertiary)] border border-[var(--color-tertiary)] border-opacity-30',
-      'programming': 'bg-[var(--color-error)] bg-opacity-20 text-[var(--color-error)] border border-[var(--color-error)] border-opacity-30',
-      'general': 'bg-[var(--color-muted-foreground)] bg-opacity-20 text-[var(--color-muted-foreground)] border border-[var(--color-muted-foreground)] border-opacity-30'
-    }
-    return colors[subject] || colors['general']
+  const handleRecordSelect = (recordId: string) => {
+    setSelectedRecordId(recordId)
   }
 
   const handleCloseModal = () => {
@@ -124,95 +79,38 @@ export default function CalendarPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-light)] flex">
-  <Header user={user} onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
-  {user && <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />}
+      <Header user={user} onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
+      {user && <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />}
 
-      {/* Main Content */}
       {/* Main Content */}
       <div className="flex-1">
-        {/* メインコンテンツ */}
         <main className={`pt-16 pb-20 md:pb-6 px-4 sm:px-6 lg:px-8 ${isNavOpen ? 'max-w-7xl mx-auto' : 'md:max-w-7xl md:mx-auto'}`}>
           <div className="py-6">
-            {/* カレンダーヘッダー */}
-            <div className="bg-[var(--color-bg-light)] border border-[var(--color-border)] rounded-xl shadow-lg mb-6 overflow-hidden">
-              <div className="flex items-center justify-between p-6 border-b border-[var(--color-border)]">
-                <button
-                  onClick={() => changeMonth(-1)}
-                  className="p-3 hover:bg-[var(--color-accent)] hover:bg-opacity-10 rounded-lg transition-colors"
-                >
-                  <svg className="w-5 h-5 text-[var(--color-text-light)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
+            <h1 className="text-3xl font-bold text-[var(--color-text-light)] mb-8">学習カレンダー</h1>
 
-                <h2 className="text-xl font-semibold text-[var(--color-text-light)]">
-                  {currentYear}年 {monthNames[currentMonth]}
-                </h2>
-
-                <button
-                  onClick={() => changeMonth(1)}
-                  className="p-3 hover:bg-[var(--color-accent)] hover:bg-opacity-10 rounded-lg transition-colors"
-                >
-                  <svg className="w-5 h-5 text-[var(--color-text-light)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
-
-              {/* 曜日ヘッダー */}
-              <div className="grid grid-cols-7 gap-0 border-b border-[var(--color-border)]">
-                {dayNames.map((day) => (
-                  <div key={day} className="p-4 text-center text-sm font-medium text-[var(--color-text-light)] bg-[var(--color-bg-light)] border-r border-[var(--color-border)] last:border-r-0">
-                    {day}
-                  </div>
-                ))}
-              </div>
-
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* カレンダーグリッド */}
-              <div className="grid grid-cols-7 gap-0">
-                {days.map((day, index) => {
-                  const isCurrentMonth = day.getMonth() === currentMonth
-                  const isToday = day.toDateString() === new Date().toDateString()
-                  const records = getRecordsForDate(day)
+              <div className="lg:col-span-2">
+                <CalendarGrid
+                  selectedDate={selectedDate}
+                  onDateSelect={handleDateSelect}
+                  learningRecords={learningRecords}
+                  isLoading={isLoading}
+                />
+              </div>
 
-                  return (
-                    <div
-                      key={index}
-                      className={`min-h-28 p-3 border-r border-b border-[var(--color-border)] last:border-r-0 ${isCurrentMonth ? 'bg-[var(--color-bg-light)]' : 'bg-[var(--color-bg-light)] opacity-50'
-                        } ${isToday ? 'bg-[var(--color-accent)] bg-opacity-10' : ''} hover:bg-[var(--color-accent)] hover:bg-opacity-5 transition-colors`}
-                    >
-                      <div className={`text-sm font-medium mb-2 ${isCurrentMonth ? 'text-[var(--color-text-light)]' : 'text-[var(--color-muted-foreground)]'
-                        } ${isToday ? 'text-[var(--color-accent)] font-bold' : ''}`}>
-                        {day.getDate()}
-                      </div>
-
-                      {/* 学習記録表示 */}
-                      <div className="space-y-1">
-                        {records.slice(0, 3).map((record) => (
-                          <div
-                            key={record.id}
-                            className={`text-xs px-2 py-1 rounded-md ${getSubjectColor(record.subject)}`}
-                            title={`${record.topic} (${record.totalDuration}分)`}
-                          >
-                            <div className="truncate">
-                              {record.topic}
-                            </div>
-                          </div>
-                        ))}
-                        {records.length > 3 && (
-                          <div className="text-xs text-[var(--color-muted-foreground)] px-2">
-                            +{records.length - 3}件
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
+              {/* 選択日の学習記録一覧 */}
+              <div className="lg:col-span-1">
+                <LearningRecordList
+                  date={selectedDate}
+                  records={getDayRecords(selectedDate)}
+                  onRecordSelect={handleRecordSelect}
+                />
               </div>
             </div>
 
             {/* 統計情報 */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
               <div className="bg-[var(--color-bg-light)] border border-[var(--color-border)] rounded-xl shadow-lg p-6 text-center">
                 <div className="text-3xl font-bold text-[var(--color-accent)] mb-2">
                   {learningRecords.length}
@@ -236,42 +134,22 @@ export default function CalendarPage() {
 
               <div className="bg-[var(--color-bg-light)] border border-[var(--color-border)] rounded-xl shadow-lg p-6 text-center">
                 <div className="text-3xl font-bold text-[var(--color-tertiary)] mb-2">
-                  {Math.round(learningRecords.reduce((sum, record) => sum + record.totalDuration, 0) / Math.max(learningRecords.length, 1))}
+                  {learningRecords.reduce((sum, record) => sum + record.sessionCount, 0)}
                 </div>
-                <div className="text-sm text-[var(--color-muted-foreground)]">平均学習時間（分）</div>
+                <div className="text-sm text-[var(--color-muted-foreground)]">総セッション数</div>
               </div>
             </div>
-
-            {/* 教科別凡例 */}
-            <div className="bg-[var(--color-bg-light)] border border-[var(--color-border)] rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-[var(--color-text-light)] mb-4">教科別カラー</h3>
-              <div className="flex flex-wrap gap-3">
-                {[
-                  { key: 'math', label: '数学' },
-                  { key: 'science', label: '理科' },
-                  { key: 'english', label: '英語' },
-                  { key: 'history', label: '歴史' },
-                  { key: 'programming', label: 'プログラミング' },
-                  { key: 'general', label: 'その他' },
-                ].map(({ key, label }) => (
-                  <div key={key} className="flex items-center space-x-2">
-                    <div className={`w-4 h-4 rounded ${getSubjectColor(key)}`}></div>
-                    <span className="text-sm text-[var(--color-text-light)]">{label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="text-sm text-gray-600">学習分野数</div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6 text-center">
-            <div className="text-2xl font-bold text-orange-600">
-              {learningRecords.reduce((sum, record) => sum + record.sessionCount, 0)}
-            </div>
-            <div className="text-sm text-gray-600">総セッション数</div>
           </div>
         </main>
       </div>
+
+      {/* チャット履歴モーダル */}
+      {selectedRecordId && (
+        <ChatHistoryModal
+          learningRecordId={selectedRecordId}
+          onClose={handleCloseModal}
+        />
+      )}
     </div>
   )
 }
