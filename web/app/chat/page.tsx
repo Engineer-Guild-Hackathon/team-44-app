@@ -2,11 +2,16 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { ChatMessage } from '../../types/api'
+import ChatView from '../../components/common/ChatView'
+import MessageInput from '../../components/common/MessageInput'
+import Header from '../../components/common/Header'
+import Navigation from '../../components/common/Navigation'
 
 export default function ChatPage() {
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isNavOpen, setIsNavOpen] = useState(false)
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [isCreatingSession, setIsCreatingSession] = useState(false)
 
@@ -83,7 +88,7 @@ export default function ChatPage() {
   }, [isCreatingSession])
 
     // メッセージ送信
-  const handleSendMessage = async () => {
+  const handleSendMessage = async (message: string) => {
     if (!message.trim()) return
 
     // セッションが存在しない場合は作成
@@ -197,64 +202,26 @@ export default function ChatPage() {
   }, [message, currentSessionId, isLoading, isCreatingSession, messages])
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto bg-white shadow-sm">
-        {/* ヘッダー */}
-        <div className="border-b bg-white px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-semibold text-gray-800">AI学習サポート</h1>
-              <p className="text-sm text-gray-600">わからない問題を入力してください。AIがヒントを提供します。</p>
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen bg-[var(--color-bg-light)] flex">
+      <Header onMenuClick={() => setIsNavOpen(true)} />
+      <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 
-        {/* チャット表示エリア */}
-        <div className="h-[calc(100vh-200px)] flex flex-col">
-          <div className="flex-1 p-4 overflow-y-auto">
-            {messages.map((msg, index) => (
-              <div key={index} className={`mb-4 p-3 rounded-lg ${
-                msg.role === 'user'
-                  ? 'bg-blue-100 ml-12'
-                  : 'bg-gray-100 mr-12'
-              }`}>
-                <div className="text-sm text-gray-600 mb-1">
-                  {msg.role === 'user' ? 'あなた' : 'AI'}
-                </div>
-                {msg.parts[0].text}
-              </div>
-            ))}
-            {isLoading && (
-              <div className="mb-4 p-3 bg-gray-100 mr-12 rounded-lg">
-                <div className="text-sm text-gray-600 mb-1">AI</div>
-                考え中...
-              </div>
-            )}
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col md:ml-80">
+        {/* Chat Content */}
+        <div className="flex-1 flex flex-col pt-16 min-h-0">
+          <div className="flex-1 overflow-hidden">
+            <ChatView messages={messages} isLoading={isLoading} />
           </div>
 
-          {/* メッセージ入力 */}
-          <div className="border-t p-4">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' && !isLoading && message.trim()) {
-                    handleSendMessage()
-                  }
-                }}
-                placeholder="質問や問題を入力してください..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          {/* Fixed Message Input at Bottom */}
+          <div className="flex-shrink-0 border-t border-[var(--color-border)] bg-[var(--color-bg-light)]">
+            <div className="max-w-4xl mx-auto px-4 py-4">
+              <MessageInput
+                onSendMessage={handleSendMessage}
                 disabled={isLoading}
+                placeholder="質問や問題を入力してください..."
               />
-              <button
-                onClick={handleSendMessage}
-                disabled={isLoading || !message.trim()}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-              >
-                {isLoading ? '送信中...' : '送信'}
-              </button>
             </div>
           </div>
         </div>

@@ -33,7 +33,7 @@ describe('ChatView', () => {
   it('should display welcome message when no messages exist', () => {
     render(<ChatView messages={[]} />);
 
-    expect(screen.getByText('新しい学習セッションを開始しましょう！')).toBeInTheDocument();
+    expect(screen.getByText('知識の探求を始めましょう')).toBeInTheDocument();
     expect(
       screen.getByText('わからない問題や疑問を入力してください。AIがヒントを提供します。')
     ).toBeInTheDocument();
@@ -42,7 +42,7 @@ describe('ChatView', () => {
   it('should display loading indicator when isLoading is true', () => {
     render(<ChatView messages={[]} isLoading={true} />);
 
-    expect(screen.getByText('AIが考えています...')).toBeInTheDocument();
+    expect(screen.getByText('考え中...')).toBeInTheDocument();
   });
 
   it('should not display welcome message when loading', () => {
@@ -62,13 +62,9 @@ describe('ChatView', () => {
 
     render(<ChatView messages={userOnlyMessages} />);
 
-    // Find the message bubble container (the div with bg-blue-500 class)
-    const messageBubbles = screen.getAllByRole('generic', { hidden: true });
-    const userMessageBubble = messageBubbles.find(bubble =>
-      bubble.classList.contains('bg-blue-500') &&
-      bubble.textContent?.includes('ユーザーメッセージ')
-    );
-    expect(userMessageBubble).toHaveClass('bg-blue-500', 'text-white');
+    // Find the message bubble container
+    const userMessageBubble = screen.getByText('ユーザーメッセージ').parentElement?.parentElement;
+    expect(userMessageBubble).toHaveClass('message-bubble-user');
   });
 
   it('should render AI messages with correct styling', () => {
@@ -82,13 +78,9 @@ describe('ChatView', () => {
 
     render(<ChatView messages={aiOnlyMessages} />);
 
-    // Find the message bubble container (the div with bg-gray-100 class)
-    const messageBubbles = screen.getAllByRole('generic', { hidden: true });
-    const aiMessageBubble = messageBubbles.find(bubble =>
-      bubble.classList.contains('bg-gray-100') &&
-      bubble.textContent?.includes('AIメッセージ')
-    );
-    expect(aiMessageBubble).toHaveClass('bg-gray-100', 'text-gray-800', 'border');
+    // Find the message bubble container
+    const aiMessageBubble = screen.getByText('AIメッセージ').parentElement?.parentElement;
+    expect(aiMessageBubble).toHaveClass('message-bubble-ai');
   });
 
   it('should display timestamp for messages', () => {
@@ -147,7 +139,7 @@ describe('ChatView', () => {
     render(<ChatView messages={mockMessages} />);
 
     // Check that the component has proper structure for screen readers
-    const chatContainer = screen.getByText('こんにちは').closest('.space-y-4');
+    const chatContainer = screen.getByText('こんにちは').closest('.space-y-6');
     expect(chatContainer).toBeInTheDocument();
   });
 });

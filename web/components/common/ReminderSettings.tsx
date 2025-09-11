@@ -102,14 +102,14 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-32">
-        <div className="text-gray-600">設定を読み込み中...</div>
+        <div className="text-[var(--color-muted-foreground)]">設定を読み込み中...</div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">リマインド設定</h2>
+    <div className="max-w-2xl mx-auto">
+      <h2 className="text-2xl font-bold mb-6 text-[var(--color-text-light)]">リマインド設定</h2>
 
       {/* リマインド有効/無効 */}
       <div className="mb-6">
@@ -118,9 +118,9 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
             type="checkbox"
             checked={settings.enabled}
             onChange={handleEnabledToggle}
-            className="w-5 h-5 text-blue-600"
+            className="w-5 h-5 text-[var(--color-accent)] bg-[var(--color-bg-light)] border-[var(--color-border)] rounded focus:ring-[var(--color-accent)] focus:ring-opacity-20"
           />
-          <span className="text-lg font-medium text-gray-700">
+          <span className="text-lg font-medium text-[var(--color-text-light)]">
             学習リマインドを有効にする
           </span>
         </label>
@@ -130,25 +130,25 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
         <>
           {/* 通知方法選択 */}
           <div className="mb-6">
-            <h3 className="text-lg font-medium mb-3 text-gray-700">通知方法</h3>
+            <h3 className="text-lg font-medium mb-3 text-[var(--color-text-light)]">通知方法</h3>
             <div className="space-y-2">
               <label className="flex items-center space-x-3">
                 <input
                   type="checkbox"
                   checked={settings.notificationMethods.includes('push')}
                   onChange={(e) => handleNotificationMethodChange('push', e.target.checked)}
-                  className="w-4 h-4 text-blue-600"
+                  className="w-4 h-4 text-[var(--color-accent)] bg-[var(--color-bg-light)] border-[var(--color-border)] rounded focus:ring-[var(--color-accent)] focus:ring-opacity-20"
                 />
-                <span className="text-gray-600">プッシュ通知</span>
+                <span className="text-[var(--color-text-light)]">プッシュ通知</span>
               </label>
               <label className="flex items-center space-x-3">
                 <input
                   type="checkbox"
                   checked={settings.notificationMethods.includes('email')}
                   onChange={(e) => handleNotificationMethodChange('email', e.target.checked)}
-                  className="w-4 h-4 text-blue-600"
+                  className="w-4 h-4 text-[var(--color-accent)] bg-[var(--color-bg-light)] border-[var(--color-border)] rounded focus:ring-[var(--color-accent)] focus:ring-opacity-20"
                 />
-                <span className="text-gray-600">メール通知</span>
+                <span className="text-[var(--color-text-light)]">メール通知</span>
               </label>
             </div>
           </div>
@@ -156,24 +156,24 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
           {/* 忘却曲線スケジュール */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-medium text-gray-700">復習スケジュール</h3>
+              <h3 className="text-lg font-medium text-[var(--color-text-light)]">復習スケジュール</h3>
               <button
                 onClick={resetToDefault}
-                className="text-sm text-blue-600 hover:text-blue-800"
+                className="text-sm text-[var(--color-accent)] hover:text-[var(--color-primary)] transition-colors"
               >
                 デフォルトに戻す
               </button>
             </div>
 
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-sm text-gray-600 mb-4">
+            <div className="bg-[var(--color-muted)] bg-opacity-30 p-4 rounded-lg border border-[var(--color-border)]">
+              <p className="text-sm text-[var(--color-muted-foreground)] mb-4">
                 ※デフォルトの値はエビングハウスの忘却曲線に基づく復習タイミングです。
               </p>
 
               <div className="space-y-3">
                 {settings.reviewIntervals.map((interval, index) => (
                   <div key={index} className="flex items-center space-x-3">
-                    <span className="w-20 text-sm text-gray-600">
+                    <span className="w-20 text-sm text-[var(--color-text-light)]">
                       {index + 1}回目:
                     </span>
                     <input
@@ -182,9 +182,9 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
                       onChange={(e) => handleIntervalChange(index, parseInt(e.target.value) || 1)}
                       min="1"
                       max="365"
-                      className="w-20 px-2 py-1 border border-gray-300 rounded text-center"
+                      className="input-field w-20 text-center"
                     />
-                    <span className="text-sm text-gray-600">日後</span>
+                    <span className="text-sm text-[var(--color-text-light)]">日後</span>
                   </div>
                 ))}
               </div>
@@ -196,10 +196,8 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
             <button
               onClick={saveSettings}
               disabled={isSaving}
-              className={`px-6 py-2 rounded-lg font-medium ${
-                isSaving
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              className={`btn-primary disabled:opacity-50 disabled:cursor-not-allowed ${
+                isSaving ? 'bg-[var(--color-muted)] text-[var(--color-muted-foreground)]' : ''
               }`}
             >
               {isSaving ? '保存中...' : '設定を保存'}

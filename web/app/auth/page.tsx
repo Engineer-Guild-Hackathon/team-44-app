@@ -1,9 +1,9 @@
 'use client'
 
-
 import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-
+import Header from '../../components/common/Header'
+import Navigation from '../../components/common/Navigation'
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -11,6 +11,7 @@ export default function AuthPage() {
   const [password, setPassword] = useState('')
   const { user, loading, error, signIn, signUp, logout, clearError } = useAuth()
   const [localError, setLocalError] = useState('')
+  const [isNavOpen, setIsNavOpen] = useState(false)
 
   useEffect(() => {
     if (!loading && user) {
@@ -38,32 +39,51 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-      <div className="max-w-md w-full mx-4">
-        <div className="bg-white rounded-lg shadow-md p-8">
-          {/* ヘッダー */}
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+    <div className="min-h-screen bg-[var(--color-bg-light)]">
+      <Header onMenuClick={() => setIsNavOpen(true)} />
+      <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
+
+      <div className="pt-16 pb-20 md:pb-6 px-4 py-8 flex items-center justify-center min-h-screen">
+        <div className="w-full max-w-md">
+        {/* Libraria Logo */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-[var(--color-primary)] rounded-xl flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-[var(--color-text-dark)]" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-[var(--color-text-light)] mb-2">
+            Libraria
+          </h1>
+          <p className="text-[var(--color-muted-foreground)]">
+            あなたの知識の図書館
+          </p>
+        </div>
+
+        {/* Auth Form */}
+        <div className="bg-[var(--color-bg-light)] border border-[var(--color-border)] rounded-xl shadow-lg p-8">
+          <div className="text-center mb-6">
+            <h2 className="text-xl font-semibold text-[var(--color-text-light)] mb-2">
               {isLogin ? 'ログイン' : 'アカウント作成'}
-            </h1>
-            <p className={`mb-4 ${isLogin ? 'text-gray-600' : 'text-green-700 font-semibold'}`}>
+            </h2>
+            <p className="text-sm text-[var(--color-muted-foreground)]">
               {isLogin
                 ? '登録済みの方はこちらからログインしてください'
                 : 'はじめての方はアカウントを作成してください'}
             </p>
           </div>
 
-          {/* エラーメッセージ */}
+          {/* Error Message */}
           {localError && (
-            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-              {localError}
+            <div className="mb-6 p-4 bg-[var(--color-error)] bg-opacity-10 border border-[var(--color-error)] border-opacity-20 rounded-lg">
+              <p className="text-sm text-[var(--color-error)]">{localError}</p>
             </div>
           )}
 
-          {/* フォーム */}
+          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-[var(--color-text-light)] mb-2">
                 メールアドレス
               </label>
               <input
@@ -72,13 +92,13 @@ export default function AuthPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="input-field w-full"
                 placeholder="example@email.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-[var(--color-text-light)] mb-2">
                 パスワード
               </label>
               <input
@@ -87,7 +107,7 @@ export default function AuthPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="input-field w-full"
                 placeholder="パスワード"
               />
             </div>
@@ -95,22 +115,18 @@ export default function AuthPage() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors
-                ${isLogin
-                  ? 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500'
-                  : 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'}
-              `}
+              className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? '処理中...' : (isLogin ? 'ログイン' : 'アカウント作成')}
             </button>
           </form>
 
-          {/* 切り替えリンク */}
+          {/* Toggle Link */}
           <div className="mt-6 text-center">
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
-              className="text-blue-600 hover:text-blue-800 text-sm"
+              className="text-[var(--color-accent)] hover:text-[var(--color-primary)] text-sm transition-colors"
             >
               {isLogin
                 ? 'アカウントをお持ちでない方はこちら'
@@ -119,19 +135,26 @@ export default function AuthPage() {
             </button>
           </div>
 
-          {/* 既にログイン済みの場合のログアウトボタン */}
+          {/* Logout for logged-in users */}
           {!loading && user && (
             <div className="mt-4 text-center">
               <button
                 type="button"
                 onClick={logout}
-                className="text-red-600 hover:text-red-800 text-sm"
+                className="text-[var(--color-error)] hover:text-[var(--color-error)] hover:opacity-80 text-sm transition-colors"
               >
                 ログアウトして別アカウントでログイン
               </button>
             </div>
           )}
+        </div>
 
+        {/* Footer */}
+        <div className="text-center mt-8">
+          <p className="text-xs text-[var(--color-muted-foreground)]">
+            © 2025 Libraria - あなたの知識の図書館
+          </p>
+        </div>
         </div>
       </div>
     </div>

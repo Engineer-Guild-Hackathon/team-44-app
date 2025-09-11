@@ -1,8 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ReminderSettings } from '@/components/common/ReminderSettings'
-import { NotificationPrompt } from '@/components/common/NotificationPrompt'
+import Header from '../../components/common/Header'
+import Navigation from '../../components/common/Navigation'
+import { ReminderSettings } from '../../components/common/ReminderSettings'
+import { NotificationPrompt } from '../../components/common/NotificationPrompt'
 
 interface ReminderPageProps {
   // 必要に応じてpropsを追加
@@ -11,6 +13,7 @@ interface ReminderPageProps {
 export default function RemindersComponent() {
   const [showNotificationPrompt, setShowNotificationPrompt] = useState(false)
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default')
+  const [isNavOpen, setIsNavOpen] = useState(false)
 
   useEffect(() => {
     // 通知権限の状態を確認
@@ -35,49 +38,63 @@ export default function RemindersComponent() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            リマインド設定
-          </h1>
-          <p className="text-gray-600">
-            学習継続をサポートするリマインド通知の設定を管理できます
-          </p>
-        </div>
+    <div className="min-h-screen bg-[var(--color-bg-light)] flex">
+      <Header onMenuClick={() => setIsNavOpen(true)} />
+      <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 
-        {/* 通知権限のステータス表示 */}
-        <div className="mb-6 p-4 rounded-lg border">
-          <h2 className="text-lg font-semibold mb-2">通知の状態</h2>
-          <div className="flex items-center space-x-2">
-            <div className={`w-3 h-3 rounded-full ${
-              notificationPermission === 'granted' ? 'bg-green-500' :
-              notificationPermission === 'denied' ? 'bg-red-500' : 'bg-yellow-500'
-            }`}></div>
-            <span className="text-sm text-gray-600">
-              {notificationPermission === 'granted' && '通知が有効です'}
-              {notificationPermission === 'denied' && '通知が無効です'}
-              {notificationPermission === 'default' && '通知の許可が必要です'}
-            </span>
+      {/* Main Content */}
+      <div className="flex-1 md:ml-80">
+        <main className="pt-16 pb-20 md:pb-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+          <div className="py-6">
+            <div className="max-w-4xl mx-auto">
+              <div className="mb-8">
+                <h1 className="text-3xl font-bold text-[var(--color-text-light)] mb-2">
+                  リマインド設定
+                </h1>
+                <p className="text-[var(--color-muted-foreground)]">
+                  学習継続をサポートするリマインド通知の設定を管理できます
+                </p>
+              </div>
+
+              {/* 通知権限のステータス表示 */}
+              <div className="mb-6 p-6 bg-[var(--color-bg-light)] border border-[var(--color-border)] rounded-xl shadow-lg">
+                <h2 className="text-lg font-semibold text-[var(--color-text-light)] mb-4">通知の状態</h2>
+                <div className="flex items-center space-x-3">
+                  <div className={`w-4 h-4 rounded-full ${
+                    notificationPermission === 'granted' ? 'bg-[var(--color-success)]' :
+                    notificationPermission === 'denied' ? 'bg-[var(--color-error)]' : 'bg-[var(--color-warning)]'
+                  }`}></div>
+                  <span className="text-sm text-[var(--color-text-light)]">
+                    {notificationPermission === 'granted' && '通知が有効です'}
+                    {notificationPermission === 'denied' && '通知が無効です'}
+                    {notificationPermission === 'default' && '通知の許可が必要です'}
+                  </span>
+                </div>
+              </div>
+
+              {/* リマインド設定コンポーネント */}
+              <div className="bg-[var(--color-bg-light)] border border-[var(--color-border)] rounded-xl shadow-lg p-6">
+                <ReminderSettings />
+              </div>
+
+              {/* 通知許可プロンプト */}
+              {showNotificationPrompt && (
+                <div className="mt-6">
+                  <NotificationPrompt
+                    onPermissionResult={(granted) => {
+                      if (granted) {
+                        handleNotificationPermissionGranted()
+                      } else {
+                        handleNotificationPermissionDenied()
+                      }
+                    }}
+                    autoShow={false}
+                  />
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-
-        {/* リマインド設定コンポーネント */}
-        <ReminderSettings />
-
-        {/* 通知許可プロンプト */}
-        {showNotificationPrompt && (
-          <NotificationPrompt
-            onPermissionResult={(granted) => {
-              if (granted) {
-                handleNotificationPermissionGranted()
-              } else {
-                handleNotificationPermissionDenied()
-              }
-            }}
-            autoShow={false}
-          />
-        )}
+        </main>
       </div>
     </div>
   )

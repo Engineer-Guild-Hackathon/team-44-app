@@ -70,3 +70,17 @@ coverage/
 *.tar.gz
 Thumbs.db
 desktop.ini
+
+# unnecessary files
+*.swp
+*.swo
+*.bak
+*.backup
+*.tmp
+*.old
+*.orig
+*.rej
+*.class
+*.war
+*.jar
+*.iml
