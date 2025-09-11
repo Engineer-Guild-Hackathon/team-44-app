@@ -254,34 +254,18 @@ export default function ChatPage() {
   // ページ離脱時にセッションを完了
   useEffect(() => {
     const handleBeforeUnload = async (e: BeforeUnloadEvent) => {
-      if (currentSessionId && !currentSessionId.startsWith('demo-')) {
-        // 同期的に完了処理を実行
-        try {
-          const token = await getAuthToken()
-          if (token) {
-            fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/chatSessions/${currentSessionId}/complete`, {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-              },
-              keepalive: true // ページ離脱後もリクエストを完了させる
-            })
-          }
-        } catch (error) {
-          console.error('Error completing session on unload:', error)
-        }
-      }
+      // セッション完了処理を削除 - セッションを保持する
+      console.log('Page unloading, keeping session active')
     }
 
     window.addEventListener('beforeunload', handleBeforeUnload)
 
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload)
-      // コンポーネントアンマウント時にも完了処理
-      completeCurrentSession()
+      // コンポーネントアンマウント時のセッション完了処理を削除
+      console.log('Component unmounting, keeping session active')
     }
-  }, [completeCurrentSession, currentSessionId, getAuthToken])
+  }, []) // completeCurrentSession, currentSessionId, getAuthToken を依存配列から削除
 
   // デバッグ用：状態確認
   useEffect(() => {
@@ -298,8 +282,8 @@ export default function ChatPage() {
     <div className="min-h-screen bg-[var(--color-bg-light)] flex">
       <Header user={user} onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} onNewChat={() => {
         setMessages([])
-        setCurrentSessionId(null)
         setErrorMessage(null)
+        // セッションIDは保持して、新しいメッセージを開始
       }} showNewChatButton={messages.length > 0} />
       {user && <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />}
 
