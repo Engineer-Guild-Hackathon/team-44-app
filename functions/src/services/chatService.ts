@@ -129,9 +129,10 @@ export class ChatService {
 
     // セッション状態をチェック
     const session = await this.getSessionById(sessionId);
-    let learningRecordUpdated = false;
+    if (!session) return { aiResponse, sessionStatus: "unknown", learningRecordUpdated: false };
 
-    if (session && session.status === "draft") {
+    let learningRecordUpdated = false;
+    if (session.status === "draft") {
       const shouldPromote = await this.shouldPromoteSession(session);
       if (shouldPromote) {
         await this.promoteToActiveSession(sessionId);
@@ -141,7 +142,7 @@ export class ChatService {
 
     return {
       aiResponse,
-      sessionStatus: session?.status || "unknown",
+      sessionStatus: session.status,
       learningRecordUpdated
     };
   }
