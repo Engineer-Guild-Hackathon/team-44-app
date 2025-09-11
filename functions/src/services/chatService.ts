@@ -207,6 +207,9 @@ export class ChatService {
       throw new Error("チャットセッションが見つかりません");
     }
 
+    // 学習コンテキストを抽出
+    const learningContext = await this.extractLearningContext(session, message);
+
     // ユーザーメッセージを追加
     const userMessage: ChatMessage = {
       role: "user",
@@ -214,9 +217,9 @@ export class ChatService {
       timestamp: new Date()
     };
 
-    // LLMから応答を取得
+    // LLMから応答を取得（学習コンテキスト付き）
     const provider = getLLMProviderInstance();
-    const response = await provider.generateResponse(session.messages, message);
+    const response = await provider.generateResponse(session.messages, message, learningContext);
 
     // AIメッセージを作成
     const aiMessage: ChatMessage = {
@@ -233,6 +236,80 @@ export class ChatService {
     });
 
     return response;
+  }
+
+  /**
+   * セッションと学習記録から学習コンテキストを抽出
+   */
+  private async extractLearningContext(session: ChatSession, currentMessage: string): Promise<any> {
+    try {
+      // 学習記録から基本情報を取得
+      if (session.learningRecordId && session.userId) {
+        const learningRecord = await this.getLearningRecordService().getLearningRecord(session.learningRecordId, session.userId);
+        if (learningRecord) {
+          return {
+            subject: learningRecord.subject,
+            topic: learningRecord.topic,
+            difficulty: learningRecord.difficulty || 3,
+            userLevel: this.estimateUserLevel(session.messages, currentMessage)
+          };
+        }
+      }
+
+      // 学習記録がない場合、メッセージから推定
+      const estimatedContext = await this.getLearningRecordService().estimateSubjectAndTopic(
+        session.messages.map(msg => `${msg.role}: ${msg.parts[0]?.text || ""}`).join("\n") + `\nuser: ${currentMessage}`
+      );
+
+      return {
+        subject: estimatedContext.subject,
+        topic: estimatedContext.topic,
+        difficulty: 3, // デフォルト
+        userLevel: this.estimateUserLevel(session.messages, currentMessage)
+      };
+    } catch (error) {
+      console.error("Error extracting learning context:", error);
+      // エラー時はデフォルトコンテキストを返す
+      return {
+        subject: "一般学習",
+        topic: "AI対話",
+        difficulty: 3,
+        userLevel: "初級"
+      };
+    }
+  }
+
+  /**
+   * メッセージ履歴からユーザーレベルを推定
+   */
+  private estimateUserLevel(messages: ChatMessage[], currentMessage: string): string {
+    const allMessages = [...messages, { role: "user", parts: [{ text: currentMessage }] }] as ChatMessage[];
+    const userMessages = allMessages.filter(msg => msg.role === "user");
+    
+    if (userMessages.length <= 2) {
+      return "初級";
+    }
+
+    // 高度な用語や複雑な質問パターンをチェック
+    const advancedPatterns = [
+      /微分|積分|関数|方程式|証明/,
+      /分析|考察|評価|比較検討/,
+      /応用|実装|実践|発展/,
+      /なぜ.*なのか|どのような.*があるか|.*の理由/
+    ];
+
+    const recentMessages = userMessages.slice(-3).map(msg => msg.parts[0]?.text || "");
+    const hasAdvancedContent = recentMessages.some(text => 
+      advancedPatterns.some(pattern => pattern.test(text))
+    );
+
+    if (hasAdvancedContent) {
+      return "上級";
+    } else if (userMessages.length > 5) {
+      return "中級";
+    } else {
+      return "初級";
+    }
   }
 
   /**
