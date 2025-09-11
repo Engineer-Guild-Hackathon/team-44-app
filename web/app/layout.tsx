@@ -17,16 +17,6 @@ export const metadata: Metadata = {
   title: 'Libraria - あなたの知識の図書館',
   description: 'AIを活用した学習支援アプリケーション。チャット、学習記録、カレンダー、リマインダー機能を備えています。',
   manifest: '/manifest.json',
-  themeColor: '#C4A676',
-  viewport: 'width=device-width, initial-scale=1',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'default',
-    title: 'Libraria',
-  },
-  formatDetection: {
-    telephone: false,
-  },
   openGraph: {
     type: 'website',
     siteName: 'Libraria',
@@ -38,6 +28,12 @@ export const metadata: Metadata = {
     title: 'Libraria - あなたの知識の図書館',
     description: 'AIを活用した学習支援アプリケーション',
   },
+}
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#C4A676',
 }
 
 export default function RootLayout({
