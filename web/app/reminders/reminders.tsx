@@ -15,7 +15,7 @@ export default function RemindersComponent() {
   const { user } = useAuth();
   const [showNotificationPrompt, setShowNotificationPrompt] = useState(false)
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default')
-  const [isNavOpen, setIsNavOpen] = useState(true)
+  const [isNavOpen, setIsNavOpen] = useState(false)
 
   useEffect(() => {
     // 通知権限の状態を確認
