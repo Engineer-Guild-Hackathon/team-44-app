@@ -283,19 +283,19 @@ export default function ChatPage() {
           </div>
 
           {/* Fixed Message Input at Bottom */}
-          <div className="flex-shrink-0 border-t border-[var(--color-border)] bg-[var(--color-bg-light)]">
-            <div className={`max-w-4xl ${isNavOpen ? 'mx-auto' : 'md:mx-auto'}`}>
-              <MessageInput
-                onSendMessage={handleSendMessage}
-                disabled={isLoading || authLoading || !user}
-                placeholder={
-                  !user
-                    ? "ログインしてチャットを開始してください"
-                    : "質問や問題を入力してください..."
-                }
-              />
+            <div className="fixed left-0 right-0 bottom-0 z-40 border-t border-[var(--color-border)] bg-[var(--color-bg-light)]">
+              <div className={`max-w-4xl mx-auto px-4 py-4`}>
+                <MessageInput
+                  onSendMessage={handleSendMessage}
+                  disabled={isLoading || authLoading || !user}
+                  placeholder={
+                    !user
+                      ? "ログインしてチャットを開始してください"
+                      : "質問や問題を入力してください..."
+                  }
+                />
+              </div>
             </div>
-          </div>
         </div>
       </div>
     </div>
