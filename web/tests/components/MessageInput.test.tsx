@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '../setup/testUtils';
 import userEvent from '@testing-library/user-event';
+import { act } from 'react';
 import MessageInput from '../../components/common/MessageInput';
 
 // Mock Next.js router
@@ -42,8 +43,10 @@ describe('MessageInput', () => {
     const textarea = screen.getByPlaceholderText('メッセージを入力してください...');
     const sendButton = screen.getByRole('button', { name: '送信' });
 
-    await user.type(textarea, 'テストメッセージ');
-    await user.click(sendButton);
+    await act(async () => {
+      await user.type(textarea, 'テストメッセージ');
+      await user.click(sendButton);
+    });
 
     expect(mockOnSendMessage).toHaveBeenCalledWith('テストメッセージ');
   });
@@ -55,8 +58,10 @@ describe('MessageInput', () => {
 
     const textarea = screen.getByPlaceholderText('メッセージを入力してください...');
 
-    await user.type(textarea, 'Enter キーテスト');
-    await user.keyboard('{Enter}');
+    await act(async () => {
+      await user.type(textarea, 'Enter キーテスト');
+      await user.keyboard('{Enter}');
+    });
 
     expect(mockOnSendMessage).toHaveBeenCalledWith('Enter キーテスト');
   });
@@ -68,8 +73,10 @@ describe('MessageInput', () => {
 
     const textarea = screen.getByPlaceholderText('メッセージを入力してください...');
 
-    await user.type(textarea, 'Shift+Enter テスト');
-    await user.keyboard('{Shift>}{Enter}{/Shift}');
+    await act(async () => {
+      await user.type(textarea, 'Shift+Enter テスト');
+      await user.keyboard('{Shift>}{Enter}{/Shift}');
+    });
 
     // Should not send message, should add newline instead
     expect(mockOnSendMessage).not.toHaveBeenCalled();
@@ -84,7 +91,9 @@ describe('MessageInput', () => {
     const sendButton = screen.getByRole('button', { name: '送信' });
 
     // Try to send without typing anything
-    await user.click(sendButton);
+    await act(async () => {
+      await user.click(sendButton);
+    });
 
     expect(mockOnSendMessage).not.toHaveBeenCalled();
   });
@@ -97,8 +106,10 @@ describe('MessageInput', () => {
     const textarea = screen.getByPlaceholderText('メッセージを入力してください...');
     const sendButton = screen.getByRole('button', { name: '送信' });
 
-    await user.type(textarea, '   ');
-    await user.click(sendButton);
+    await act(async () => {
+      await user.type(textarea, '   ');
+      await user.click(sendButton);
+    });
 
     expect(mockOnSendMessage).not.toHaveBeenCalled();
   });
@@ -111,8 +122,10 @@ describe('MessageInput', () => {
     const textarea = screen.getByPlaceholderText('メッセージを入力してください...');
     const sendButton = screen.getByRole('button', { name: '送信' });
 
-    await user.type(textarea, 'クリアテスト');
-    await user.click(sendButton);
+    await act(async () => {
+      await user.type(textarea, 'クリアテスト');
+      await user.click(sendButton);
+    });
 
     expect(textarea).toHaveValue('');
   });
@@ -125,8 +138,10 @@ describe('MessageInput', () => {
     const textarea = screen.getByPlaceholderText('メッセージを入力してください...');
     const sendButton = screen.getByRole('button', { name: '送信' });
 
-    await user.type(textarea, '  トリムテスト  ');
-    await user.click(sendButton);
+    await act(async () => {
+      await user.type(textarea, '  トリムテスト  ');
+      await user.click(sendButton);
+    });
 
     expect(mockOnSendMessage).toHaveBeenCalledWith('トリムテスト');
   });
@@ -143,8 +158,10 @@ describe('MessageInput', () => {
     expect(sendButton).toBeDisabled();
 
     // Try to interact while disabled
-    await user.type(textarea, 'このメッセージは送信されません');
-    await user.click(sendButton);
+    await act(async () => {
+      await user.type(textarea, 'このメッセージは送信されません');
+      await user.click(sendButton);
+    });
 
     expect(mockOnSendMessage).not.toHaveBeenCalled();
   });
@@ -157,7 +174,9 @@ describe('MessageInput', () => {
     const textarea = screen.getByPlaceholderText('メッセージを入力してください...');
 
     // Even though disabled, we can test the key handler
-    fireEvent.keyDown(textarea, { key: 'Enter', shiftKey: false });
+    await act(async () => {
+      fireEvent.keyDown(textarea, { key: 'Enter', shiftKey: false });
+    });
 
     expect(mockOnSendMessage).not.toHaveBeenCalled();
   });
@@ -171,8 +190,10 @@ describe('MessageInput', () => {
     const textarea = screen.getByPlaceholderText('メッセージを入力してください...');
     const sendButton = screen.getByRole('button', { name: '送信' });
 
-    await user.type(textarea, longMessage);
-    await user.click(sendButton);
+    await act(async () => {
+      await user.type(textarea, longMessage);
+      await user.click(sendButton);
+    });
 
     expect(mockOnSendMessage).toHaveBeenCalledWith(longMessage);
   });
