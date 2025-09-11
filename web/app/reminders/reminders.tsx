@@ -13,7 +13,7 @@ interface ReminderPageProps {
 export default function RemindersComponent() {
   const [showNotificationPrompt, setShowNotificationPrompt] = useState(false)
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default')
-  const [isNavOpen, setIsNavOpen] = useState(false)
+  const [isNavOpen, setIsNavOpen] = useState(true)
 
   useEffect(() => {
     // 通知権限の状態を確認
@@ -39,12 +39,12 @@ export default function RemindersComponent() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-light)] flex">
-      <Header onMenuClick={() => setIsNavOpen(true)} />
+      <Header onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
       <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 
       {/* Main Content */}
       <div className="flex-1">
-        <main className="pt-16 pb-20 md:pb-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <main className={`pt-16 pb-20 md:pb-6 px-4 sm:px-6 lg:px-8 ${isNavOpen ? 'max-w-7xl mx-auto' : 'md:max-w-7xl md:mx-auto'}`}>
           <div className="py-6">
             <div className="max-w-4xl mx-auto">
               <div className="mb-8">

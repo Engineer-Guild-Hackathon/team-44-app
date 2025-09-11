@@ -13,7 +13,7 @@ export default function ChatPage() {
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const [isNavOpen, setIsNavOpen] = useState(false)
+  const [isNavOpen, setIsNavOpen] = useState(true)
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [isCreatingSession, setIsCreatingSession] = useState(false)
   const { user, loading: authLoading } = useAuth()
@@ -245,7 +245,7 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-light)] flex">
-      <Header onMenuClick={() => setIsNavOpen(true)} />
+      <Header onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
       <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 
       {/* Main Content */}
@@ -284,7 +284,7 @@ export default function ChatPage() {
 
           {/* Fixed Message Input at Bottom */}
           <div className="flex-shrink-0 border-t border-[var(--color-border)] bg-[var(--color-bg-light)]">
-            <div className="max-w-4xl mx-auto px-4 py-4">
+            <div className={`max-w-4xl px-4 py-4 ${isNavOpen ? 'mx-auto' : 'md:mx-auto'}`}>
               <MessageInput
                 onSendMessage={handleSendMessage}
                 disabled={isLoading || authLoading || !user}
