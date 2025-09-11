@@ -218,7 +218,7 @@ export class ChatService {
     const sessionDuration = (now.getTime() - session.startedAt.getTime()) / (1000 * 60); // 分
     console.log(`Session duration: ${sessionDuration} minutes, message count: ${session.messageCount}`);
     // 条件: メッセージ数 >= 4回 かつ 継続時間 >= 3分
-    return session.messageCount >= 4 && sessionDuration >= 1;
+    return session.messageCount >= 4 && sessionDuration >= 3;
   }
 
   /**
