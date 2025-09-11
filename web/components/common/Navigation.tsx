@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useAuth } from '../../hooks/useAuth'
 
 interface NavigationProps {
   isOpen: boolean
@@ -11,6 +12,7 @@ interface NavigationProps {
 
 export default function Navigation({ isOpen, onClose }: NavigationProps) {
   const pathname = usePathname()
+  const { logout } = useAuth()
 
   // ESCキーで閉じる
   useEffect(() => {
@@ -33,20 +35,11 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
 
   const menuItems = [
     {
-      href: '/',
+      href: '/chat',
       label: 'ホーム',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-      )
-    },
-    {
-      href: '/chat',
-      label: 'チャット',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
       )
     },
@@ -155,11 +148,40 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
                   </Link>
                 )
               })}
+              {/* Logout Button for Mobile */}
+              <button
+                onClick={() => {
+                  logout()
+                  onClose()
+                }}
+                className="flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 min-w-0 flex-1 text-[var(--color-muted-foreground)] hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)]"
+              >
+                <svg className="w-5 h-5 flex-shrink-0 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span className="text-xs font-medium truncate">ログアウト</span>
+              </button>
             </div>
           </div>
 
           {/* Divider */}
           <div className="my-6 border-t border-[var(--color-border)] md:block hidden"></div>
+
+          {/* Logout Button */}
+          <div className="md:block hidden">
+            <button
+              onClick={() => {
+                logout()
+                onClose()
+              }}
+              className="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-[var(--color-text-light)] hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)] w-full text-left"
+            >
+              <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span className="font-medium">ログアウト</span>
+            </button>
+          </div>
 
           {/* Additional Info */}
           <div className="text-center md:block hidden">
