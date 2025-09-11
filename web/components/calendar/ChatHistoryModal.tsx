@@ -23,7 +23,7 @@ export function ChatHistoryModal({ learningRecordId, onClose }: ChatHistoryModal
   const fetchLearningRecordAndSessions = async () => {
     try {
       setIsLoading(true)
-      
+
       // 学習記録を取得
       const record = await apiClient.getLearningRecord(learningRecordId)
       setLearningRecord(record)
@@ -31,7 +31,7 @@ export function ChatHistoryModal({ learningRecordId, onClose }: ChatHistoryModal
       // 関連するセッションを取得 (現在のAPIでは直接的な方法がないため、
       // 全セッションを取得してフィルタリング)
       const allSessions = await apiClient.getUserSessions()
-      const relatedSessions = allSessions.filter(session => 
+      const relatedSessions = allSessions.filter(session =>
         session.learningRecordId === learningRecordId
       )
       setSessions(relatedSessions)
@@ -106,7 +106,7 @@ export function ChatHistoryModal({ learningRecordId, onClose }: ChatHistoryModal
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden flex">
-        
+
         {/* 左サイドバー: セッション一覧 */}
         <div className="w-1/3 border-r border-gray-200 flex flex-col">
           <div className="p-4 border-b border-gray-200">
@@ -115,7 +115,7 @@ export function ChatHistoryModal({ learningRecordId, onClose }: ChatHistoryModal
               {sessions.length}個のセッション
             </div>
           </div>
-          
+
           <div className="flex-1 overflow-y-auto">
             {sessions.length === 0 ? (
               <div className="p-4 text-center text-gray-500">
