@@ -213,3 +213,72 @@ export async function completeSession(req: Request, res: Response): Promise<void
     });
   }
 }
+
+/**
+ * 古い仮セッション（下書きセッション）を削除
+ */
+export async function cleanupOldDraftSessions(req: Request, res: Response): Promise<void> {
+  try {
+    // 管理者権限をチェック（現在は認証されたユーザーのみ許可）
+    await validateAuth(req);
+    
+    // クエリパラメータから時間を取得（デフォルト: 24時間）
+    const hoursParam = req.query.hours as string;
+    const hours = hoursParam ? parseInt(hoursParam, 10) : 24;
+    
+    if (isNaN(hours) || hours < 1) {
+      res.status(400).json({
+        error: "Invalid hours parameter. Must be a positive number."
+      });
+      return;
+    }
+
+    const deletedCount = await chatServiceInstance.cleanupOldDraftSessions(hours);
+
+    res.json({
+      success: true,
+      deletedCount,
+      message: `Successfully cleaned up ${deletedCount} old draft sessions older than ${hours} hours`
+    });
+  } catch (error) {
+    console.error("Error cleaning up old draft sessions:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to cleanup old draft sessions"
+    });
+  }
+}
+
+/**
+ * ユーザーの古い仮セッションを削除
+ */
+export async function cleanupUserOldDraftSessions(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = await validateAuth(req);
+    
+    // クエリパラメータから時間を取得（デフォルト: 24時間）
+    const hoursParam = req.query.hours as string;
+    const hours = hoursParam ? parseInt(hoursParam, 10) : 24;
+    
+    if (isNaN(hours) || hours < 1) {
+      res.status(400).json({
+        error: "Invalid hours parameter. Must be a positive number."
+      });
+      return;
+    }
+
+    const deletedCount = await chatServiceInstance.cleanupUserOldDraftSessions(userId, hours);
+
+    res.json({
+      success: true,
+      deletedCount,
+      message: `Successfully cleaned up ${deletedCount} of your old draft sessions older than ${hours} hours`
+    });
+  } catch (error) {
+    console.error("Error cleaning up user's old draft sessions:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to cleanup your old draft sessions"
+    });
+  }
+}

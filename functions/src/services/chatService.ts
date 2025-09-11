@@ -378,4 +378,71 @@ export class ChatService {
       throw new Error("セッション一覧の取得に失敗しました");
     }
   }
+
+  /**
+   * 古い下書きセッション（仮セッション）を削除
+   * @param olderThanHours 指定した時間より古いセッションを削除（デフォルト: 24時間）
+   */
+  async cleanupOldDraftSessions(olderThanHours: number = 24): Promise<number> {
+    try {
+      const cutoffTime = new Date(Date.now() - olderThanHours * 60 * 60 * 1000);
+      
+      const snapshot = await this.db
+        .collection("chatSessions")
+        .where("status", "==", "draft")
+        .where("createdAt", "<", cutoffTime)
+        .get();
+
+      if (snapshot.empty) {
+        return 0;
+      }
+
+      // バッチ処理で削除
+      const batch = this.db.batch();
+      snapshot.docs.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+      
+      console.log(`Cleaned up ${snapshot.size} old draft sessions older than ${olderThanHours} hours`);
+      return snapshot.size;
+    } catch (error) {
+      console.error("Error cleaning up old draft sessions:", error);
+      throw new Error("古いセッションの削除に失敗しました");
+    }
+  }
+
+  /**
+   * 特定ユーザーの古い下書きセッションを削除
+   */
+  async cleanupUserOldDraftSessions(userId: string, olderThanHours: number = 24): Promise<number> {
+    try {
+      const cutoffTime = new Date(Date.now() - olderThanHours * 60 * 60 * 1000);
+      
+      const snapshot = await this.db
+        .collection("chatSessions")
+        .where("userId", "==", userId)
+        .where("status", "==", "draft")
+        .where("createdAt", "<", cutoffTime)
+        .get();
+
+      if (snapshot.empty) {
+        return 0;
+      }
+
+      // バッチ処理で削除
+      const batch = this.db.batch();
+      snapshot.docs.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+
+      await batch.commit();
+      
+      return snapshot.size;
+    } catch (error) {
+      console.error("Error cleaning up user's old draft sessions:", error);
+      throw new Error("ユーザーの古いセッションの削除に失敗しました");
+    }
+  }
 }

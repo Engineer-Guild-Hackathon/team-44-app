@@ -5,9 +5,10 @@ import dotenv from "dotenv";
 
 // .envファイルを読み込む
 dotenv.config();
-import { createSession, createSmartSession, postMessage, getUserSessions, getSession, completeSession } from "./controllers/chatController";
+import { createSession, createSmartSession, postMessage, getUserSessions, getSession, completeSession, cleanupOldDraftSessions, cleanupUserOldDraftSessions } from "./controllers/chatController";
 import { generateLearningRecord, getUserLearningRecords, getLearningRecord, getLearningRecordsForPeriod, createManualLearningRecord } from "./controllers/learningRecordController";
 import { getReminders, getReminderSettings, updateReminderSettings, updateReminderStatus } from "./controllers/reminderController";
+import { ChatService } from "./services/chatService";
 
 const app = express();
 
@@ -30,6 +31,10 @@ app.get("/chatSessions", getUserSessions);
 app.get("/chatSessions/:sessionId", getSession);
 app.post("/chatSessions/:sessionId/messages", postMessage);
 app.post("/chatSessions/:sessionId/complete", completeSession);
+
+// Cleanup routes
+app.post("/admin/cleanup/draft-sessions", cleanupOldDraftSessions);
+app.post("/users/cleanup/draft-sessions", cleanupUserOldDraftSessions);
 
 // Learning record routes
 app.post("/chatSessions/:sessionId/learningRecord", generateLearningRecord);
@@ -112,3 +117,26 @@ app.use("*", (req: Request, res: Response) => {
 });
 
 export const api = functions.https.onRequest(app);
+
+// 毎日午前2時に古い下書きセッションを自動削除する
+export const scheduledCleanup = functions.pubsub.schedule('0 2 * * *')
+  .timeZone('Asia/Tokyo') // 日本時間
+  .onRun(async (context) => {
+    console.log('Starting scheduled cleanup of old draft sessions...');
+    
+    try {
+      const chatService = new ChatService();
+      const deletedCount = await chatService.cleanupOldDraftSessions(24); // 24時間より古いものを削除
+      
+      console.log(`Scheduled cleanup completed. Deleted ${deletedCount} old draft sessions.`);
+      
+      return {
+        success: true,
+        deletedCount,
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      console.error('Error in scheduled cleanup:', error);
+      throw error;
+    }
+  });

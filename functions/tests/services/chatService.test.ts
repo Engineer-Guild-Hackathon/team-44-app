@@ -246,4 +246,106 @@ describe('ChatService', () => {
       expect(sessions[0].userId).toBe('test-user');
     });
   });
+
+  describe('cleanup functionality', () => {
+    it('should clean up old draft sessions', async () => {
+      // Create mock instances for cleanup tests
+      const mockDocs = [
+        { ref: { delete: jest.fn() }, id: 'old-draft-1' },
+        { ref: { delete: jest.fn() }, id: 'old-draft-2' }
+      ];
+
+      const mockBatch = {
+        delete: jest.fn(),
+        commit: jest.fn().mockResolvedValue(undefined)
+      };
+
+      const cleanupMockInstance = {
+        collection: jest.fn().mockImplementation(() => ({
+          where: jest.fn().mockReturnThis(),
+          get: jest.fn().mockResolvedValue({
+            empty: false,
+            size: 2,
+            docs: mockDocs
+          })
+        })),
+        batch: jest.fn().mockReturnValue(mockBatch)
+      };
+
+      // Replace the db instance
+      (chatService as any).db = cleanupMockInstance;
+
+      const deletedCount = await chatService.cleanupOldDraftSessions(24);
+
+      expect(deletedCount).toBe(2);
+      expect(mockBatch.commit).toHaveBeenCalled();
+    });
+
+    it('should return 0 when no old draft sessions exist', async () => {
+      const cleanupMockInstance = {
+        collection: jest.fn().mockImplementation(() => ({
+          where: jest.fn().mockReturnThis(),
+          get: jest.fn().mockResolvedValue({
+            empty: true,
+            size: 0,
+            docs: []
+          })
+        }))
+      };
+
+      // Replace the db instance
+      (chatService as any).db = cleanupMockInstance;
+
+      const deletedCount = await chatService.cleanupOldDraftSessions(24);
+
+      expect(deletedCount).toBe(0);
+    });
+
+    it('should clean up user-specific old draft sessions', async () => {
+      const mockDocs = [
+        { ref: { delete: jest.fn() }, id: 'user-old-draft-1' }
+      ];
+
+      const mockBatch = {
+        delete: jest.fn(),
+        commit: jest.fn().mockResolvedValue(undefined)
+      };
+
+      const userCleanupMockInstance = {
+        collection: jest.fn().mockImplementation(() => ({
+          where: jest.fn().mockReturnThis(),
+          get: jest.fn().mockResolvedValue({
+            empty: false,
+            size: 1,
+            docs: mockDocs
+          })
+        })),
+        batch: jest.fn().mockReturnValue(mockBatch)
+      };
+
+      // Replace the db instance
+      (chatService as any).db = userCleanupMockInstance;
+
+      const deletedCount = await chatService.cleanupUserOldDraftSessions('test-user', 24);
+
+      expect(deletedCount).toBe(1);
+      expect(mockBatch.commit).toHaveBeenCalled();
+    });
+
+    it('should handle cleanup errors gracefully', async () => {
+      const errorMockInstance = {
+        collection: jest.fn().mockImplementation(() => ({
+          where: jest.fn().mockReturnThis(),
+          get: jest.fn().mockRejectedValue(new Error('Firestore error'))
+        }))
+      };
+
+      // Replace the db instance
+      (chatService as any).db = errorMockInstance;
+
+      await expect(
+        chatService.cleanupOldDraftSessions(24)
+      ).rejects.toThrow('古いセッションの削除に失敗しました');
+    });
+  });
 });
