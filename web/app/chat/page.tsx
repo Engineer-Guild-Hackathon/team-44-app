@@ -6,14 +6,30 @@ import ChatView from '../../components/common/ChatView'
 import MessageInput from '../../components/common/MessageInput'
 import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
+import { useAuth } from '../../hooks/useAuth'
+import { getAuthClient } from '../../lib/firebase'
 
 export default function ChatPage() {
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const [isNavOpen, setIsNavOpen] = useState(false)
+  const [isNavOpen, setIsNavOpen] = useState(true)
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [isCreatingSession, setIsCreatingSession] = useState(false)
+  const { user, loading: authLoading } = useAuth()
+
+  // 認証トークンを取得する関数
+  const getAuthToken = useCallback(async (): Promise<string | null> => {
+    if (!user) return null
+    try {
+      const auth = await getAuthClient()
+      const token = await user.getIdToken()
+      return token
+    } catch (error) {
+      console.error('Failed to get auth token:', error)
+      return null
+    }
+  }, [user])
 
   // モック応答を生成する関数
   const getMockResponse = (userMessage: string): string => {
@@ -49,6 +65,20 @@ export default function ChatPage() {
   const createNewSession = useCallback(async () => {
     if (isCreatingSession) return // 既に作成中ならスキップ
 
+    // 認証状態を確認
+    if (authLoading) {
+      console.log('Auth is still loading, skipping session creation')
+      return
+    }
+
+    if (!user) {
+      console.log('User not authenticated, using demo mode')
+      const demoSessionId = `demo-${Date.now()}`
+      setCurrentSessionId(demoSessionId)
+      console.log('Demo session created:', demoSessionId)
+      return demoSessionId
+    }
+
     setIsCreatingSession(true)
     try {
       console.log('Creating new session...')
@@ -57,11 +87,17 @@ export default function ChatPage() {
         throw new Error('Backend not available')
       }
 
+      const token = await getAuthToken()
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
       const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/chatSessions`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({ title: 'AI学習サポート' }),
       })
 
@@ -85,9 +121,9 @@ export default function ChatPage() {
     } finally {
       setIsCreatingSession(false)
     }
-  }, [isCreatingSession])
+  }, [isCreatingSession, getAuthToken, user, authLoading])
 
-    // メッセージ送信
+  // メッセージ送信
   const handleSendMessage = async (message: string) => {
     if (!message.trim()) return
 
@@ -132,11 +168,17 @@ export default function ChatPage() {
         return
       }
 
+      const token = await getAuthToken()
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      }
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/chatSessions/${sessionId}/messages`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify({ message: currentMessage }),
       })
 
@@ -203,24 +245,54 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-light)] flex">
-      <Header onMenuClick={() => setIsNavOpen(true)} />
+      <Header onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
       <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col md:ml-80">
+      <div className="flex-1 flex flex-col">
         {/* Chat Content */}
         <div className="flex-1 flex flex-col pt-16 min-h-0">
           <div className="flex-1 overflow-hidden">
-            <ChatView messages={messages} isLoading={isLoading} />
+            {authLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary)] mx-auto mb-4"></div>
+                  <p className="text-[var(--color-text-secondary)]">認証状態を確認中...</p>
+                </div>
+              </div>
+            ) : !user ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center max-w-md mx-auto px-4">
+                  <h2 className="text-xl font-semibold text-[var(--color-text-primary)] mb-4">
+                    ログインが必要です
+                  </h2>
+                  <p className="text-[var(--color-text-secondary)] mb-6">
+                    チャット機能を利用するには、ログインしてください。
+                  </p>
+                  <a
+                    href="/auth"
+                    className="inline-block bg-[var(--color-primary)] text-[var(--color-text-dark)] px-6 py-2 rounded-lg hover:bg-[var(--color-accent)] transition-colors"
+                  >
+                    ログインする
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <ChatView messages={messages} isLoading={isLoading} />
+            )}
           </div>
 
           {/* Fixed Message Input at Bottom */}
           <div className="flex-shrink-0 border-t border-[var(--color-border)] bg-[var(--color-bg-light)]">
-            <div className="max-w-4xl mx-auto px-4 py-4">
+            <div className={`max-w-4xl px-4 py-4 ${isNavOpen ? 'mx-auto' : 'md:mx-auto'}`}>
               <MessageInput
                 onSendMessage={handleSendMessage}
-                disabled={isLoading}
-                placeholder="質問や問題を入力してください..."
+                disabled={isLoading || authLoading || !user}
+                placeholder={
+                  !user
+                    ? "ログインしてチャットを開始してください"
+                    : "質問や問題を入力してください..."
+                }
               />
             </div>
           </div>

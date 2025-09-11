@@ -5,9 +5,11 @@ import ThemeToggle from './ThemeToggle'
 
 interface HeaderProps {
   onMenuClick: () => void
+  isNavOpen?: boolean
+  onToggleNav?: () => void
 }
 
-export default function Header({ onMenuClick }: HeaderProps) {
+export default function Header({ onMenuClick, isNavOpen, onToggleNav }: HeaderProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-[var(--color-bg-light)] border-b border-[var(--color-border)] shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -22,6 +24,19 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
+
+            {/* Desktop Menu Toggle */}
+            {onToggleNav && (
+              <button
+                onClick={onToggleNav}
+                className="hidden md:block p-2 hover:bg-[var(--color-accent)] hover:bg-opacity-10 rounded-lg transition-colors"
+                title={isNavOpen ? "サイドバーを閉じる" : "サイドバーを開く"}
+              >
+                <svg className="w-6 h-6 text-[var(--color-text-light)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isNavOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+                </svg>
+              </button>
+            )}
 
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-[var(--color-primary)] rounded-lg flex items-center justify-center">

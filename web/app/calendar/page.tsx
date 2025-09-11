@@ -12,7 +12,7 @@ export default function CalendarPage() {
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [isNavOpen, setIsNavOpen] = useState(false)
+  const [isNavOpen, setIsNavOpen] = useState(true)
 
   // カレンダー関連の定数
   const currentMonth = selectedDate.getMonth()
@@ -122,13 +122,14 @@ export default function CalendarPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-light)] flex">
-      <Header onMenuClick={() => setIsNavOpen(true)} />
+      <Header onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
       <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 
       {/* Main Content */}
-      <div className="flex-1 md:ml-80">
+      {/* Main Content */}
+      <div className="flex-1">
         {/* メインコンテンツ */}
-        <main className="pt-16 pb-20 md:pb-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <main className={`pt-16 pb-20 md:pb-6 px-4 sm:px-6 lg:px-8 ${isNavOpen ? 'max-w-7xl mx-auto' : 'md:max-w-7xl md:mx-auto'}`}>
           <div className="py-6">
             {/* カレンダーヘッダー */}
             <div className="bg-[var(--color-bg-light)] border border-[var(--color-border)] rounded-xl shadow-lg mb-6 overflow-hidden">
@@ -175,13 +176,11 @@ export default function CalendarPage() {
                   return (
                     <div
                       key={index}
-                      className={`min-h-28 p-3 border-r border-b border-[var(--color-border)] last:border-r-0 ${
-                        isCurrentMonth ? 'bg-[var(--color-bg-light)]' : 'bg-[var(--color-bg-light)] opacity-50'
-                      } ${isToday ? 'bg-[var(--color-accent)] bg-opacity-10' : ''} hover:bg-[var(--color-accent)] hover:bg-opacity-5 transition-colors`}
+                      className={`min-h-28 p-3 border-r border-b border-[var(--color-border)] last:border-r-0 ${isCurrentMonth ? 'bg-[var(--color-bg-light)]' : 'bg-[var(--color-bg-light)] opacity-50'
+                        } ${isToday ? 'bg-[var(--color-accent)] bg-opacity-10' : ''} hover:bg-[var(--color-accent)] hover:bg-opacity-5 transition-colors`}
                     >
-                      <div className={`text-sm font-medium mb-2 ${
-                        isCurrentMonth ? 'text-[var(--color-text-light)]' : 'text-[var(--color-muted-foreground)]'
-                      } ${isToday ? 'text-[var(--color-accent)] font-bold' : ''}`}>
+                      <div className={`text-sm font-medium mb-2 ${isCurrentMonth ? 'text-[var(--color-text-light)]' : 'text-[var(--color-muted-foreground)]'
+                        } ${isToday ? 'text-[var(--color-accent)] font-bold' : ''}`}>
                         {day.getDate()}
                       </div>
 
