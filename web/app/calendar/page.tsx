@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
+import apiClient from '../../lib/apiClient'
 
 interface LearningRecord {
   id: string
