@@ -31,11 +31,21 @@ const getLLMProviderInstance = () => {
 
 export class ChatService {
   private db: admin.firestore.Firestore;
-  private learningRecordService: LearningRecordService;
+  // make learningRecordService optional and initialize lazily to avoid
+  // eager LLM provider initialization during construction (helps tests)
+  private learningRecordService?: LearningRecordService;
 
   constructor(dbInstance?: admin.firestore.Firestore) {
     this.db = dbInstance || db;
-    this.learningRecordService = new LearningRecordService();
+    // do NOT instantiate LearningRecordService here to avoid calling into
+    // LLM provider or other heavy logic during ChatService construction
+  }
+
+  private getLearningRecordService(): LearningRecordService {
+    if (!this.learningRecordService) {
+      this.learningRecordService = new LearningRecordService();
+    }
+    return this.learningRecordService;
   }
 
   /**
@@ -49,7 +59,7 @@ export class ChatService {
   ): Promise<SmartSessionResult> {
     return this.db.runTransaction(async (transaction) => {
       // 既存のアクティブな学習記録を検索
-      const existingRecord = await this.learningRecordService.findActiveLearningRecord(
+      const existingRecord = await this.getLearningRecordService().findActiveLearningRecord(
         userId,
         estimatedSubject,
         estimatedTopic
@@ -64,7 +74,7 @@ export class ChatService {
         isNewLearningRecord = false;
       } else {
         // 新しい学習記録を作成
-        learningRecordId = await this.learningRecordService.createNewLearningRecord(
+        learningRecordId = await this.getLearningRecordService().createNewLearningRecord(
           userId,
           estimatedSubject,
           estimatedTopic
@@ -187,7 +197,7 @@ export class ChatService {
     const session = await this.getSession(sessionId, "system"); // システム内部呼び出し
 
     if (!session) {
-      throw new Error("セッションが見つかりません");
+      throw new Error("チャットセッションが見つかりません");
     }
 
     // ユーザーメッセージを追加
@@ -235,7 +245,7 @@ export class ChatService {
 
       // 学習記録を更新
       if (session.learningRecordId) {
-        await this.learningRecordService.updateLearningRecordOnSessionComplete(
+        await this.getLearningRecordService().updateLearningRecordOnSessionComplete(
           session.learningRecordId,
           session.duration,
           session.sessionSummary
