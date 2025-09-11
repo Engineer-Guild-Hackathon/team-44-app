@@ -63,7 +63,7 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/reminderSettings`, {
         method: 'PUT',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(settings)
@@ -203,9 +203,8 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
             <button
               onClick={saveSettings}
               disabled={isSaving}
-              className={`btn-primary disabled:opacity-50 disabled:cursor-not-allowed ${
-                isSaving ? 'bg-[var(--color-muted)] text-[var(--color-muted-foreground)]' : ''
-              }`}
+              className={`btn-primary disabled:opacity-50 disabled:cursor-not-allowed ${isSaving ? 'bg-[var(--color-muted)] text-[var(--color-muted-foreground)]' : ''
+                }`}
             >
               {isSaving ? '保存中...' : '設定を保存'}
             </button>
