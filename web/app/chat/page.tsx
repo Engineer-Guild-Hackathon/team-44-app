@@ -271,7 +271,7 @@ export default function ChatPage() {
                   </p>
                   <a
                     href="/auth"
-                    className="inline-block bg-[var(--color-primary)] text-white px-6 py-2 rounded-lg hover:bg-[var(--color-primary-dark)] transition-colors"
+                    className="inline-block bg-[var(--color-primary)] text-[var(--color-text-dark)] px-6 py-2 rounded-lg hover:bg-[var(--color-accent)] transition-colors"
                   >
                     ログインする
                   </a>
