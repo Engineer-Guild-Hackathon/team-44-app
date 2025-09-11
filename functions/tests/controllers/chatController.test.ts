@@ -84,6 +84,7 @@ describe('ChatController', () => {
     mockChatService = {
       createSession: jest.fn(),
       sendMessage: jest.fn(),
+      sendMessageWithStateManagement: jest.fn(),
       getSession: jest.fn(),
       getUserSessions: jest.fn(),
     };
@@ -165,19 +166,25 @@ describe('ChatController', () => {
     it('should send message successfully', async () => {
       mockRequest.params = { sessionId: 'session-123' };
       mockRequest.body = { message: 'Hello AI' };
-      mockChatService.sendMessage.mockResolvedValue('AI response');
+      mockChatService.sendMessageWithStateManagement.mockResolvedValue({
+        aiResponse: 'AI response',
+        sessionStatus: 'active',
+        learningRecordUpdated: false
+      });
 
       await postMessage(mockRequest as Request, mockResponse as Response);
 
-      expect(mockChatService.sendMessage).toHaveBeenCalledWith(
+      expect(mockChatService.sendMessageWithStateManagement).toHaveBeenCalledWith(
         'session-123',
-        'test-user-123',
-        'Hello AI'
+        'Hello AI',
+        'test-user-123'
       );
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith({
         response: 'AI response',
         sessionId: 'session-123',
+        sessionStatus: 'active',
+        learningRecordUpdated: false,
         message: 'メッセージが送信されました',
       });
     });
@@ -197,7 +204,7 @@ describe('ChatController', () => {
     it('should handle service error when sending message', async () => {
       mockRequest.params = { sessionId: 'session-123' };
       mockRequest.body = { message: 'Hello AI' };
-      mockChatService.sendMessage.mockRejectedValue(new Error('Session not found'));
+      mockChatService.sendMessageWithStateManagement.mockRejectedValue(new Error('Session not found'));
 
       await postMessage(mockRequest as Request, mockResponse as Response);
 
