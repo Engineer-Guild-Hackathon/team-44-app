@@ -24,6 +24,13 @@ export default function CalendarPage() {
   const [clickedDate, setClickedDate] = useState<Date | null>(null)
   const [dayRecords, setDayRecords] = useState<LearningRecord[]>([])
   const [detailRecordId, setDetailRecordId] = useState<string | null>(null)
+  
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+
+  // ルートが変わったら自動でサイドバーを閉じる
+  useEffect(() => {
+    setIsNavOpen(false);
+  }, [pathname]);
 
   // カレンダー関連の定数
   const currentMonth = selectedDate.getMonth()
