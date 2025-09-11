@@ -66,9 +66,9 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
       )}
 
       {/* Navigation Panel */}
-      <nav className={`fixed top-0 left-0 h-full w-80 bg-[var(--color-bg-light)] border-r border-[var(--color-border)] shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
+      <nav className={`fixed top-0 left-0 h-full w-80 bg-[var(--color-bg-light)] border-r border-[var(--color-border)] shadow-xl z-50 transform transition-transform duration-300 ease-in-out md:static md:h-screen md:w-80 md:shadow-lg md:translate-x-0 md:transform-none md:transition-none ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
-      } md:translate-x-0 md:static md:h-screen md:w-80 md:shadow-lg`}>
+      }`}>
 
         {/* Mobile Close Button */}
         <div className="flex items-center justify-between p-6 border-b border-[var(--color-border)] md:hidden">
