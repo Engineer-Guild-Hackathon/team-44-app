@@ -30,11 +30,20 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
   const fetchSettings = async () => {
     setIsLoading(true);
     try {
-      // TODO: API呼び出しを実装
-      console.log('Fetching reminder settings...');
-      // const response = await fetch('/api/reminderSettings');
-      // const data = await response.json();
-      // setSettings(data.data);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/reminderSettings`, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setSettings(data.data);
+        }
+      } else {
+        console.log('Using default settings');
+      }
     } catch (error) {
       console.error('Failed to fetch settings:', error);
     } finally {
@@ -45,16 +54,20 @@ export const ReminderSettings: React.FC<ReminderSettingsProps> = ({ onSettingsCh
   const saveSettings = async () => {
     setIsSaving(true);
     try {
-      // TODO: API呼び出しを実装
-      console.log('Saving reminder settings:', settings);
-      // const response = await fetch('/api/reminderSettings', {
-      //   method: 'PUT',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(settings)
-      // });
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/reminderSettings`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(settings)
+      });
 
-      onSettingsChange?.(settings);
-      alert('設定が保存されました');
+      if (response.ok) {
+        onSettingsChange?.(settings);
+        alert('設定が保存されました');
+      } else {
+        throw new Error('Failed to save settings');
+      }
     } catch (error) {
       console.error('Failed to save settings:', error);
       alert('設定の保存に失敗しました');

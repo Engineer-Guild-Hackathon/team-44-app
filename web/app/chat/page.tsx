@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { ChatMessage } from '../../types/api'
 import ChatView from '../../components/common/ChatView'
 import MessageInput from '../../components/common/MessageInput'
@@ -8,12 +8,99 @@ import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
 
 export default function ChatPage() {
+  const [message, setMessage] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isNavOpen, setIsNavOpen] = useState(false)
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
+  const [isCreatingSession, setIsCreatingSession] = useState(false)
 
-  const handleSendMessage = async (message: string) => {
+  // モック応答を生成する関数
+  const getMockResponse = (userMessage: string): string => {
+    const responses = [
+      `「${userMessage}」についてですね。まず、この問題を解決するために、どのようなアプローチを考えますか？`,
+      `いい質問ですね。「${userMessage}」について考えてみましょう。基本的な概念から確認してみませんか？`,
+      `「${userMessage}」という問題は、段階的に考えるとわかりやすいかもしれません。まず、どの部分が難しいですか？`,
+      `それは重要なポイントですね。「${userMessage}」について、具体例を挙げて考えてみましょう。`,
+      `「${userMessage}」についてお手伝いします。自分で解いてみる前に、どのような手がかりがあるか考えてみてください。`
+    ]
+    return responses[Math.floor(Math.random() * responses.length)]
+  }
+
+  // バックエンドのヘルスチェック
+  const checkBackendHealth = useCallback(async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/health`)
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Backend health check:', data)
+        return data
+      } else {
+        console.error('Backend health check failed:', response.status)
+        return null
+      }
+    } catch (error) {
+      console.error('Backend health check error:', error)
+      return null
+    }
+  }, [])
+
+  // セッション作成
+  const createNewSession = useCallback(async () => {
+    if (isCreatingSession) return // 既に作成中ならスキップ
+
+    setIsCreatingSession(true)
+    try {
+      console.log('Creating new session...')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/health`)
+      if (!response.ok) {
+        throw new Error('Backend not available')
+      }
+
+      const sessionResponse = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/chatSessions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title: 'AI学習サポート' }),
+      })
+
+      if (sessionResponse.ok) {
+        const data = await sessionResponse.json()
+        setCurrentSessionId(data.sessionId)
+        console.log('New session created:', data.sessionId)
+        return data.sessionId
+      } else {
+        console.error('Failed to create session:', sessionResponse.status, sessionResponse.statusText)
+        throw new Error(`セッション作成に失敗しました (${sessionResponse.status})`)
+      }
+    } catch (error) {
+      console.error('Error creating session:', error)
+      // APIが利用できない場合はデモモード
+      const demoSessionId = `demo-${Date.now()}`
+      setCurrentSessionId(demoSessionId)
+      console.log('Backend LLM service is not available. Using demo mode for AI responses.')
+      console.log('Demo session created:', demoSessionId)
+      return demoSessionId
+    } finally {
+      setIsCreatingSession(false)
+    }
+  }, [isCreatingSession])
+
+    // メッセージ送信
+  const handleSendMessage = async () => {
     if (!message.trim()) return
+
+    // セッションが存在しない場合は作成
+    let sessionId = currentSessionId
+    if (!sessionId) {
+      console.log('No session found, creating new session...')
+      sessionId = await createNewSession()
+      if (!sessionId) {
+        console.error('Failed to create session')
+        return
+      }
+    }
 
     const userMessage: ChatMessage = {
       role: 'user',
@@ -23,18 +110,96 @@ export default function ChatPage() {
 
     setMessages(prev => [...prev, userMessage])
     setIsLoading(true)
+    const currentMessage = message
+    setMessage('') // すぐにクリア
 
-    // モック応答
-    setTimeout(() => {
+    try {
+      console.log('Sending message to session:', sessionId)
+
+      // デモセッションの場合はモック応答を返す
+      if (sessionId.startsWith('demo-')) {
+        console.log('Using demo mode for AI response')
+        await new Promise(resolve => setTimeout(resolve, 1500)) // シミュレーション遅延
+
+        const mockResponse = getMockResponse(currentMessage)
+        const aiMessage: ChatMessage = {
+          role: 'model',
+          parts: [{ text: mockResponse }],
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, aiMessage])
+        console.log('Demo AI response:', mockResponse)
+        return
+      }
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/chatSessions/${sessionId}/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: currentMessage }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        const aiMessage: ChatMessage = {
+          role: 'model',
+          parts: [{ text: data.response }],
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, aiMessage])
+        console.log('AI response received:', data.response)
+      } else {
+        console.error('API error:', response.status, response.statusText)
+        console.log('Backend LLM service is not available. Switching to demo mode.')
+        // APIが利用できない場合はデモモードで応答
+        await new Promise(resolve => setTimeout(resolve, 1500)) // シミュレーション遅延
+        const mockResponse = getMockResponse(currentMessage)
+        const aiMessage: ChatMessage = {
+          role: 'model',
+          parts: [{ text: mockResponse }],
+          timestamp: new Date()
+        }
+        setMessages(prev => [...prev, aiMessage])
+        console.log('Demo AI response:', mockResponse)
+        return
+      }
+    } catch (error) {
+      console.error('Error sending message:', error)
+      console.log('Backend LLM service is not available. Switching to demo mode.')
+      // APIが利用できない場合はデモモードで応答
+      await new Promise(resolve => setTimeout(resolve, 1500)) // シミュレーション遅延
+      const mockResponse = getMockResponse(currentMessage)
       const aiMessage: ChatMessage = {
         role: 'model',
-        parts: [{ text: `「${message}」についてですね。どのような質問がありますか？` }],
+        parts: [{ text: mockResponse }],
         timestamp: new Date()
       }
       setMessages(prev => [...prev, aiMessage])
+      console.log('Demo AI response:', mockResponse)
+      return
+    } finally {
       setIsLoading(false)
-    }, 1000)
+    }
   }
+
+  // 初期化
+  useEffect(() => {
+    console.log('Initializing chat page...')
+    checkBackendHealth()
+    createNewSession()
+  }, [])
+
+  // デバッグ用：状態確認
+  useEffect(() => {
+    console.log('Current state:', {
+      message: message.length,
+      currentSessionId,
+      isLoading,
+      isCreatingSession,
+      messagesCount: messages.length
+    })
+  }, [message, currentSessionId, isLoading, isCreatingSession, messages])
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-light)] flex">

@@ -5,8 +5,8 @@ import dotenv from "dotenv";
 
 // .envファイルを読み込む
 dotenv.config();
-import { createSession, postMessage, getUserSessions, getSession } from "./controllers/chatController";
-import { generateLearningRecord, getUserLearningRecords, getLearningRecord } from "./controllers/learningRecordController";
+import { createSession, createSmartSession, postMessage, getUserSessions, getSession, completeSession } from "./controllers/chatController";
+import { generateLearningRecord, getUserLearningRecords, getLearningRecord, getLearningRecordsForPeriod, createManualLearningRecord } from "./controllers/learningRecordController";
 import { getReminders, getReminderSettings, updateReminderSettings, updateReminderStatus } from "./controllers/reminderController";
 
 const app = express();
@@ -25,14 +25,18 @@ app.use((error: Error, req: Request, res: Response, next: express.NextFunction) 
 
 // ルーティング
 app.post("/chatSessions", createSession);
+app.post("/chatSessions/smart", createSmartSession);
 app.get("/chatSessions", getUserSessions);
 app.get("/chatSessions/:sessionId", getSession);
 app.post("/chatSessions/:sessionId/messages", postMessage);
+app.post("/chatSessions/:sessionId/complete", completeSession);
 
 // Learning record routes
 app.post("/chatSessions/:sessionId/learningRecord", generateLearningRecord);
 app.get("/learningRecords", getUserLearningRecords);
+app.get("/learningRecords/period", getLearningRecordsForPeriod);
 app.get("/learningRecords/:recordId", getLearningRecord);
+app.post("/learningRecords/manual", createManualLearningRecord);
 
 // Reminder routes
 app.get("/reminders", getReminders);
@@ -66,6 +70,39 @@ app.get("/health", async (req: Request, res: Response) => {
       timestamp: new Date().toISOString(),
       error: error instanceof Error ? error.message : 'Unknown error'
     });
+  }
+});
+
+// デバッグ: 環境変数出力と Firestore 接続確認用エンドポイント
+app.get("/debug/emulator-check", async (req: Request, res: Response) => {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const admin = require('firebase-admin');
+
+  const firestoreHost = process.env.FIRESTORE_EMULATOR_HOST || null;
+
+    // 現在の env を返す
+    const env = {
+      FIRESTORE_EMULATOR_HOST: process.env.FIRESTORE_EMULATOR_HOST || null,
+      GCLOUD_PROJECT: process.env.GCLOUD_PROJECT || null,
+      NODE_ENV: process.env.NODE_ENV || null
+    };
+
+    // Firestore に簡単なクエリを投げてみる（接続確認）
+    let firestoreOk = false;
+    let testCount = 0;
+    try {
+      const db = admin.firestore();
+      const snapshot = await db.collection('debug_emulator_check').limit(1).get();
+      testCount = snapshot.size;
+      firestoreOk = true;
+    } catch (err) {
+      console.error('Firestore check failed:', err);
+    }
+
+    res.json({ env, firestoreHost, firestoreOk, testCount });
+  } catch (error) {
+    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
   }
 });
 

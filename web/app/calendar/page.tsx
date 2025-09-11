@@ -18,69 +18,50 @@ interface LearningRecord {
 }
 
 export default function CalendarPage() {
-  const [learningRecords, setLearningRecords] = useState<LearningRecord[]>([])
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+  const [learningRecords, setLearningRecords] = useState<LearningRecord[]>([])
+  const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isNavOpen, setIsNavOpen] = useState(false)
 
-  // カレンダー表示用の日付計算
-  const currentMonth = selectedDate.getMonth()
-  const currentYear = selectedDate.getFullYear()
-  const firstDayOfMonth = new Date(currentYear, currentMonth, 1)
-  const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0)
-  const startDate = new Date(firstDayOfMonth)
-  startDate.setDate(startDate.getDate() - firstDayOfMonth.getDay())
-
-  const days = []
-  for (let i = 0; i < 42; i++) {
-    const date = new Date(startDate)
-    date.setDate(date.getDate() + i)
-    days.push(date)
-  }
-
-  // 学習記録を取得
-  const fetchLearningRecords = async () => {
+  // 月の学習記録を取得
+  const fetchMonthlyRecords = async (date: Date) => {
     setIsLoading(true)
     setError(null)
 
     try {
-      // TODO: API呼び出しを実装
-      console.log('Fetching learning records...')
-      // const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL
-      // const response = await fetch(`${API_BASE_URL}/learningRecords`)
-      // const data = await response.json()
-      // if (data.success) {
-      //   setLearningRecords(data.data)
-      // }
+      const year = date.getFullYear()
+      const month = date.getMonth()
+      const startDate = new Date(year, month, 1)
+      const endDate = new Date(year, month + 1, 0)
 
-      // デモ用のダミーデータ
-      setLearningRecords([])
-    } catch (err) {
+      const records = await apiClient.getLearningRecordsForPeriod(startDate, endDate)
+      setLearningRecords(records)
+    } catch (error) {
+      console.error('Failed to fetch learning records:', error)
       setError('学習記録の取得に失敗しました')
-      console.error('Error fetching learning records:', err)
+      setLearningRecords([])
     } finally {
       setIsLoading(false)
     }
   }
 
-  useEffect(() => {
-    fetchLearningRecords()
-  }, [])
-
-  // 指定した日付の学習記録を取得
-  const getRecordsForDate = (date: Date): LearningRecord[] => {
+  // 選択日の学習記録をフィルタリング
+  const getDayRecords = (date: Date) => {
     return learningRecords.filter(record => {
-      const recordDate = new Date(record.completedAt)
+      const recordDate = new Date(record.lastStudiedAt)
       return recordDate.toDateString() === date.toDateString()
     })
   }
 
-  // 月を変更
-  const changeMonth = (delta: number) => {
-    const newDate = new Date(selectedDate)
-    newDate.setMonth(newDate.getMonth() + delta)
-    setSelectedDate(newDate)
+  // 月が変わった時に記録を取得
+  useEffect(() => {
+    fetchMonthlyRecords(selectedDate)
+  }, [selectedDate.getMonth(), selectedDate.getFullYear()])
+
+  const handleDateSelect = (date: Date) => {
+    setSelectedDate(date)
   }
 
   // 教科別の色分け（Librariaテーマ対応）
@@ -96,12 +77,9 @@ export default function CalendarPage() {
     return colors[subject] || colors['general']
   }
 
-  const monthNames = [
-    '1月', '2月', '3月', '4月', '5月', '6月',
-    '7月', '8月', '9月', '10月', '11月', '12月'
-  ]
-
-  const dayNames = ['日', '月', '火', '水', '木', '金', '土']
+  const handleCloseModal = () => {
+    setSelectedRecordId(null)
+  }
 
   if (error) {
     return (
@@ -254,6 +232,14 @@ export default function CalendarPage() {
                 ))}
               </div>
             </div>
+            <div className="text-sm text-gray-600">学習分野数</div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6 text-center">
+            <div className="text-2xl font-bold text-orange-600">
+              {learningRecords.reduce((sum, record) => sum + record.sessionCount, 0)}
+            </div>
+            <div className="text-sm text-gray-600">総セッション数</div>
           </div>
         </main>
       </div>
