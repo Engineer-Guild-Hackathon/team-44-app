@@ -17,6 +17,7 @@ export default function CalendarPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isNavOpen, setIsNavOpen] = useState(true)
+  const [statusFilter, setStatusFilter] = useState<string>('all') // 'all', 'active', 'completed'
 
   // Modal states
   const [showDayModal, setShowDayModal] = useState(false)
@@ -63,11 +64,13 @@ export default function CalendarPage() {
     setSelectedDate(newDate)
   }
 
-  // 日付の学習記録を取得
+  // 日付の学習記録を取得（フィルタ適用）
   const getRecordsForDate = (date: Date) => {
     return learningRecords.filter(record => {
       const recordDate = new Date(record.lastStudiedAt)
-      return recordDate.toDateString() === date.toDateString()
+      const dateMatches = recordDate.toDateString() === date.toDateString()
+      const statusMatches = statusFilter === 'all' || record.status === statusFilter
+      return dateMatches && statusMatches
     })
   }
 
@@ -97,7 +100,9 @@ export default function CalendarPage() {
   const getDayRecords = (date: Date) => {
     return learningRecords.filter(record => {
       const recordDate = new Date(record.lastStudiedAt)
-      return recordDate.toDateString() === date.toDateString()
+      const dateMatches = recordDate.toDateString() === date.toDateString()
+      const statusMatches = statusFilter === 'all' || record.status === statusFilter
+      return dateMatches && statusMatches
     })
   }
 

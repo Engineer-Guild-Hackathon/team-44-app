@@ -77,20 +77,14 @@ export async function createSmartSession(req: Request, res: Response): Promise<v
     const learningRecordService = new LearningRecordService();
     const estimation = await learningRecordService.estimateSubjectAndTopic(initialMessage);
 
-    // スマートセッション作成（既存記録への追加 or 新規作成）
-    const result = await chatServiceInstance.createSmartSession(
-      userId,
-      estimation.subject,
-      estimation.topic,
-      initialMessage
-    );
+    // セッション作成（LearningRecordは昇格時に作成）
+    const sessionId = await chatServiceInstance.createSession(userId, "AI対話セッション");
 
     res.json({
       success: true,
-      sessionId: result.sessionId,
-      learningRecordId: result.learningRecordId,
-      isNewLearningRecord: result.isNewLearningRecord,
-      estimation
+      sessionId,
+      subject: estimation.subject,
+      topic: estimation.topic
     });
   } catch (error) {
     console.error("Error creating smart session:", error);

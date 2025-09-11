@@ -85,8 +85,8 @@ export class ChatService {
    */
   async createSmartSession(
     userId: string,
-    estimatedSubject: string,
-    estimatedTopic: string,
+    subject: string,
+    topic: string,
     // initialMessage is currently unused here but kept in signature for future use
     _initialMessage: string
   ): Promise<SmartSessionResult> {
@@ -96,8 +96,8 @@ export class ChatService {
       // 既存のアクティブな学習記録を検索
       const existingRecord = await this.getLearningRecordService().findActiveLearningRecord(
         userId,
-        estimatedSubject,
-        estimatedTopic
+        subject,
+        topic
       );
 
       let learningRecordId: string;
@@ -111,8 +111,8 @@ export class ChatService {
         // 新しい学習記録を作成
         learningRecordId = await this.getLearningRecordService().createNewLearningRecord(
           userId,
-          estimatedSubject,
-          estimatedTopic
+          subject,
+          topic
         );
         isNewLearningRecord = true;
       }
@@ -122,7 +122,7 @@ export class ChatService {
       const sessionData: Omit<ChatSession, "id"> = {
         userId,
         learningRecordId,
-        title: `${estimatedTopic}に関する対話`,
+        title: `${topic}に関する対話`,
         status: "draft",
         startedAt: new Date(),
         messageCount: 0,
@@ -234,12 +234,30 @@ export class ChatService {
     const now = new Date();
     const durationMinutes = (now.getTime() - session?.startedAt?.toDate()?.getTime()) / (1000 * 60);
 
-    // learningRecordIdが存在することを保証
-    const learningRecordId = await this.ensureLearningRecordExists(sessionId, session!.userId);
+    // 昇格時にLearningRecordを作成または既存レコードと紐付け
+    const learningRecordId = await this.getLearningRecordService().createOrLinkLearningRecordForSession(sessionId, session!.userId);
 
-    // セッションをアクティブ状態に昇格し、現在の継続時間を更新
+    // LLMを使ってセッションタイトルを生成
+    let generatedTitle = session?.title || "AI対話セッション"; // デフォルト
+    if (session?.messages && session.messages.length > 0) {
+      try {
+        const provider = getLLMProviderInstance();
+        const titlePrompt = "以下の会話の内容を基に、適切なセッションタイトルを1行で生成してください。タイトルは簡潔で、学習内容を反映したものにしてください。";
+        const conversationText = session.messages.map((msg: ChatMessage) => `${msg.role}: ${msg.parts.map((p: { text: string }) => p.text).join('')}`).join('\n');
+        const fullPrompt = `${titlePrompt}\n\n会話内容:\n${conversationText}`;
+        generatedTitle = await provider.generateResponse([], fullPrompt);
+        // 応答から余分なテキストを除去（必要に応じて）
+        generatedTitle = generatedTitle.trim().replace(/^["']|["']$/g, '');
+      } catch (error) {
+        console.error("タイトル生成エラー:", error);
+        // エラー時はデフォルトタイトルを使用
+      }
+    }
+
+    // セッションをアクティブ状態に昇格し、タイトルと現在の継続時間を更新
     await sessionRef.update({
       status: "active",
+      title: generatedTitle,
       duration: Math.round(durationMinutes || 0),
       updatedAt: new Date()
     });

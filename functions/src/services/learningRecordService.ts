@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
-import { LearningRecord, SubjectTopicEstimation } from "../models/types";
+import { LearningRecord, ChatSession } from "../models/types";
 import { getLLMProvider } from "./llm/llmFactory";
 
 // Firebase Admin の初期化
@@ -16,7 +16,7 @@ export class LearningRecordService {
   /**
    * 初期メッセージから学習分野とトピックを推定
    */
-  async estimateSubjectAndTopic(initialMessage: string): Promise<SubjectTopicEstimation> {
+  async estimateSubjectAndTopic(initialMessage: string): Promise<{ subject: string; topic: string; confidence: number }> {
     const prompt = `
 以下のメッセージから学習分野とトピックを推定してください：
 
@@ -47,6 +47,158 @@ export class LearningRecordService {
         confidence: 0.3
       };
     }
+  }
+
+  /**
+   * セッションのメタデータからsubject/topicをLLMで推定
+   */
+  async estimateSubjectAndTopicFromSession(session: ChatSession): Promise<{ subject: string; topic: string; confidence: number }> {
+    const messages = session.messages.map(m => m.parts.map(p => p.text).join(' ')).join(' ');
+    const prompt = `
+以下のチャットセッションのメタデータから、学習分野(subject)と具体的なトピック(topic)を推定してください。
+
+タイトル: ${session.title || 'なし'}
+サマリー: ${session.sessionSummary || 'なし'}
+主要メッセージ: ${messages.substring(0, 500)}...
+
+出力形式（JSON）:
+{
+  "subject": "学習分野（例: 数学、英語、物理）",
+  "topic": "具体的なトピック（例: 二次関数、現在完了形）",
+  "confidence": 0.0-1.0
+}
+`;
+
+    try {
+      const response = await this.llm.generateResponse([], prompt);
+      const cleanedResponse = response.replace(/```json|```/g, "").trim();
+      const result = JSON.parse(cleanedResponse);
+      return {
+        subject: result.subject || "一般学習",
+        topic: result.topic || "AI対話",
+        confidence: result.confidence || 0.5
+      };
+    } catch (error) {
+      console.error("Error estimating from session:", error);
+      return {
+        subject: "一般学習",
+        topic: "AI対話",
+        confidence: 0.3
+      };
+    }
+  }
+
+  /**
+   * 当日レコード一覧を取得
+   */
+  async getTodayLearningRecords(userId: string): Promise<LearningRecord[]> {
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+
+    const snapshot = await db
+      .collection("learningRecords")
+      .where("userId", "==", userId)
+      .where("lastStudiedAt", ">=", startOfDay)
+      .where("lastStudiedAt", "<", endOfDay)
+      .get();
+
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+      lastStudiedAt: doc.data().lastStudiedAt?.toDate ? doc.data().lastStudiedAt.toDate() : doc.data().lastStudiedAt,
+      createdAt: doc.data().createdAt?.toDate ? doc.data().createdAt.toDate() : doc.data().createdAt,
+      updatedAt: doc.data().updatedAt?.toDate ? doc.data().updatedAt.toDate() : doc.data().updatedAt
+    } as LearningRecord));
+  }
+
+  /**
+   * LLMで既存レコードとのマッチングを判断
+   */
+  async findMatchingLearningRecord(userId: string, subject: string, topic: string, existingRecords: LearningRecord[]): Promise<string | null> {
+    if (existingRecords.length === 0) return null;
+
+    const recordsText = existingRecords.map(r => `ID: ${r.id}, subject: ${r.subject}, topic: ${r.topic}`).join('\n');
+    const prompt = `
+新しいセッションのsubject: ${subject}, topic: ${topic} に対して、以下の既存レコード一覧から最も似ているものを選んでください。該当なしの場合はnullを返してください。
+
+既存レコード:
+${recordsText}
+
+出力: {matchedId} または null
+`;
+
+    try {
+      const response = await this.llm.generateResponse([], prompt);
+      const matchedId = response.trim();
+      return matchedId === 'null' ? null : matchedId;
+    } catch (error) {
+      console.error("Error finding matching record:", error);
+      return null;
+    }
+  }
+
+  /**
+   * セッション昇格時のLearningRecord作成または紐付け
+   */
+  async createOrLinkLearningRecordForSession(sessionId: string, userId: string): Promise<string> {
+    return db.runTransaction(async (transaction) => {
+      // セッションを取得
+      const sessionRef = db.collection("chatSessions").doc(sessionId);
+      const sessionDoc = await transaction.get(sessionRef);
+      if (!sessionDoc.exists) throw new Error("Session not found");
+      const session = sessionDoc.data() as ChatSession;
+
+      // LLM推定
+      const estimation = await this.estimateSubjectAndTopicFromSession(session);
+
+      // 当日レコード取得
+      const todayRecords = await this.getTodayLearningRecords(userId);
+
+      // マッチング
+      const matchedId = await this.findMatchingLearningRecord(userId, estimation.subject, estimation.topic, todayRecords);
+
+      let learningRecordId: string;
+      if (matchedId) {
+        learningRecordId = matchedId;
+        // 既存レコードを更新
+        const recordRef = db.collection("learningRecords").doc(matchedId);
+        transaction.update(recordRef, {
+          sessionCount: FieldValue.increment(1),
+          lastStudiedAt: new Date(),
+          updatedAt: new Date()
+        });
+      } else {
+        // 新規作成
+        const recordRef = db.collection("learningRecords").doc();
+        const recordData = {
+          id: recordRef.id,
+          userId,
+          subject: estimation.subject,
+          topic: estimation.topic,
+          status: "active",
+          totalDuration: 0,
+          sessionCount: 1,
+          difficulty: 3,
+          lastStudiedAt: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };
+        transaction.set(recordRef, recordData);
+        learningRecordId = recordRef.id;
+      }
+
+      // セッションにlearningRecordIdを設定
+      transaction.update(sessionRef, {
+        learningRecordId,
+        updatedAt: new Date()
+      });
+
+      // ログ
+      console.log(`LearningRecord ${matchedId ? 'linked' : 'created'}: ${learningRecordId} for session ${sessionId}`);
+
+      return learningRecordId;
+    });
   }
 
   /**
