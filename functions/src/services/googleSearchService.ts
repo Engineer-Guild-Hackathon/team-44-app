@@ -21,11 +21,11 @@ export class GoogleSearchService {
   private searchEngineId: string;
 
   constructor() {
-    this.apiKey = process.env.GOOGLE_SEARCH_API_KEY || '';
-    this.searchEngineId = process.env.GOOGLE_SEARCH_ENGINE_ID || '';
+    this.apiKey = process.env.GOOGLE_SEARCH_API_KEY || "";
+    this.searchEngineId = process.env.GOOGLE_SEARCH_ENGINE_ID || "";
     
     if (!this.apiKey || !this.searchEngineId) {
-      console.warn('Google Search API credentials not configured. Search functionality will be disabled.');
+      console.warn("Google Search API credentials not configured. Search functionality will be disabled.");
     }
   }
 
@@ -34,52 +34,52 @@ export class GoogleSearchService {
    */
   async search(query: string, maxResults: number = 5): Promise<SearchResponse | null> {
     if (!this.apiKey || !this.searchEngineId) {
-      console.log('Google Search API not configured, skipping search');
+      console.log("Google Search API not configured, skipping search");
       return null;
     }
 
     try {
-      const searchUrl = new URL('https://www.googleapis.com/customsearch/v1');
-      searchUrl.searchParams.append('key', this.apiKey);
-      searchUrl.searchParams.append('cx', this.searchEngineId);
-      searchUrl.searchParams.append('q', query);
-      searchUrl.searchParams.append('num', Math.min(maxResults, 10).toString());
-      searchUrl.searchParams.append('safe', 'active');
-      searchUrl.searchParams.append('lr', 'lang_ja'); // Japanese language preference
+      const searchUrl = new URL("https://www.googleapis.com/customsearch/v1");
+      searchUrl.searchParams.append("key", this.apiKey);
+      searchUrl.searchParams.append("cx", this.searchEngineId);
+      searchUrl.searchParams.append("q", query);
+      searchUrl.searchParams.append("num", Math.min(maxResults, 10).toString());
+      searchUrl.searchParams.append("safe", "active");
+      searchUrl.searchParams.append("lr", "lang_ja"); // Japanese language preference
 
       const response = await fetch(searchUrl.toString());
       
       if (!response.ok) {
-        console.error('Google Search API error:', response.status, response.statusText);
+        console.error("Google Search API error:", response.status, response.statusText);
         return null;
       }
 
       const data = await response.json();
       
       if (!data.items) {
-        console.log('No search results found for query:', query);
+        console.log("No search results found for query:", query);
         return {
           results: [],
-          searchTime: data.searchInformation?.searchTime || '0',
-          totalResults: data.searchInformation?.totalResults || '0'
+          searchTime: data.searchInformation?.searchTime || "0",
+          totalResults: data.searchInformation?.totalResults || "0"
         };
       }
 
       const results: SearchResult[] = data.items.map((item: any) => ({
-        title: item.title || '',
-        link: item.link || '',
-        snippet: item.snippet || '',
-        displayLink: item.displayLink || ''
+        title: item.title || "",
+        link: item.link || "",
+        snippet: item.snippet || "",
+        displayLink: item.displayLink || ""
       }));
 
       return {
         results,
-        searchTime: data.searchInformation?.searchTime || '0',
-        totalResults: data.searchInformation?.totalResults || '0'
+        searchTime: data.searchInformation?.searchTime || "0",
+        totalResults: data.searchInformation?.totalResults || "0"
       };
 
     } catch (error) {
-      console.error('Error performing Google search:', error);
+      console.error("Error performing Google search:", error);
       return null;
     }
   }
@@ -96,10 +96,10 @@ export class GoogleSearchService {
    */
   formatSearchResults(searchResponse: SearchResponse): string {
     if (!searchResponse.results.length) {
-      return '検索結果が見つかりませんでした。';
+      return "検索結果が見つかりませんでした。";
     }
 
-    let formatted = '🔍 **関連する情報を検索しました：**\n\n';
+    let formatted = "🔍 **関連する情報を検索しました：**\n\n";
     
     searchResponse.results.forEach((result, index) => {
       formatted += `**${index + 1}. ${result.title}**\n`;
@@ -108,7 +108,7 @@ export class GoogleSearchService {
     });
 
     formatted += `*検索結果: ${searchResponse.totalResults}件 (${searchResponse.searchTime}秒)*\n\n`;
-    formatted += 'これらの情報を参考に、さらに詳しく学習を進めましょう！';
+    formatted += "これらの情報を参考に、さらに詳しく学習を進めましょう！";
 
     return formatted;
   }
@@ -119,8 +119,8 @@ export class GoogleSearchService {
   generateSearchQuery(userMessage: string, context?: string): string {
     // Remove common Japanese particles and focus on key terms
     let query = userMessage
-      .replace(/[？！。、]/g, ' ')
-      .replace(/\s+/g, ' ')
+      .replace(/[？！。、]/g, " ")
+      .replace(/\s+/g, " ")
       .trim();
 
     // Add context if available
@@ -129,7 +129,7 @@ export class GoogleSearchService {
     }
 
     // Add Japanese educational content preference
-    query += ' 学習 解説';
+    query += " 学習 解説";
 
     return query;
   }

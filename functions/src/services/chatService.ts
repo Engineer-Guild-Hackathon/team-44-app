@@ -257,7 +257,7 @@ export class ChatService {
 
       // 学習記録がない場合、メッセージから推定
       const estimatedContext = await this.getLearningRecordService().estimateSubjectAndTopic(
-        session.messages.map(msg => `${msg.role}: ${msg.parts[0]?.text || ''}`).join('\n') + `\nuser: ${currentMessage}`
+        session.messages.map(msg => `${msg.role}: ${msg.parts[0]?.text || ""}`).join("\n") + `\nuser: ${currentMessage}`
       );
 
       return {
@@ -267,7 +267,7 @@ export class ChatService {
         userLevel: this.estimateUserLevel(session.messages, currentMessage)
       };
     } catch (error) {
-      console.error('Error extracting learning context:', error);
+      console.error("Error extracting learning context:", error);
       // エラー時はデフォルトコンテキストを返す
       return {
         subject: "一般学習",
@@ -282,8 +282,8 @@ export class ChatService {
    * メッセージ履歴からユーザーレベルを推定
    */
   private estimateUserLevel(messages: ChatMessage[], currentMessage: string): string {
-    const allMessages = [...messages, { role: 'user', parts: [{ text: currentMessage }] }] as ChatMessage[];
-    const userMessages = allMessages.filter(msg => msg.role === 'user');
+    const allMessages = [...messages, { role: "user", parts: [{ text: currentMessage }] }] as ChatMessage[];
+    const userMessages = allMessages.filter(msg => msg.role === "user");
     
     if (userMessages.length <= 2) {
       return "初級";
@@ -297,7 +297,7 @@ export class ChatService {
       /なぜ.*なのか|どのような.*があるか|.*の理由/
     ];
 
-    const recentMessages = userMessages.slice(-3).map(msg => msg.parts[0]?.text || '');
+    const recentMessages = userMessages.slice(-3).map(msg => msg.parts[0]?.text || "");
     const hasAdvancedContent = recentMessages.some(text => 
       advancedPatterns.some(pattern => pattern.test(text))
     );
