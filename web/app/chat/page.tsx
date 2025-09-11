@@ -22,6 +22,18 @@ export default function ChatPage() {
   }, [pathname]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [isCreatingSession, setIsCreatingSession] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<ChatMessage | null>(null)
+
+  // エラーメッセージをチャット形式で追加
+  const addErrorMessage = (errorText: string) => {
+    const errorMsg: ChatMessage = {
+      role: 'model',
+      parts: [{ text: `⚠️ ${errorText}` }],
+      timestamp: new Date()
+    }
+    setMessages(prev => [...prev, errorMsg])
+    setErrorMessage(errorMsg)
+  }
   const { user, loading: authLoading } = useAuth()
 
   // 認証トークンを取得する関数
@@ -199,32 +211,12 @@ export default function ChatPage() {
         console.log('AI response received:', data.response)
       } else {
         console.error('API error:', response.status, response.statusText)
-        console.log('Backend LLM service is not available. Switching to demo mode.')
-        // APIが利用できない場合はデモモードで応答
-        await new Promise(resolve => setTimeout(resolve, 1500)) // シミュレーション遅延
-        const mockResponse = getMockResponse(currentMessage)
-        const aiMessage: ChatMessage = {
-          role: 'model',
-          parts: [{ text: mockResponse }],
-          timestamp: new Date()
-        }
-        setMessages(prev => [...prev, aiMessage])
-        console.log('Demo AI response:', mockResponse)
+        addErrorMessage('AI応答の取得に失敗しました。しばらく経ってから再度お試しください。')
         return
       }
     } catch (error) {
       console.error('Error sending message:', error)
-      console.log('Backend LLM service is not available. Switching to demo mode.')
-      // APIが利用できない場合はデモモードで応答
-      await new Promise(resolve => setTimeout(resolve, 1500)) // シミュレーション遅延
-      const mockResponse = getMockResponse(currentMessage)
-      const aiMessage: ChatMessage = {
-        role: 'model',
-        parts: [{ text: mockResponse }],
-        timestamp: new Date()
-      }
-      setMessages(prev => [...prev, aiMessage])
-      console.log('Demo AI response:', mockResponse)
+      addErrorMessage('メッセージの送信に失敗しました。ネットワーク接続を確認してください。')
       return
     } finally {
       setIsLoading(false)
@@ -262,34 +254,18 @@ export default function ChatPage() {
   // ページ離脱時にセッションを完了
   useEffect(() => {
     const handleBeforeUnload = async (e: BeforeUnloadEvent) => {
-      if (currentSessionId && !currentSessionId.startsWith('demo-')) {
-        // 同期的に完了処理を実行
-        try {
-          const token = await getAuthToken()
-          if (token) {
-            fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/chatSessions/${currentSessionId}/complete`, {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-              },
-              keepalive: true // ページ離脱後もリクエストを完了させる
-            })
-          }
-        } catch (error) {
-          console.error('Error completing session on unload:', error)
-        }
-      }
+      // セッション完了処理を削除 - セッションを保持する
+      console.log('Page unloading, keeping session active')
     }
 
     window.addEventListener('beforeunload', handleBeforeUnload)
 
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload)
-      // コンポーネントアンマウント時にも完了処理
-      completeCurrentSession()
+      // コンポーネントアンマウント時のセッション完了処理を削除
+      console.log('Component unmounting, keeping session active')
     }
-  }, [completeCurrentSession, currentSessionId, getAuthToken])
+  }, []) // completeCurrentSession, currentSessionId, getAuthToken を依存配列から削除
 
   // デバッグ用：状態確認
   useEffect(() => {
@@ -304,7 +280,11 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-light)] flex">
-      <Header user={user} onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
+      <Header user={user} onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} onNewChat={() => {
+        setMessages([])
+        setErrorMessage(null)
+        // セッションIDは保持して、新しいメッセージを開始
+      }} showNewChatButton={messages.length > 0} />
       {user && <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />}
 
       {/* Main Content */}
@@ -337,7 +317,11 @@ export default function ChatPage() {
                 </div>
               </div>
             ) : (
-              <ChatView messages={messages} isLoading={isLoading} />
+              <div>
+                <div className="pb-24">
+                  <ChatView messages={messages} isLoading={isLoading} />
+                </div>
+              </div>
             )}
           </div>
 

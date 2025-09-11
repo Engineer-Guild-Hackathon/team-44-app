@@ -81,7 +81,7 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-[var(--color-accent)] hover:bg-opacity-10 rounded-lg transition-colors"
+            className="p-2 hover:bg-[var(--color-accent)] hover:bg-opacity-15 rounded-lg transition-colors"
           >
             <svg className="w-5 h-5 text-[var(--color-text-light)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -101,7 +101,7 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-[var(--color-accent)] hover:bg-opacity-10 rounded-lg transition-colors"
+            className="p-2 hover:bg-[var(--color-accent)] hover:bg-opacity-15 rounded-lg transition-colors"
             title="サイドバーを閉じる"
           >
             <svg className="w-5 h-5 text-[var(--color-text-light)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -121,8 +121,8 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
                     href={item.href}
                     onClick={() => onClose()}
                     className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive
-                        ? 'bg-[var(--color-primary)] text-[var(--color-text-dark)] shadow-md'
-                        : 'text-[var(--color-text-light)] hover:bg-[var(--color-accent)] hover:bg-opacity-10 hover:text-[var(--color-accent)]'
+                      ? 'bg-[var(--color-primary)] text-[var(--color-text-dark)] shadow-md'
+                      : 'text-[var(--color-text-light)] hover:bg-[var(--color-accent)] hover:bg-opacity-15 hover:text-[var(--color-accent)]'
                       }`}
                   >
                     <span className="flex-shrink-0">{item.icon}</span>
@@ -142,7 +142,7 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
                   logout()
                   onClose()
                 }}
-                className="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-[var(--color-text-light)] hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)] w-full text-left"
+                className="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-[var(--color-text-light)] hover:bg-[var(--color-error)] hover:bg-opacity-15 hover:text-[var(--color-error)] w-full text-left"
               >
                 <LogoutIcon className="w-5 h-5 flex-shrink-0 text-[var(--color-error)]" />
                 <span className="font-medium">ログアウト</span>

@@ -104,17 +104,17 @@ export default function LearningRecordDetail({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div 
-        className="bg-white rounded-xl shadow-2xl w-full max-w-6xl h-[80vh] overflow-hidden animate-in fade-in-0 zoom-in-95 duration-300"
+        className="bg-[var(--color-bg-light)] rounded-xl shadow-2xl w-full max-w-6xl h-[80vh] overflow-hidden animate-in fade-in-0 zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ヘッダー */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-[var(--color-border)]">
           <div className="flex items-center space-x-3">
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-[var(--color-accent)] hover:bg-opacity-10 rounded-lg transition-colors"
             >
-              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-[var(--color-text-light)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
@@ -145,23 +145,23 @@ export default function LearningRecordDetail({
         {/* メインコンテンツ */}
         <div className="flex h-full">
           {/* 左パネル: セッション一覧 */}
-          <div className="w-1/3 border-r border-gray-200 bg-gray-50">
-            <div className="p-4 border-b border-gray-200">
-              <h3 className="font-medium text-gray-900">セッション一覧</h3>
-              <p className="text-sm text-gray-500">{sessions.length}セッション</p>
+          <div className="w-1/3 border-r border-[var(--color-border)] bg-[var(--color-bg-light)] bg-opacity-50">
+            <div className="p-4 border-b border-[var(--color-border)]">
+              <h3 className="font-medium text-[var(--color-text-light)]">セッション一覧</h3>
+              <p className="text-sm text-[var(--color-text-secondary)]">{sessions.length}セッション</p>
             </div>
             
             <div className="overflow-y-auto h-full pb-32">
               {isLoading ? (
                 <div className="flex items-center justify-center p-8">
-                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-500 border-t-transparent"></div>
+                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-[var(--color-primary)] border-t-transparent"></div>
                 </div>
               ) : error ? (
-                <div className="p-4 text-center text-red-600">
+                <div className="p-4 text-center text-[var(--color-error)]">
                   {error}
                 </div>
               ) : sessions.length === 0 ? (
-                <div className="p-4 text-center text-gray-500">
+                <div className="p-4 text-center text-[var(--color-text-secondary)]">
                   セッションが見つかりません
                 </div>
               ) : (
@@ -172,24 +172,24 @@ export default function LearningRecordDetail({
                       onClick={() => setSelectedSession(session)}
                       className={`w-full text-left p-3 rounded-lg transition-colors ${
                         selectedSession?.id === session.id
-                          ? 'bg-blue-100 border-2 border-blue-500'
-                          : 'bg-white hover:bg-gray-50 border border-gray-200'
+                          ? 'bg-[var(--color-accent)] bg-opacity-20 border-2 border-[var(--color-accent)]'
+                          : 'bg-[var(--color-bg-light)] hover:bg-[var(--color-accent)] hover:bg-opacity-10 border border-[var(--color-border)]'
                       }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <span className="text-sm font-medium text-gray-900">
+                          <span className="text-sm font-medium text-[var(--color-text-light)]">
                             セッション{index + 1}
                           </span>
                           {session.status === 'completed' && (
-                            <span className="text-green-500">✅</span>
+                            <span className="text-[var(--color-success)]">✅</span>
                           )}
                         </div>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-[var(--color-text-secondary)]">
                           {formatDuration(session.duration)}
                         </span>
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className="text-xs text-[var(--color-text-secondary)] mt-1">
                         {new Date(session.startedAt).toLocaleString('ja-JP', {
                           month: 'short',
                           day: 'numeric',
@@ -202,7 +202,7 @@ export default function LearningRecordDetail({
                         })}`}
                       </div>
                       {session.title && (
-                        <div className="text-xs text-gray-600 mt-1 truncate">
+                        <div className="text-xs text-[var(--color-text-secondary)] mt-1 truncate">
                           {session.title}
                         </div>
                       )}
@@ -217,11 +217,11 @@ export default function LearningRecordDetail({
           <div className="flex-1 flex flex-col">
             {selectedSession ? (
               <>
-                <div className="p-4 border-b border-gray-200 bg-white">
-                  <h3 className="font-medium text-gray-900">
+                <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-bg-light)]">
+                  <h3 className="font-medium text-[var(--color-text-light)]">
                     {selectedSession.title || `セッション${sessions.indexOf(selectedSession) + 1}`}
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-[var(--color-text-secondary)]">
                     {new Date(selectedSession.startedAt).toLocaleString('ja-JP')} • {selectedSession.messageCount}メッセージ
                   </p>
                 </div>
@@ -235,8 +235,8 @@ export default function LearningRecordDetail({
                       <div
                         className={`max-w-[80%] p-3 rounded-lg ${
                           message.role === 'user'
-                            ? 'bg-blue-500 text-white'
-                            : 'bg-gray-100 text-gray-900'
+                            ? 'bg-[var(--color-primary)] text-[var(--color-text-dark)]'
+                            : 'bg-[var(--color-accent)] bg-opacity-10 text-[var(--color-text-light)]'
                         }`}
                       >
                         <div className="whitespace-pre-wrap">
@@ -244,7 +244,7 @@ export default function LearningRecordDetail({
                         </div>
                         {message.timestamp && (
                           <div className={`text-xs mt-1 ${
-                            message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
+                            message.role === 'user' ? 'text-[var(--color-text-dark)] opacity-70' : 'text-[var(--color-text-secondary)]'
                           }`}>
                             {new Date(message.timestamp).toLocaleTimeString('ja-JP', {
                               hour: '2-digit',
@@ -258,7 +258,7 @@ export default function LearningRecordDetail({
                 </div>
               </>
             ) : (
-              <div className="flex-1 flex items-center justify-center text-gray-500">
+              <div className="flex-1 flex items-center justify-center text-[var(--color-text-secondary)]">
                 セッションを選択してください
               </div>
             )}
@@ -266,13 +266,13 @@ export default function LearningRecordDetail({
         </div>
 
         {/* フッター */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-[var(--color-bg-light)] border-t border-[var(--color-border)]">
           <div className="flex items-center justify-between">
             {/* 学習サマリー */}
             {record && (
               <div className="flex-1">
                 {record.summary && (
-                  <div className="text-sm text-gray-600 mb-2">
+                  <div className="text-sm text-[var(--color-text-secondary)] mb-2">
                     <span className="font-medium">学習サマリー:</span> {record.summary}
                   </div>
                 )}
@@ -281,13 +281,13 @@ export default function LearningRecordDetail({
                     {record.keyPoints.slice(0, 4).map((point, index) => (
                       <span
                         key={index}
-                        className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-gray-100 text-gray-700"
+                        className="inline-flex items-center px-2 py-1 rounded-md text-xs bg-[var(--color-accent)] bg-opacity-10 text-[var(--color-text-light)]"
                       >
                         {point}
                       </span>
                     ))}
                     {record.keyPoints.length > 4 && (
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-[var(--color-text-secondary)]">
                         +{record.keyPoints.length - 4}個
                       </span>
                     )}
@@ -299,7 +299,7 @@ export default function LearningRecordDetail({
             {/* 続きから学習ボタン */}
             <button
               onClick={() => onContinueLearning(recordId)}
-              className="ml-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              className="ml-4 px-6 py-2 bg-[var(--color-primary)] text-[var(--color-text-dark)] rounded-lg hover:bg-[var(--color-accent)] transition-colors font-medium"
             >
               続きから学習
             </button>
