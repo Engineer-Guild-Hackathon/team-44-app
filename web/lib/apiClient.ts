@@ -117,6 +117,16 @@ class ApiClient {
   }
 
   /**
+   * ユーザーの古い下書きセッションをクリーンアップ
+   */
+  async cleanupUserOldDraftSessions(hours: number = 24): Promise<{ success: boolean; deletedCount: number; message: string }> {
+    const response = await this.client.post('/users/cleanup/draft-sessions', {}, {
+      params: { hours }
+    });
+    return response.data;
+  }
+
+  /**
    * 学習記録を生成
    */
   async generateLearningRecord(sessionId: string): Promise<LearningRecord> {

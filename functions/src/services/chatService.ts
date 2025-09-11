@@ -258,7 +258,12 @@ export class ChatService {
         );
       }
     } else if (session.status === "draft") {
-      // ドラフト状態のセッションは削除
+      // ドラフト状態のセッションは削除（仮セッションのクリーンアップ）
+      console.log(`Deleting unused draft session: ${sessionId}, messageCount: ${session.messageCount}`);
+      await this.deleteSession(sessionId);
+    } else if (session.status === "active" && session.messageCount < 2) {
+      // アクティブだが意味のないセッション（メッセージが少ない）も削除
+      console.log(`Deleting low-activity session: ${sessionId}, messageCount: ${session.messageCount}`);
       await this.deleteSession(sessionId);
     }
   }
