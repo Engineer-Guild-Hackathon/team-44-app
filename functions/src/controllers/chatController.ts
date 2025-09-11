@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { ChatService } from "../services/chatService";
+import { LearningRecordService } from "../services/learningRecordService";
 import { CreateSessionRequest, PostMessageRequest } from "../models/types";
 import * as admin from "firebase-admin";
 
@@ -60,6 +61,47 @@ export async function createSession(req: Request, res: Response): Promise<void> 
 }
 
 /**
+ * スマートセッション作成（AI分析による学習記録統合）
+ */
+export async function createSmartSession(req: Request, res: Response): Promise<void> {
+  try {
+    const { initialMessage } = req.body;
+    const userId = await validateAuth(req);
+
+    if (!initialMessage) {
+      res.status(400).json({ error: "初期メッセージが必要です" });
+      return;
+    }
+
+    // 初期メッセージからAI分析で学習分野を推定
+    const learningRecordService = new LearningRecordService();
+    const estimation = await learningRecordService.estimateSubjectAndTopic(initialMessage);
+
+    // スマートセッション作成（既存記録への追加 or 新規作成）
+    const result = await chatServiceInstance.createSmartSession(
+      userId,
+      estimation.subject,
+      estimation.topic,
+      initialMessage
+    );
+
+    res.json({
+      success: true,
+      sessionId: result.sessionId,
+      learningRecordId: result.learningRecordId,
+      isNewLearningRecord: result.isNewLearningRecord,
+      estimation
+    });
+  } catch (error) {
+    console.error("Error creating smart session:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to create smart session"
+    });
+  }
+}
+
+/**
  * チャットセッションにメッセージを送信する
  */
 export async function postMessage(req: Request, res: Response): Promise<void> {
@@ -73,11 +115,14 @@ export async function postMessage(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const response = await chatServiceInstance.sendMessage(sessionId, userId, message);
+    // メッセージ送信とセッション状態更新
+    const response = await chatServiceInstance.sendMessageWithStateManagement(sessionId, message, userId);
 
     res.status(200).json({
-      response,
+      response: response.aiResponse,
       sessionId,
+      sessionStatus: response.sessionStatus,
+      learningRecordUpdated: response.learningRecordUpdated,
       message: "メッセージが送信されました"
     });
   } catch (error) {
@@ -131,6 +176,29 @@ export async function getSession(req: Request, res: Response): Promise<void> {
     console.error("Error in getSession:", error);
     res.status(500).json({
       error: error instanceof Error ? error.message : "セッションの取得に失敗しました"
+    });
+  }
+}
+
+/**
+ * セッション完了処理（ブラウザクローズ対応）
+ */
+export async function completeSession(req: Request, res: Response): Promise<void> {
+  try {
+    const { sessionId } = req.params;
+    const userId = await validateAuth(req);
+
+    await chatServiceInstance.gracefulSessionCompletion(sessionId, userId);
+
+    res.json({
+      success: true,
+      message: "Session completed successfully"
+    });
+  } catch (error) {
+    console.error("Error completing session:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to complete session"
     });
   }
 }

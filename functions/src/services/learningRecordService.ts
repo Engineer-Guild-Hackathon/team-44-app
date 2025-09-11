@@ -1,7 +1,6 @@
 import * as admin from "firebase-admin";
-import { LearningRecord, ChatSession } from "../models/types";
+import { LearningRecord, SubjectTopicEstimation } from "../models/types";
 import { getLLMProvider } from "./llm/llmFactory";
-import { ReminderService } from "./reminderService";
 
 // Firebase Admin の初期化
 if (!admin.apps.length) {
@@ -12,72 +11,215 @@ const db = admin.firestore();
 
 export class LearningRecordService {
   private llm = getLLMProvider();
-  private reminderService = new ReminderService();
 
   /**
-   * チャットセッションから学習記録を自動生成
+   * 初期メッセージから学習分野とトピックを推定
    */
-  async generateRecord(sessionId: string, userId: string): Promise<LearningRecord> {
-    // セッションを取得
-    const sessionDoc = await db.collection("chatSessions").doc(sessionId).get();
-    if (!sessionDoc.exists) {
-      throw new Error("Session not found");
+  async estimateSubjectAndTopic(initialMessage: string): Promise<SubjectTopicEstimation> {
+    const prompt = `
+以下のメッセージから学習分野とトピックを推定してください：
+
+メッセージ: "${initialMessage}"
+
+出力形式（JSON）:
+{
+  "subject": "学習分野（数学、英語、物理、化学、生物、国語、社会、プログラミング等）",
+  "topic": "具体的なトピック（二次関数、現在完了形、力学等）",
+  "confidence": 信頼度（0.0-1.0）
+}
+`;
+
+    try {
+      const response = await this.llm.generateResponse([], prompt);
+      const cleanedResponse = response.replace(/```json|```/g, "").trim();
+      const result = JSON.parse(cleanedResponse);
+      return {
+        subject: result.subject || "一般学習",
+        topic: result.topic || "AI対話",
+        confidence: result.confidence || 0.5
+      };
+    } catch (error) {
+      console.error("Error estimating subject and topic:", error);
+      return {
+        subject: "一般学習",
+        topic: "AI対話",
+        confidence: 0.3
+      };
     }
+  }
 
-    const session = sessionDoc.data() as ChatSession;
-    if (session.userId !== userId) {
-      throw new Error("Unauthorized access to session");
+  /**
+   * アクティブな学習記録を検索（同一subject+topic）
+   */
+  async findActiveLearningRecord(
+    userId: string,
+    subject: string,
+    topic: string
+  ): Promise<LearningRecord | null> {
+    try {
+      const snapshot = await db
+        .collection("learningRecords")
+        .where("userId", "==", userId)
+        .where("subject", "==", subject)
+        .where("topic", "==", topic)
+        .where("status", "==", "active")
+        .limit(1)
+        .get();
+
+      if (snapshot.empty) {
+        return null;
+      }
+
+      const doc = snapshot.docs[0];
+      const data = doc.data();
+      return { 
+        id: doc.id, 
+        ...data,
+        lastStudiedAt: data.lastStudiedAt?.toDate ? data.lastStudiedAt.toDate() : data.lastStudiedAt,
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
+        updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : data.updatedAt
+      } as LearningRecord;
+    } catch (error) {
+      console.error("Error finding active learning record:", error);
+      return null;
     }
+  }
 
-    // セッションからメッセージを抽出
-    const messages = session.messages || [];
-    if (messages.length === 0) {
-      throw new Error("No messages found in session");
-    }
+  /**
+   * 新しい学習記録を作成
+   */
+  async createNewLearningRecord(
+    userId: string,
+    subject: string,
+    topic: string,
+    isManuallyCreated: boolean = false
+  ): Promise<string> {
+    const recordRef = db.collection("learningRecords").doc();
 
-    // 学習時間を計算（最初と最後のメッセージの時間差）
-    const firstMessage = messages[0];
-    const lastMessage = messages[messages.length - 1];
-    const duration = this.calculateDuration(firstMessage.timestamp, lastMessage.timestamp);
-
-    // AIで要約と教科・トピックを生成
-    const { summary, subject, topic } = await this.generateSummaryAndCategories(messages);
-
-    // 学習記録を作成
-    const learningRecord: Omit<LearningRecord, "id"> = {
+    const recordData = {
+      id: recordRef.id,
       userId,
-      sessionId,
       subject,
       topic,
-      summary,
-      duration,
-      completedAt: new Date(),
+      status: "active",
+      totalDuration: 0,
+      sessionCount: 0,
+      difficulty: 3, // デフォルト
+      lastStudiedAt: new Date(),
+      isManuallyCreated,
       createdAt: new Date(),
       updatedAt: new Date()
     };
 
-    // Firestoreに保存
-    const docRef = await db.collection("learningRecords").add(learningRecord);
-
-    const savedRecord = {
-      id: docRef.id,
-      ...learningRecord
-    };
-
-    // 学習記録が作成されたら、自動的にリマインドもスケジュール
-    try {
-      await this.reminderService.scheduleReminders(userId, docRef.id);
-      console.log(`Reminders scheduled for learning record: ${docRef.id}`);
-    } catch (error) {
-      console.error("Failed to schedule reminders:", error);
-      // リマインドのスケジューリングが失敗しても学習記録の作成は成功とする
-    }
-
-    return savedRecord;
+    await recordRef.set(recordData);
+    return recordRef.id;
   }
 
   /**
-   * ユーザーの学習記録一覧を取得
+   * 学習記録を更新（セッション追加時）
+   */
+  async updateLearningRecordOnSessionComplete(
+    learningRecordId: string,
+    sessionDuration: number,
+    sessionSummary?: string
+  ): Promise<void> {
+    const recordRef = db.collection("learningRecords").doc(learningRecordId);
+
+    await recordRef.update({
+      totalDuration: admin.firestore.FieldValue.increment(sessionDuration),
+      sessionCount: admin.firestore.FieldValue.increment(1),
+      lastStudiedAt: new Date(),
+      updatedAt: new Date()
+    });
+
+    // AI分析で学習記録のサマリーを更新
+    await this.updateLearningRecordSummary(learningRecordId);
+  }
+
+  /**
+   * 学習記録のサマリーをAI分析で更新
+   */
+  private async updateLearningRecordSummary(learningRecordId: string): Promise<void> {
+    try {
+      // 関連する全セッションを取得
+      const sessionsSnapshot = await db
+        .collection("chatSessions")
+        .where("learningRecordId", "==", learningRecordId)
+        .where("status", "==", "completed")
+        .get();
+
+      if (sessionsSnapshot.empty) return;
+
+      // 全セッションの内容を統合してAI分析
+      const allSessionContent = sessionsSnapshot.docs.map(doc => {
+        const session = doc.data();
+        return `セッション: ${session.title}\n内容: ${session.sessionSummary || ''}`;
+      }).join('\n\n');
+
+      const analysisPrompt = `
+以下の学習セッション群を分析して、学習記録のサマリーと重要ポイントを生成してください：
+
+${allSessionContent}
+
+出力形式（JSON）:
+{
+  "summary": "学習テーマ全体の要約（200文字程度）",
+  "keyPoints": ["重要ポイント1", "重要ポイント2", "重要ポイント3"],
+  "difficulty": 1から5の難易度評価
+}
+`;
+
+      const analysisResponse = await this.llm.generateResponse([], analysisPrompt);
+      const cleanedResponse = analysisResponse.replace(/```json|```/g, "").trim();
+      const analysis = JSON.parse(cleanedResponse);
+
+      // 学習記録を更新
+      await db.collection("learningRecords").doc(learningRecordId).update({
+        summary: analysis.summary,
+        keyPoints: analysis.keyPoints,
+        difficulty: analysis.difficulty,
+        updatedAt: new Date()
+      });
+    } catch (error) {
+      console.error("Error updating learning record summary:", error);
+    }
+  }
+
+  /**
+   * 期間指定で学習記録一覧取得（カレンダー用）
+   */
+  async getLearningRecordsForPeriod(
+    userId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<LearningRecord[]> {
+    try {
+      const snapshot = await db
+        .collection("learningRecords")
+        .where("userId", "==", userId)
+        .where("lastStudiedAt", ">=", startDate)
+        .where("lastStudiedAt", "<=", endDate)
+        .orderBy("lastStudiedAt", "desc")
+        .get();
+
+      return snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          lastStudiedAt: data.lastStudiedAt?.toDate ? data.lastStudiedAt.toDate() : data.lastStudiedAt,
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
+          updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : data.updatedAt
+        } as LearningRecord;
+      });
+    } catch (error) {
+      console.error("Error getting learning records:", error);
+      return [];
+    }
+  }
+
+  /**
+   * ユーザーの学習記録一覧を取得（従来互換性）
    */
   async getUserLearningRecords(userId: string, limit = 20): Promise<LearningRecord[]> {
     try {
@@ -85,7 +227,7 @@ export class LearningRecordService {
 
       const snapshot = await db.collection("learningRecords")
         .where("userId", "==", userId)
-        .orderBy("completedAt", "desc")
+        .orderBy("lastStudiedAt", "desc")
         .limit(limit)
         .get();
 
@@ -98,36 +240,23 @@ export class LearningRecordService {
         return {
           id: doc.id,
           userId: data.userId,
-          sessionId: data.sessionId,
           subject: data.subject,
           topic: data.topic,
+          status: data.status || "active",
+          totalDuration: data.totalDuration || 0,
+          sessionCount: data.sessionCount || 0,
+          difficulty: data.difficulty || 3,
           summary: data.summary,
-          duration: data.duration,
-          completedAt: data.completedAt?.toDate ? data.completedAt.toDate() : data.completedAt,
-          createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt
+          keyPoints: data.keyPoints,
+          lastStudiedAt: data.lastStudiedAt?.toDate ? data.lastStudiedAt.toDate() : data.lastStudiedAt,
+          createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
+          updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : data.updatedAt
         } as LearningRecord;
       });
     } catch (error) {
       console.error("Error in getUserLearningRecords:", error);
       throw error;
     }
-  }
-
-  /**
-   * 教科別の学習記録を取得
-   */
-  async getLearningRecordsBySubject(userId: string, subject: string): Promise<LearningRecord[]> {
-    const snapshot = await db.collection("learningRecords")
-      .where("userId", "==", userId)
-      .where("subject", "==", subject)
-      .orderBy("completedAt", "desc")
-      .limit(10)
-      .get();
-
-    return snapshot.docs.map((doc: admin.firestore.QueryDocumentSnapshot) => ({
-      id: doc.id,
-      ...doc.data()
-    } as LearningRecord));
   }
 
   /**
@@ -149,81 +278,73 @@ export class LearningRecordService {
     return {
       id: doc.id,
       userId: data.userId,
-      sessionId: data.sessionId,
       subject: data.subject,
       topic: data.topic,
+      status: data.status || "active",
+      totalDuration: data.totalDuration || 0,
+      sessionCount: data.sessionCount || 0,
+      difficulty: data.difficulty || 3,
       summary: data.summary,
-      duration: data.duration,
-      completedAt: data.completedAt,
-      createdAt: data.createdAt
+      keyPoints: data.keyPoints,
+      lastStudiedAt: data.lastStudiedAt?.toDate ? data.lastStudiedAt.toDate() : data.lastStudiedAt,
+      createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
+      updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : data.updatedAt
     } as LearningRecord;
   }
 
   /**
-   * 学習時間を計算（分単位）
+   * 手動学習記録作成（将来機能）
    */
-  private calculateDuration(startTime?: Date, endTime?: Date): number {
-    if (!startTime || !endTime) {
-      return 30; // デフォルト30分
+  async createManualRecord(data: {
+    userId: string;
+    subject: string;
+    topic: string;
+    summary?: string;
+    keyPoints?: string[];
+  }): Promise<string> {
+    const recordId = await this.createNewLearningRecord(
+      data.userId,
+      data.subject,
+      data.topic,
+      true // isManuallyCreated = true
+    );
+
+    if (data.summary || data.keyPoints) {
+      await db.collection("learningRecords").doc(recordId).update({
+        summary: data.summary,
+        keyPoints: data.keyPoints,
+        updatedAt: new Date()
+      });
     }
 
-    const diffMs = endTime.getTime() - startTime.getTime();
-    const diffMinutes = Math.round(diffMs / (1000 * 60));
-
-    // 最小5分、最大180分（3時間）
-    return Math.max(5, Math.min(180, diffMinutes));
+    return recordId;
   }
 
   /**
-   * AIを使って要約と教科・トピックを生成
+   * 教科別の学習記録を取得（従来互換性）
    */
-  private async generateSummaryAndCategories(messages: any[]): Promise<{
-    summary: string;
-    subject: string;
-    topic: string;
-  }> {
-    // メッセージをテキストに変換
-    const conversationText = messages
-      .map(msg => `${msg.role}: ${msg.parts[0]?.text || ""}`)
-      .join("\n");
+  async getLearningRecordsBySubject(userId: string, subject: string): Promise<LearningRecord[]> {
+    const snapshot = await db.collection("learningRecords")
+      .where("userId", "==", userId)
+      .where("subject", "==", subject)
+      .orderBy("lastStudiedAt", "desc")
+      .limit(10)
+      .get();
 
-    const prompt = `
-以下の学習対話から、学習記録を生成してください。
-
-対話内容:
-${conversationText}
-
-以下のJSON形式で回答してください：
-{
-  "summary": "学習内容の要約（100-200文字）",
-  "subject": "教科名（例：math, science, english, history, programming）",
-  "topic": "具体的なトピック（例：二次方程式、化学反応、過去形）"
-}
-
-注意：
-- 学習に関係ない対話の場合は、subject を "general" にしてください
-- 要約は学習者が後で振り返りやすいように具体的に書いてください
-`;
-
-    try {
-      const response = await this.llm.generateResponse([], prompt);
-      const cleanedResponse = response.replace(/```json|```/g, "").trim();
-      const parsed = JSON.parse(cleanedResponse);
-
+    return snapshot.docs.map((doc: admin.firestore.QueryDocumentSnapshot) => {
+      const data = doc.data();
       return {
-        summary: parsed.summary || "学習対話を行いました",
-        subject: parsed.subject || "general",
-        topic: parsed.topic || "一般的な質問・回答"
-      };
-    } catch (error) {
-      console.error("Failed to generate summary:", error);
+        id: doc.id,
+        ...data,
+        lastStudiedAt: data.lastStudiedAt?.toDate ? data.lastStudiedAt.toDate() : data.lastStudiedAt,
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
+        updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : data.updatedAt
+      } as LearningRecord;
+    });
+  }
 
-      // フォールバック
-      return {
-        summary: "学習対話を行いました",
-        subject: "general",
-        topic: "一般的な質問・回答"
-      };
-    }
+  // Legacy method for backward compatibility
+  async generateRecord(sessionId: string, userId: string): Promise<LearningRecord> {
+    throw new Error("generateRecord is deprecated. Use the new 1:N architecture instead.");
   }
 }

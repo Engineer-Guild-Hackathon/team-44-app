@@ -158,3 +158,76 @@ export const getLearningRecord = async (req: Request, res: Response): Promise<vo
     res.status(500).json({ error: "Failed to fetch learning record" });
   }
 };
+
+/**
+ * 期間指定で学習記録を取得（カレンダー用）
+ */
+export const getLearningRecordsForPeriod = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = await validateAuth(req);
+    const { startDate, endDate } = req.query;
+
+    if (!startDate || !endDate) {
+      res.status(400).json({ error: "startDate and endDate are required" });
+      return;
+    }
+
+    const start = new Date(startDate as string);
+    const end = new Date(endDate as string);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      res.status(400).json({ error: "Invalid date format" });
+      return;
+    }
+
+    const records = await learningRecordService.getLearningRecordsForPeriod(userId, start, end);
+
+    res.json({
+      success: true,
+      records
+    });
+  } catch (error) {
+    console.error("Error fetching learning records for period:", error);
+    
+    if (error instanceof Error && error.message === "認証トークンが必要です") {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    res.status(500).json({ error: "Failed to fetch learning records for period" });
+  }
+};
+
+/**
+ * 手動学習記録作成（将来機能）
+ */
+export const createManualLearningRecord = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { subject, topic, summary, keyPoints } = req.body;
+    const userId = await validateAuth(req);
+
+    if (!subject || !topic) {
+      res.status(400).json({ error: "subject and topic are required" });
+      return;
+    }
+
+    const recordId = await learningRecordService.createManualRecord({
+      userId,
+      subject,
+      topic,
+      summary,
+      keyPoints
+    });
+
+    res.json({
+      success: true,
+      recordId
+    });
+  } catch (error) {
+    console.error("Error creating manual learning record:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to create manual learning record"
+    });
+  }
+};
