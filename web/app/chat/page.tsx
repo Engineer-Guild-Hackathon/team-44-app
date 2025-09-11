@@ -14,6 +14,12 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isNavOpen, setIsNavOpen] = useState(false) // デフォルトで閉じる
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+
+  // ルートが変わったら自動でサイドバーを閉じる
+  useEffect(() => {
+    setIsNavOpen(false);
+  }, [pathname]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [isCreatingSession, setIsCreatingSession] = useState(false)
   const { user, loading: authLoading } = useAuth()
