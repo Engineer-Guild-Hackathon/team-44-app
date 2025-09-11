@@ -55,8 +55,11 @@ export class ChatService {
     userId: string,
     estimatedSubject: string,
     estimatedTopic: string,
-    initialMessage: string
+    // initialMessage is currently unused here but kept in signature for future use
+    _initialMessage: string
   ): Promise<SmartSessionResult> {
+  // mark unused parameter as used to satisfy linter
+    void _initialMessage;
     return this.db.runTransaction(async (transaction) => {
       // 既存のアクティブな学習記録を検索
       const existingRecord = await this.getLearningRecordService().findActiveLearningRecord(
@@ -113,8 +116,11 @@ export class ChatService {
   async sendMessageWithStateManagement(
     sessionId: string,
     message: string,
-    userId: string
+    // userId not used in this implementation but remains for signature compatibility
+    _userId: string
   ): Promise<SessionStateResult> {
+  // ensure linter does not complain about unused param
+    void _userId;
     // メッセージを送信してAI応答を取得
     const aiResponse = await this.getAIResponse(sessionId, message);
 
@@ -163,7 +169,7 @@ export class ChatService {
    */
   private async updateSessionActivity(sessionId: string): Promise<void> {
     await this.db.collection("chatSessions").doc(sessionId).update({
-  messageCount: FieldValue.increment(1),
+      messageCount: FieldValue.increment(1),
       updatedAt: new Date()
     });
   }

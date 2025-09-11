@@ -122,13 +122,15 @@ export class LearningRecordService {
   async updateLearningRecordOnSessionComplete(
     learningRecordId: string,
     sessionDuration: number,
-    sessionSummary?: string
+    _sessionSummary?: string
   ): Promise<void> {
+  // mark unused param for linter
+    void _sessionSummary;
     const recordRef = db.collection("learningRecords").doc(learningRecordId);
 
     await recordRef.update({
-  totalDuration: FieldValue.increment(sessionDuration),
-  sessionCount: FieldValue.increment(1),
+      totalDuration: FieldValue.increment(sessionDuration),
+      sessionCount: FieldValue.increment(1),
       lastStudiedAt: new Date(),
       updatedAt: new Date()
     });
@@ -154,8 +156,8 @@ export class LearningRecordService {
       // 全セッションの内容を統合してAI分析
       const allSessionContent = sessionsSnapshot.docs.map(doc => {
         const session = doc.data();
-        return `セッション: ${session.title}\n内容: ${session.sessionSummary || ''}`;
-      }).join('\n\n');
+        return `セッション: ${session.title}\n内容: ${session.sessionSummary || ""}`;
+      }).join("\n\n");
 
       const analysisPrompt = `
 以下の学習セッション群を分析して、学習記録のサマリーと重要ポイントを生成してください：
@@ -345,7 +347,10 @@ ${allSessionContent}
   }
 
   // Legacy method for backward compatibility
-  async generateRecord(sessionId: string, userId: string): Promise<LearningRecord> {
+  async generateRecord(_sessionId: string, _userId: string): Promise<LearningRecord> {
+    // mark unused params for linter
+    void _sessionId;
+    void _userId;
     throw new Error("generateRecord is deprecated. Use the new 1:N architecture instead.");
   }
 }
