@@ -4,19 +4,7 @@ import { useState, useEffect } from 'react'
 import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
 import apiClient from '../../lib/apiClient'
-
-interface LearningRecord {
-  id: string
-  userId: string
-  sessionId: string
-  subject: string
-  topic: string
-  summary: string
-  duration: number
-  completedAt: Date
-  createdAt: Date
-  updatedAt: Date
-}
+import { LearningRecord } from '../../types/api'
 
 export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
@@ -25,6 +13,45 @@ export default function CalendarPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isNavOpen, setIsNavOpen] = useState(false)
+
+  // カレンダー関連の定数
+  const currentMonth = selectedDate.getMonth()
+  const currentYear = selectedDate.getFullYear()
+  const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+  const dayNames = ['日', '月', '火', '水', '木', '金', '土']
+
+  // カレンダーの日付配列を生成
+  const generateCalendarDays = () => {
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1)
+    const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0)
+    const startDate = new Date(firstDayOfMonth)
+    startDate.setDate(startDate.getDate() - firstDayOfMonth.getDay())
+
+    const days = []
+    for (let i = 0; i < 42; i++) {
+      const date = new Date(startDate)
+      date.setDate(date.getDate() + i)
+      days.push(date)
+    }
+    return days
+  }
+
+  const days = generateCalendarDays()
+
+  // 月を変更する関数
+  const changeMonth = (direction: number) => {
+    const newDate = new Date(selectedDate)
+    newDate.setMonth(newDate.getMonth() + direction)
+    setSelectedDate(newDate)
+  }
+
+  // 日付の学習記録を取得
+  const getRecordsForDate = (date: Date) => {
+    return learningRecords.filter(record => {
+      const recordDate = new Date(record.lastStudiedAt)
+      return recordDate.toDateString() === date.toDateString()
+    })
+  }
 
   // 月の学習記録を取得
   const fetchMonthlyRecords = async (date: Date) => {
@@ -164,7 +191,7 @@ export default function CalendarPage() {
                           <div
                             key={record.id}
                             className={`text-xs px-2 py-1 rounded-md ${getSubjectColor(record.subject)}`}
-                            title={`${record.topic} (${record.duration}分)`}
+                            title={`${record.topic} (${record.totalDuration}分)`}
                           >
                             <div className="truncate">
                               {record.topic}
@@ -194,7 +221,7 @@ export default function CalendarPage() {
 
               <div className="bg-[var(--color-bg-light)] border border-[var(--color-border)] rounded-xl shadow-lg p-6 text-center">
                 <div className="text-3xl font-bold text-[var(--color-primary)] mb-2">
-                  {learningRecords.reduce((sum, record) => sum + record.duration, 0)}
+                  {learningRecords.reduce((sum, record) => sum + record.totalDuration, 0)}
                 </div>
                 <div className="text-sm text-[var(--color-muted-foreground)]">総学習時間（分）</div>
               </div>
@@ -208,7 +235,7 @@ export default function CalendarPage() {
 
               <div className="bg-[var(--color-bg-light)] border border-[var(--color-border)] rounded-xl shadow-lg p-6 text-center">
                 <div className="text-3xl font-bold text-[var(--color-tertiary)] mb-2">
-                  {Math.round(learningRecords.reduce((sum, record) => sum + record.duration, 0) / Math.max(learningRecords.length, 1))}
+                  {Math.round(learningRecords.reduce((sum, record) => sum + record.totalDuration, 0) / Math.max(learningRecords.length, 1))}
                 </div>
                 <div className="text-sm text-[var(--color-muted-foreground)]">平均学習時間（分）</div>
               </div>
