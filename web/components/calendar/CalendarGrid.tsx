@@ -6,11 +6,12 @@ import { LearningRecord } from '../../types/api'
 interface CalendarGridProps {
   selectedDate: Date
   onDateSelect: (date: Date) => void
+  onDateClick: (date: Date, records: LearningRecord[]) => void
   learningRecords: LearningRecord[]
   isLoading: boolean
 }
 
-export function CalendarGrid({ selectedDate, onDateSelect, learningRecords, isLoading }: CalendarGridProps) {
+export function CalendarGrid({ selectedDate, onDateSelect, onDateClick, learningRecords, isLoading }: CalendarGridProps) {
   const currentMonth = selectedDate.getMonth()
   const currentYear = selectedDate.getFullYear()
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1)
@@ -33,12 +34,22 @@ export function CalendarGrid({ selectedDate, onDateSelect, learningRecords, isLo
     })
   }
 
-  // 日付の学習記録数を取得
-  const getRecordCount = (date: Date) => {
+  // 日付の学習記録を取得
+  const getRecordsForDate = (date: Date) => {
     return learningRecords.filter(record => {
       const recordDate = new Date(record.lastStudiedAt)
       return recordDate.toDateString() === date.toDateString()
-    }).length
+    })
+  }
+
+  // 日付クリック処理
+  const handleDateClick = (date: Date) => {
+    const records = getRecordsForDate(date)
+    onDateSelect(date)
+    
+    if (records.length > 0) {
+      onDateClick(date, records)
+    }
   }
 
   const moveMonth = (direction: number) => {
@@ -90,17 +101,18 @@ export function CalendarGrid({ selectedDate, onDateSelect, learningRecords, isLo
           const isSelected = date.toDateString() === selectedDate.toDateString()
           const isToday = date.toDateString() === new Date().toDateString()
           const hasRecord = hasLearningRecord(date)
-          const recordCount = getRecordCount(date)
+          const recordCount = getRecordsForDate(date).length
 
           return (
             <button
               key={index}
-              onClick={() => onDateSelect(date)}
+              onClick={() => handleDateClick(date)}
               className={`
                 relative p-2 h-16 text-left rounded-lg transition-colors
                 ${isCurrentMonth ? 'text-gray-900' : 'text-gray-300'}
                 ${isSelected ? 'bg-blue-100 border-2 border-blue-500' : 'hover:bg-gray-50'}
                 ${isToday ? 'bg-blue-50' : ''}
+                ${hasRecord ? 'cursor-pointer' : 'cursor-default'}
               `}
             >
               <div className="text-sm font-medium">{date.getDate()}</div>

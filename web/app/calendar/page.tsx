@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
+import DayRecordsModal from '../../components/calendar/DayRecordsModal'
+import LearningRecordDetail from '../../components/calendar/LearningRecordDetail'
 import { useAuth } from '../../hooks/useAuth'
 import apiClient from '../../lib/apiClient'
 import { LearningRecord } from '../../types/api'
@@ -15,6 +17,13 @@ export default function CalendarPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isNavOpen, setIsNavOpen] = useState(true)
+  
+  // Modal states
+  const [showDayModal, setShowDayModal] = useState(false)
+  const [showDetailModal, setShowDetailModal] = useState(false)
+  const [clickedDate, setClickedDate] = useState<Date | null>(null)
+  const [dayRecords, setDayRecords] = useState<LearningRecord[]>([])
+  const [detailRecordId, setDetailRecordId] = useState<string | null>(null)
 
   // カレンダー関連の定数
   const currentMonth = selectedDate.getMonth()
@@ -92,6 +101,38 @@ export default function CalendarPage() {
 
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date)
+  }
+
+  // 日付クリック時のハンドラー（モーダル表示）
+  const handleDateClick = (date: Date, records: LearningRecord[]) => {
+    setClickedDate(date)
+    setDayRecords(records)
+    setShowDayModal(true)
+  }
+
+  // 学習記録選択時のハンドラー（詳細モーダル表示）
+  const handleRecordSelect = (recordId: string) => {
+    setDetailRecordId(recordId)
+    setShowDayModal(false)
+    setShowDetailModal(true)
+  }
+
+  // 続きから学習ボタンのハンドラー
+  const handleContinueLearning = (recordId: string) => {
+    // チャットページにリダイレクト
+    window.location.href = `/chat?recordId=${recordId}`
+  }
+
+  // モーダルを閉じる
+  const closeDayModal = () => {
+    setShowDayModal(false)
+    setClickedDate(null)
+    setDayRecords([])
+  }
+
+  const closeDetailModal = () => {
+    setShowDetailModal(false)
+    setDetailRecordId(null)
   }
 
   // 教科別の色分け（Librariaテーマ対応）
@@ -176,10 +217,11 @@ export default function CalendarPage() {
                   const records = getRecordsForDate(day)
 
                   return (
-                    <div
+                    <button
                       key={index}
+                      onClick={() => records.length > 0 && handleDateClick(day, records)}
                       className={`min-h-28 p-3 border-r border-b border-[var(--color-border)] last:border-r-0 ${isCurrentMonth ? 'bg-[var(--color-bg-light)]' : 'bg-[var(--color-bg-light)] opacity-50'
-                        } ${isToday ? 'bg-[var(--color-accent)] bg-opacity-10' : ''} hover:bg-[var(--color-accent)] hover:bg-opacity-5 transition-colors`}
+                        } ${isToday ? 'bg-[var(--color-accent)] bg-opacity-10' : ''} ${records.length > 0 ? 'hover:bg-[var(--color-accent)] hover:bg-opacity-5 cursor-pointer' : 'cursor-default'} transition-colors text-left`}
                     >
                       <div className={`text-sm font-medium mb-2 ${isCurrentMonth ? 'text-[var(--color-text-light)]' : 'text-[var(--color-muted-foreground)]'
                         } ${isToday ? 'text-[var(--color-accent)] font-bold' : ''}`}>
@@ -205,7 +247,7 @@ export default function CalendarPage() {
                           </div>
                         )}
                       </div>
-                    </div>
+                    </button>
                   )
                 })}
               </div>
@@ -261,17 +303,29 @@ export default function CalendarPage() {
                 ))}
               </div>
             </div>
-            <div className="text-sm text-gray-600">学習分野数</div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6 text-center">
-            <div className="text-2xl font-bold text-orange-600">
-              {learningRecords.reduce((sum, record) => sum + record.sessionCount, 0)}
-            </div>
-            <div className="text-sm text-gray-600">総セッション数</div>
           </div>
         </main>
       </div>
+
+      {/* モーダル */}
+      {showDayModal && clickedDate && (
+        <DayRecordsModal
+          isOpen={showDayModal}
+          onClose={closeDayModal}
+          date={clickedDate}
+          records={dayRecords}
+          onRecordSelect={handleRecordSelect}
+        />
+      )}
+
+      {showDetailModal && detailRecordId && (
+        <LearningRecordDetail
+          isOpen={showDetailModal}
+          onClose={closeDetailModal}
+          recordId={detailRecordId}
+          onContinueLearning={handleContinueLearning}
+        />
+      )}
     </div>
   )
 }
