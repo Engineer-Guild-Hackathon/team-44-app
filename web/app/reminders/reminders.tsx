@@ -16,6 +16,11 @@ export default function RemindersComponent() {
   const [showNotificationPrompt, setShowNotificationPrompt] = useState(false)
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default')
   const [isNavOpen, setIsNavOpen] = useState(true)
+  // サイドバー自動クローズ: ルート変更時に閉じる
+  const { pathname } = require('next/navigation');
+  useEffect(() => {
+    setIsNavOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     // 通知権限の状態を確認

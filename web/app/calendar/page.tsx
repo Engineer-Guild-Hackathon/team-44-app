@@ -15,6 +15,11 @@ export default function CalendarPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isNavOpen, setIsNavOpen] = useState(true)
+  // サイドバー自動クローズ: ルート変更時に閉じる
+  const { pathname } = require('next/navigation');
+  useEffect(() => {
+    setIsNavOpen(false);
+  }, [pathname]);
 
   // カレンダー関連の定数
   const currentMonth = selectedDate.getMonth()
