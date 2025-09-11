@@ -1,68 +1,105 @@
-// Mock the LLM factory first
-const mockLLMFactory = {
-  getLLMProvider: jest.fn().mockReturnValue({
-    generateResponse: jest.fn().mockResolvedValue('Mock AI response'),
-  }),
+// @ts-nocheck
+import { jest, describe, it, expect, beforeEach } from '@jest/globals';
+
+// Create mock firestore instance first
+const mockFirestoreInstance = {
+  collection: jest.fn().mockImplementation(() => ({
+    add: jest.fn().mockResolvedValue({ id: "test-session-123" }),
+    doc: jest.fn().mockImplementation(() => ({
+      get: jest.fn().mockResolvedValue({
+        exists: true,
+        id: "test-session-123",
+        data: () => ({
+          userId: "test-user",
+          title: "Test Session",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          messages: []
+        }),
+      }),
+      set: jest.fn().mockResolvedValue(undefined),
+      update: jest.fn().mockResolvedValue(undefined),
+    })),
+    where: jest.fn().mockImplementation(() => ({
+      orderBy: jest.fn().mockImplementation(() => ({
+        get: jest.fn().mockResolvedValue({
+          docs: [{
+            id: "test-session-123",
+            data: () => ({
+              userId: "test-user",
+              title: "Test Session",
+              createdAt: new Date(),
+              updatedAt: new Date(),
+              messages: []
+            })
+          }]
+        })
+      }))
+    }))
+  })),
 };
 
-jest.mock('../../src/services/llm/llmFactory', () => ({
-  getLLMProvider: mockLLMFactory.getLLMProvider,
+// Mock Firebase Admin
+jest.mock("firebase-admin", () => ({
+  apps: [],
+  initializeApp: jest.fn(),
+  firestore: jest.fn(() => mockFirestoreInstance),
+  auth: jest.fn(() => ({
+    verifyIdToken: jest.fn().mockResolvedValue({ uid: "test-user" }),
+  })),
 }));
 
 import { ChatService } from '../../src/services/chatService';
-import { createTestChatSession } from '../setup/mocks/firestore';
-
-// Mock getLLMProviderInstance function
-const mockGetLLMProviderInstance = jest.fn().mockReturnValue({
-  generateResponse: jest.fn().mockResolvedValue('Mock AI response'),
-});
-
-// Apply the mock to the module
-jest.doMock('../../src/services/chatService', () => {
-  const originalModule = jest.requireActual('../../src/services/chatService');
-  return {
-    ...originalModule,
-    getLLMProviderInstance: mockGetLLMProviderInstance,
-  };
-});
-
-// Mock Firebase Admin
-jest.mock('firebase-admin', () => ({
-  apps: [],
-  initializeApp: jest.fn(),
-  firestore: jest.fn(() => ({
-    collection: jest.fn().mockReturnValue({
-      add: jest.fn().mockResolvedValue({ id: 'test-session-123' }),
-      doc: jest.fn().mockReturnValue({
-        get: jest.fn().mockResolvedValue({
-          exists: true,
-          data: () => createTestChatSession(),
-        }),
-        set: jest.fn(),
-        update: jest.fn(),
-      }),
-    }),
-  })),
-}));
 
 describe('ChatService', () => {
   let chatService: ChatService;
 
   beforeEach(() => {
     chatService = new ChatService();
+    // Override the db property with our mock
+    (chatService as any).db = mockFirestoreInstance;
+
+    // Reset all mocks
     jest.clearAllMocks();
 
-    // Enable local mock for testing
-    process.env.USE_LOCAL_FIRESTORE_MOCK = 'true';
-    process.env.USE_TEST_LLM_MOCK = 'true'; // Enable test mode for LLM provider
+    // Reset mock implementations to default behavior
+    mockFirestoreInstance.collection.mockImplementation(() => ({
+      add: jest.fn().mockResolvedValue({ id: "test-session-123" }),
+      doc: jest.fn().mockImplementation(() => ({
+        get: jest.fn().mockResolvedValue({
+          exists: true,
+          id: "test-session-123",
+          data: () => ({
+            userId: "test-user",
+            title: "Test Session",
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            messages: []
+          }),
+        }),
+        set: jest.fn().mockResolvedValue(undefined),
+        update: jest.fn().mockResolvedValue(undefined),
+      })),
+      where: jest.fn().mockImplementation(() => ({
+        orderBy: jest.fn().mockImplementation(() => ({
+          get: jest.fn().mockResolvedValue({
+            docs: [{
+              id: "test-session-123",
+              data: () => ({
+                userId: "test-user",
+                title: "Test Session",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                messages: []
+              })
+            }]
+          })
+        }))
+      }))
+    }));
 
-    // Reset and setup LLM mock
-    mockLLMFactory.getLLMProvider.mockClear();
-    const mockProvider = mockLLMFactory.getLLMProvider();
-    if (mockProvider && mockProvider.generateResponse) {
-      mockProvider.generateResponse.mockClear();
-      mockProvider.generateResponse.mockResolvedValue('Mock AI response');
-    }
+    // Enable test mode for LLM provider
+    process.env.USE_TEST_LLM_MOCK = 'true';
   });
 
   describe('createSession', () => {
@@ -71,7 +108,7 @@ describe('ChatService', () => {
 
       expect(sessionId).toBeDefined();
       expect(typeof sessionId).toBe('string');
-      expect(sessionId.startsWith('local-')).toBe(true);
+      expect(sessionId).toBe('test-session-123'); // Firestore document ID
     });
 
     it('should create a new chat session with custom title', async () => {
@@ -79,13 +116,23 @@ describe('ChatService', () => {
 
       expect(sessionId).toBeDefined();
       expect(typeof sessionId).toBe('string');
-      expect(sessionId.startsWith('local-')).toBe(true);
+      expect(sessionId).toBe('test-session-123'); // Firestore document ID
     });
 
-    it.skip('should handle errors when creating session', async () => {
-      // Skip this test when using local mock
-      const sessionId = await chatService.createSession('test-user');
-      expect(sessionId.startsWith('local-')).toBe(true);
+    it('should handle errors when creating session', async () => {
+      // Create a new mock that throws an error
+      const errorMockInstance = {
+        collection: jest.fn().mockImplementation(() => ({
+          add: jest.fn().mockRejectedValue(new Error('Firestore error')),
+        })),
+      };
+
+      // Replace the db instance with error mock
+      (chatService as any).db = errorMockInstance;
+
+      await expect(
+        chatService.createSession('test-user')
+      ).rejects.toThrow('チャットセッションの作成に失敗しました');
     });
   });
 
@@ -103,16 +150,26 @@ describe('ChatService', () => {
       );
 
       expect(response).toBe('Mock AI response for testing');
-      // Note: In test mode, we use a direct mock, so LLM factory might not be called
-      // expect(mockLLMFactory.getLLMProvider().generateResponse).toHaveBeenCalledWith(
-      //   [],
-      //   'Hello, AI!'
-      // );
     });
 
-    it.skip('should handle session not found error', async () => {
-      // Skip this test when using local mock
-      expect(true).toBe(true);
+    it('should handle session not found error', async () => {
+      // Create a mock that returns session not found
+      const notFoundMockInstance = {
+        collection: jest.fn().mockImplementation(() => ({
+          doc: jest.fn().mockImplementation(() => ({
+            get: jest.fn().mockResolvedValue({
+              exists: false,
+            }),
+          })),
+        })),
+      };
+
+      // Replace the db instance
+      (chatService as any).db = notFoundMockInstance;
+
+      await expect(
+        chatService.sendMessage('non-existent-session', 'test-user', 'Hello')
+      ).rejects.toThrow('チャットセッションが見つかりません');
     });
   });
 
@@ -127,14 +184,66 @@ describe('ChatService', () => {
       expect(session?.id).toBe(sessionId);
       expect(session?.userId).toBe('test-user');
     });
+
+    it('should return null for non-existent session', async () => {
+      // Create a mock that returns session not found
+      const notFoundMockInstance = {
+        collection: jest.fn().mockImplementation(() => ({
+          doc: jest.fn().mockImplementation(() => ({
+            get: jest.fn().mockResolvedValue({
+              exists: false,
+            }),
+          })),
+        })),
+      };
+
+      // Replace the db instance
+      (chatService as any).db = notFoundMockInstance;
+
+      const session = await chatService.getSession('non-existent', 'test-user');
+      expect(session).toBeNull();
+    });
+
+    it('should handle unauthorized access', async () => {
+      // Create a mock that returns a session with different userId
+      const unauthorizedMockInstance = {
+        collection: jest.fn().mockImplementation(() => ({
+          doc: jest.fn().mockImplementation(() => ({
+            get: jest.fn().mockResolvedValue({
+              exists: true,
+              id: "test-session-123",
+              data: () => ({
+                userId: "test-user", // Different from requested user
+                title: "Test Session",
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                messages: []
+              }),
+            }),
+          })),
+        })),
+      };
+
+      // Replace the db instance
+      (chatService as any).db = unauthorizedMockInstance;
+
+      await expect(
+        chatService.getSession('test-session-123', 'different-user')
+      ).rejects.toThrow('このセッションにアクセスする権限がありません');
+    });
   });
 
   describe('getUserSessions', () => {
     it('should retrieve user sessions', async () => {
-      // This test would need more complex mocking for Firestore queries
-      // For now, we'll just ensure the method exists and can be called
-      expect(chatService.getUserSessions).toBeDefined();
-      expect(typeof chatService.getUserSessions).toBe('function');
+      // Create a session first
+      await chatService.createSession('test-user');
+
+      const sessions = await chatService.getUserSessions('test-user');
+
+      expect(sessions).toBeDefined();
+      expect(Array.isArray(sessions)).toBe(true);
+      expect(sessions.length).toBeGreaterThan(0);
+      expect(sessions[0].userId).toBe('test-user');
     });
   });
 });

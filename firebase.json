@@ -1,6 +1,6 @@
 {
   "projects": {
-    "default": "ai-learning-support-project"
+    "default": "engineer-guild-hackathon-c04cc"
   },
   "firestore": {
     "rules": "firestore.rules",
@@ -29,11 +29,11 @@
       "port": 5003
     },
     "firestore": {
-      "port": 8081
+      "port": 8082
     },
     "ui": {
       "enabled": true,
-      "port": 4001
+      "port": 4002
     }
   }
 }

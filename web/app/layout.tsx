@@ -1,14 +1,12 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import Link from 'next/link'
 import HamburgerMenu from '../components/common/HamburgerMenu'
-
-const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'AI学習サポート',
   description: 'AIとの対話を通じて、ユーザーが「自力で解けた」という達成感を得られる学習サポートアプリ',
+  manifest: '/manifest.json',
 }
 
 export default function RootLayout({
@@ -18,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body className={inter.className}>
+      <body className="font-sans">
   {/* ナビゲーションバー */}
   <nav className="bg-white shadow-sm border-b fixed top-0 left-0 w-full z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

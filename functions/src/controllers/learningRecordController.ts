@@ -71,27 +71,46 @@ export const generateLearningRecord = async (req: Request, res: Response): Promi
  */
 export const getUserLearningRecords = async (req: Request, res: Response): Promise<void> => {
   try {
+    console.log("getUserLearningRecords called with query:", req.query);
+
     const userId = await validateAuth(req);
+    console.log(`Authenticated user: ${userId}`);
+
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 20;
     const subject = req.query.subject as string;
 
+    console.log(`Fetching records with limit: ${limit}, subject: ${subject}`);
+
     let records;
     if (subject) {
+      console.log(`Fetching records by subject: ${subject}`);
       records = await learningRecordService.getLearningRecordsBySubject(userId, subject);
     } else {
+      console.log("Fetching all user records");
       records = await learningRecordService.getUserLearningRecords(userId, limit);
     }
+
+    console.log(`Returning ${records.length} records`);
 
     res.json({
       success: true,
       data: records
     });
   } catch (error) {
-    console.error("Error fetching learning records:", error);
+    console.error("Error in getUserLearningRecords controller:", error);
 
-    if (error instanceof Error && error.message === "認証トークンが必要です") {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
+    if (error instanceof Error) {
+      if (error.message === "認証トークンが必要です") {
+        res.status(401).json({ error: "Unauthorized" });
+        return;
+      }
+
+      // Firestore 関連のエラーをより詳細に処理
+      if (error.message.includes("index")) {
+        console.error("Index error detected:", error.message);
+        res.status(500).json({ error: "Database index error. Please check Firestore indexes." });
+        return;
+      }
     }
 
     res.status(500).json({ error: "Failed to fetch learning records" });
@@ -103,24 +122,112 @@ export const getUserLearningRecords = async (req: Request, res: Response): Promi
  */
 export const getLearningRecord = async (req: Request, res: Response): Promise<void> => {
   try {
-    await validateAuth(req);
+    const userId = await validateAuth(req);
     const { recordId } = req.params;
 
-    // TODO: 実装 - 特定の学習記録を取得する処理
-    console.log("Getting learning record:", recordId);
+    if (!recordId) {
+      res.status(400).json({ error: "Record ID is required" });
+      return;
+    }
+
+    const learningRecord = await learningRecordService.getLearningRecord(recordId, userId);
+
+    if (!learningRecord) {
+      res.status(404).json({ error: "Learning record not found" });
+      return;
+    }
 
     res.json({
       success: true,
-      message: "Get specific learning record - to be implemented"
+      data: learningRecord
     });
   } catch (error) {
     console.error("Error fetching learning record:", error);
 
+    if (error instanceof Error) {
+      if (error.message === "認証トークンが必要です") {
+        res.status(401).json({ error: "Unauthorized" });
+        return;
+      }
+      if (error.message === "Unauthorized access to learning record") {
+        res.status(403).json({ error: "Forbidden" });
+        return;
+      }
+    }
+
+    res.status(500).json({ error: "Failed to fetch learning record" });
+  }
+};
+
+/**
+ * 期間指定で学習記録を取得（カレンダー用）
+ */
+export const getLearningRecordsForPeriod = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = await validateAuth(req);
+    const { startDate, endDate } = req.query;
+
+    if (!startDate || !endDate) {
+      res.status(400).json({ error: "startDate and endDate are required" });
+      return;
+    }
+
+    const start = new Date(startDate as string);
+    const end = new Date(endDate as string);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      res.status(400).json({ error: "Invalid date format" });
+      return;
+    }
+
+    const records = await learningRecordService.getLearningRecordsForPeriod(userId, start, end);
+
+    res.json({
+      success: true,
+      records
+    });
+  } catch (error) {
+    console.error("Error fetching learning records for period:", error);
+    
     if (error instanceof Error && error.message === "認証トークンが必要です") {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
 
-    res.status(500).json({ error: "Failed to fetch learning record" });
+    res.status(500).json({ error: "Failed to fetch learning records for period" });
+  }
+};
+
+/**
+ * 手動学習記録作成（将来機能）
+ */
+export const createManualLearningRecord = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { subject, topic, summary, keyPoints } = req.body;
+    const userId = await validateAuth(req);
+
+    if (!subject || !topic) {
+      res.status(400).json({ error: "subject and topic are required" });
+      return;
+    }
+
+    const recordId = await learningRecordService.createManualRecord({
+      userId,
+      subject,
+      topic,
+      summary,
+      keyPoints
+    });
+
+    res.json({
+      success: true,
+      recordId
+    });
+  } catch (error) {
+    console.error("Error creating manual learning record:", error);
+    res.status(500).json({
+      success: false,
+      error: "Failed to create manual learning record"
+    });
   }
 };
