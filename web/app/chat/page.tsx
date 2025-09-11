@@ -13,7 +13,7 @@ export default function ChatPage() {
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const [isNavOpen, setIsNavOpen] = useState(true)
+  const [isNavOpen, setIsNavOpen] = useState(false)
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [isCreatingSession, setIsCreatingSession] = useState(false)
   const { user, loading: authLoading } = useAuth()
