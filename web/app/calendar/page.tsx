@@ -126,6 +126,7 @@ export default function CalendarPage() {
       <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 
       {/* Main Content */}
+      {/* Main Content */}
       <div className="flex-1">
         {/* メインコンテンツ */}
         <main className={`pt-16 pb-20 md:pb-6 px-4 sm:px-6 lg:px-8 ${isNavOpen ? 'max-w-7xl mx-auto' : 'md:max-w-7xl md:mx-auto'}`}>
@@ -175,13 +176,11 @@ export default function CalendarPage() {
                   return (
                     <div
                       key={index}
-                      className={`min-h-28 p-3 border-r border-b border-[var(--color-border)] last:border-r-0 ${
-                        isCurrentMonth ? 'bg-[var(--color-bg-light)]' : 'bg-[var(--color-bg-light)] opacity-50'
-                      } ${isToday ? 'bg-[var(--color-accent)] bg-opacity-10' : ''} hover:bg-[var(--color-accent)] hover:bg-opacity-5 transition-colors`}
+                      className={`min-h-28 p-3 border-r border-b border-[var(--color-border)] last:border-r-0 ${isCurrentMonth ? 'bg-[var(--color-bg-light)]' : 'bg-[var(--color-bg-light)] opacity-50'
+                        } ${isToday ? 'bg-[var(--color-accent)] bg-opacity-10' : ''} hover:bg-[var(--color-accent)] hover:bg-opacity-5 transition-colors`}
                     >
-                      <div className={`text-sm font-medium mb-2 ${
-                        isCurrentMonth ? 'text-[var(--color-text-light)]' : 'text-[var(--color-muted-foreground)]'
-                      } ${isToday ? 'text-[var(--color-accent)] font-bold' : ''}`}>
+                      <div className={`text-sm font-medium mb-2 ${isCurrentMonth ? 'text-[var(--color-text-light)]' : 'text-[var(--color-muted-foreground)]'
+                        } ${isToday ? 'text-[var(--color-accent)] font-bold' : ''}`}>
                         {day.getDate()}
                       </div>
 

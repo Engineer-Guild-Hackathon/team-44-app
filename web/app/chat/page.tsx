@@ -123,7 +123,7 @@ export default function ChatPage() {
     }
   }, [isCreatingSession, getAuthToken, user, authLoading])
 
-    // メッセージ送信
+  // メッセージ送信
   const handleSendMessage = async (message: string) => {
     if (!message.trim()) return
 
