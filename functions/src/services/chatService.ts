@@ -23,9 +23,7 @@ const getLLMProviderInstance = () => {
     return getLLMProvider();
   } catch (error) {
     console.error("LLM provider error:", error);
-    return {
-      generateResponse: async () => "Mock response due to provider error"
-    };
+    throw new Error("LLMプロバイダーの初期化に失敗しました");
   }
 };
 
