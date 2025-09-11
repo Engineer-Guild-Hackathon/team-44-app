@@ -120,7 +120,7 @@ export default function CalendarPage() {
       <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 
       {/* メインコンテンツ */}
-      <main className="pt-16 pb-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <main className="pt-16 pb-20 md:pb-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="py-6">
           {/* カレンダーヘッダー */}
           <div className="bg-[var(--color-bg-light)] border border-[var(--color-border)] rounded-xl shadow-lg mb-6 overflow-hidden">

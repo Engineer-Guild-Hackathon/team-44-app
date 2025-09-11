@@ -32,10 +32,42 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
   }, [isOpen, onClose])
 
   const menuItems = [
-    { href: '/', label: 'ホーム', icon: '🏠' },
-    { href: '/chat', label: 'チャット', icon: '💬' },
-    { href: '/calendar', label: 'カレンダー', icon: '📅' },
-    { href: '/reminders', label: 'リマインダー', icon: '🔔' },
+    {
+      href: '/',
+      label: 'ホーム',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+      )
+    },
+    {
+      href: '/chat',
+      label: 'チャット',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+      )
+    },
+    {
+      href: '/calendar',
+      label: 'カレンダー',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      )
+    },
+    {
+      href: '/reminders',
+      label: 'リマインダー',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4.868 12.683A17.925 17.925 0 0112 21c7.962 0 12-1.21 12-2.683m-12 2.683a17.925 17.925 0 01-7.132-8.317M12 21c4.411 0 8-4.03 8-9s-3.589-9-8-9-8 4.03-8 9a9.06 9.06 0 001.832 5.445L3 21l1.868-2.317z" />
+        </svg>
+      )
+    },
   ]
 
   return (
@@ -89,7 +121,7 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
                         : 'text-[var(--color-text-light)] hover:bg-[var(--color-accent)] hover:bg-opacity-10 hover:text-[var(--color-accent)]'
                     }`}
                   >
-                    <span className="text-lg">{item.icon}</span>
+                    <span className="flex-shrink-0">{item.icon}</span>
                     <span className="font-medium">{item.label}</span>
                     {isActive && (
                       <svg className="w-4 h-4 ml-auto" fill="currentColor" viewBox="0 0 24 24">
@@ -102,11 +134,35 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
             })}
           </ul>
 
+          {/* Mobile Bottom Navigation */}
+          <div className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--color-bg-light)] border-t border-[var(--color-border)] px-2 py-2 z-50">
+            <div className="flex justify-around items-center">
+              {menuItems.map((item) => {
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => onClose()}
+                    className={`flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 min-w-0 flex-1 ${
+                      isActive
+                        ? 'bg-[var(--color-primary)] text-[var(--color-text-dark)]'
+                        : 'text-[var(--color-muted-foreground)] hover:bg-[var(--color-accent)] hover:bg-opacity-10 hover:text-[var(--color-accent)]'
+                    }`}
+                  >
+                    <span className="flex-shrink-0 mb-1">{item.icon}</span>
+                    <span className="text-xs font-medium truncate">{item.label}</span>
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+
           {/* Divider */}
-          <div className="my-6 border-t border-[var(--color-border)]"></div>
+          <div className="my-6 border-t border-[var(--color-border)] md:block hidden"></div>
 
           {/* Additional Info */}
-          <div className="text-center">
+          <div className="text-center md:block hidden">
             <p className="text-sm text-[var(--color-muted-foreground)]">
               あなたの知識の図書館
             </p>

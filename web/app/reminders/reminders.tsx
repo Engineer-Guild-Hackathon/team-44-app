@@ -42,7 +42,7 @@ export default function RemindersComponent() {
       <Header onMenuClick={() => setIsNavOpen(true)} />
       <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 
-      <main className="pt-16 pb-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+      <main className="pt-16 pb-20 md:pb-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="py-6">
           <div className="max-w-4xl mx-auto">
             <div className="mb-8">

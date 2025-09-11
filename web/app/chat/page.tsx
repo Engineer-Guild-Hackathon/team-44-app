@@ -4,10 +4,13 @@ import { useState } from 'react'
 import { ChatMessage } from '../../types/api'
 import ChatView from '../../components/common/ChatView'
 import MessageInput from '../../components/common/MessageInput'
+import Header from '../../components/common/Header'
+import Navigation from '../../components/common/Navigation'
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isNavOpen, setIsNavOpen] = useState(false)
 
   const handleSendMessage = async (message: string) => {
     if (!message.trim()) return
@@ -34,15 +37,20 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[var(--color-bg-light)]">
-      <div className="flex-1 overflow-hidden">
-        <ChatView messages={messages} isLoading={isLoading} />
+    <div className="min-h-screen bg-[var(--color-bg-light)]">
+      <Header onMenuClick={() => setIsNavOpen(true)} />
+      <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
+
+      <div className="pt-16 h-screen flex flex-col pb-16 md:pb-0">
+        <div className="flex-1 overflow-hidden">
+          <ChatView messages={messages} isLoading={isLoading} />
+        </div>
+        <MessageInput
+          onSendMessage={handleSendMessage}
+          disabled={isLoading}
+          placeholder="質問や問題を入力してください..."
+        />
       </div>
-      <MessageInput
-        onSendMessage={handleSendMessage}
-        disabled={isLoading}
-        placeholder="質問や問題を入力してください..."
-      />
     </div>
   )
 }
