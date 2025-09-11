@@ -60,6 +60,7 @@ export default function MessageInput({ onSendMessage, disabled = false, placehol
               : 'hover:scale-105'
           }`}
           style={{ width: '48px', height: '48px' }}
+          aria-label="送信"
         >
           <svg
             className="w-5 h-5"
