@@ -14,7 +14,7 @@ export default function CalendarPage() {
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [isNavOpen, setIsNavOpen] = useState(true)
+  const [isNavOpen, setIsNavOpen] = useState(false)
 
   // カレンダー関連の定数
   const currentMonth = selectedDate.getMonth()
