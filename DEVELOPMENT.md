@@ -134,7 +134,7 @@ firebase deploy --only functions
 
 ### Database Setup
 ```bash
-firebase deploy --only firestore:rules
+firebase deploy --only firestore:rules,firestore:indexes,functions
 firebase deploy --only firestore:indexes
 ```
 

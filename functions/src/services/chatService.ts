@@ -243,11 +243,11 @@ export class ChatService {
       try {
         const provider = getLLMProviderInstance();
         const titlePrompt = "以下の会話の内容を基に、適切なセッションタイトルを1行で生成してください。タイトルは簡潔で、学習内容を反映したものにしてください。";
-        const conversationText = session.messages.map((msg: ChatMessage) => `${msg.role}: ${msg.parts.map((p: { text: string }) => p.text).join('')}`).join('\n');
+        const conversationText = session.messages.map((msg: ChatMessage) => `${msg.role}: ${msg.parts.map((p: { text: string }) => p.text).join("")}`).join("\n");
         const fullPrompt = `${titlePrompt}\n\n会話内容:\n${conversationText}`;
         generatedTitle = await provider.generateResponse([], fullPrompt);
         // 応答から余分なテキストを除去（必要に応じて）
-        generatedTitle = generatedTitle.trim().replace(/^["']|["']$/g, '');
+        generatedTitle = generatedTitle.trim().replace(/^["']|["']$/g, "");
       } catch (error) {
         console.error("タイトル生成エラー:", error);
         // エラー時はデフォルトタイトルを使用
