@@ -65,6 +65,10 @@ export interface LearningRecord {
   summary?: string;                   // 学習テーマ全体のサマリー
   keyPoints?: string[];              // 重要ポイント
   isManuallyCreated?: boolean;       // 手動作成フラグ（将来機能）
+  estimatedSubject?: string;         // LLM推定subject
+  estimatedTopic?: string;           // LLM推定topic
+  estimationConfidence?: number;     // LLM推定confidence
+  estimationMethod?: string;         // 推定方法（例: "llm_session_metadata"）
   createdAt: Date;
   updatedAt: Date;
 }
