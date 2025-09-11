@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 import { LearningRecord, SubjectTopicEstimation } from "../models/types";
 import { getLLMProvider } from "./llm/llmFactory";
 
@@ -72,8 +73,8 @@ export class LearningRecordService {
 
       const doc = snapshot.docs[0];
       const data = doc.data();
-      return { 
-        id: doc.id, 
+      return {
+        id: doc.id,
         ...data,
         lastStudiedAt: data.lastStudiedAt?.toDate ? data.lastStudiedAt.toDate() : data.lastStudiedAt,
         createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : data.createdAt,
@@ -126,8 +127,8 @@ export class LearningRecordService {
     const recordRef = db.collection("learningRecords").doc(learningRecordId);
 
     await recordRef.update({
-      totalDuration: admin.firestore.FieldValue.increment(sessionDuration),
-      sessionCount: admin.firestore.FieldValue.increment(1),
+  totalDuration: FieldValue.increment(sessionDuration),
+  sessionCount: FieldValue.increment(1),
       lastStudiedAt: new Date(),
       updatedAt: new Date()
     });

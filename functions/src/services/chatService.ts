@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 import { ChatSession, ChatMessage, SmartSessionResult, SessionStateResult } from "../models/types";
 import { getLLMProvider } from "./llm/llmFactory";
 import { LearningRecordService } from "./learningRecordService";
@@ -135,7 +136,7 @@ export class ChatService {
   private async getSessionById(sessionId: string): Promise<ChatSession | null> {
     const doc = await this.db.collection("chatSessions").doc(sessionId).get();
     if (!doc.exists) return null;
-    
+
     const data = doc.data();
     return {
       id: doc.id,
@@ -152,7 +153,7 @@ export class ChatService {
    */
   private async updateSessionActivity(sessionId: string): Promise<void> {
     await this.db.collection("chatSessions").doc(sessionId).update({
-      messageCount: admin.firestore.FieldValue.increment(1),
+  messageCount: FieldValue.increment(1),
       updatedAt: new Date()
     });
   }
@@ -163,7 +164,7 @@ export class ChatService {
   private async shouldPromoteSession(session: ChatSession): Promise<boolean> {
     const now = new Date();
     const sessionDuration = (now.getTime() - session.startedAt.getTime()) / (1000 * 60); // 分
-    
+
     // 条件: メッセージ数 >= 4回 かつ 継続時間 >= 3分
     return session.messageCount >= 4 && sessionDuration >= 3;
   }
@@ -275,12 +276,12 @@ export class ChatService {
       updatedAt: now
     });
 
-    return { 
-      ...session, 
+    return {
+      ...session,
       id: sessionId,
-      status: "completed", 
-      completedAt: now, 
-      duration: Math.round(durationMinutes || 0) 
+      status: "completed",
+      completedAt: now,
+      duration: Math.round(durationMinutes || 0)
     } as ChatSession;
   }
 
