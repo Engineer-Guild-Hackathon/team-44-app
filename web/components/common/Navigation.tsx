@@ -4,6 +4,10 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '../../hooks/useAuth'
+import HomeIcon from '@mui/icons-material/Home'
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
+import NotificationsIcon from '@mui/icons-material/Notifications'
+import LogoutIcon from '@mui/icons-material/Logout'
 
 interface NavigationProps {
   isOpen: boolean
@@ -37,29 +41,17 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
     {
       href: '/chat',
       label: 'ホーム',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-      )
+      icon: <HomeIcon className="w-5 h-5" />
     },
     {
       href: '/calendar',
       label: 'カレンダー',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      )
+      icon: <CalendarTodayIcon className="w-5 h-5" />
     },
     {
       href: '/reminders',
       label: 'リマインダー',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4.868 12.683A17.925 17.925 0 0112 21c7.962 0 12-1.21 12-2.683m-12 2.683a17.925 17.925 0 01-7.132-8.317M12 21c4.411 0 8-4.03 8-9s-3.589-9-8-9-8 4.03-8 9a9.06 9.06 0 001.832 5.445L3 21l1.868-2.317z" />
-        </svg>
-      )
+      icon: <NotificationsIcon className="w-5 h-5" />
     },
   ]
 
@@ -166,9 +158,7 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
                 }}
                 className="flex flex-col items-center justify-center p-2 rounded-lg transition-all duration-200 min-w-0 flex-1 text-[var(--color-muted-foreground)] hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)]"
               >
-                <svg className="w-5 h-5 flex-shrink-0 mb-1" fill="none" stroke="[var(--color-error)]" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
+                <LogoutIcon className="w-5 h-5 flex-shrink-0 mb-1" />
                 <span className="text-xs font-medium truncate">ログアウト</span>
               </button>
             </div>
@@ -186,9 +176,7 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
               }}
               className="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-[var(--color-text-light)] hover:bg-[var(--color-error)] hover:bg-opacity-10 hover:text-[var(--color-error)] w-full text-left"
             >
-              <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="[var(--color-error)]" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
+              <LogoutIcon className="w-5 h-5 flex-shrink-0" />
               <span className="font-medium">ログアウト</span>
             </button>
           </div>
