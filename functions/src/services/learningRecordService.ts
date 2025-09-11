@@ -53,12 +53,12 @@ export class LearningRecordService {
    * セッションのメタデータからsubject/topicをLLMで推定
    */
   async estimateSubjectAndTopicFromSession(session: ChatSession): Promise<{ subject: string; topic: string; confidence: number }> {
-    const messages = session.messages.map(m => m.parts.map(p => p.text).join(' ')).join(' ');
+    const messages = session.messages.map(m => m.parts.map(p => p.text).join(" ")).join(" ");
     const prompt = `
 以下のチャットセッションのメタデータから、学習分野(subject)と具体的なトピック(topic)を推定してください。
 
-タイトル: ${session.title || 'なし'}
-サマリー: ${session.sessionSummary || 'なし'}
+タイトル: ${session.title || "なし"}
+サマリー: ${session.sessionSummary || "なし"}
 主要メッセージ: ${messages.substring(0, 500)}...
 
 出力形式（JSON）:
@@ -118,7 +118,7 @@ export class LearningRecordService {
   async findMatchingLearningRecord(userId: string, subject: string, topic: string, existingRecords: LearningRecord[]): Promise<string | null> {
     if (existingRecords.length === 0) return null;
 
-    const recordsText = existingRecords.map(r => `ID: ${r.id}, subject: ${r.subject}, topic: ${r.topic}`).join('\n');
+    const recordsText = existingRecords.map(r => `ID: ${r.id}, subject: ${r.subject}, topic: ${r.topic}`).join("\n");
     const prompt = `
 新しいセッションのsubject: ${subject}, topic: ${topic} に対して、以下の既存レコード一覧から最も似ているものを選んでください。該当なしの場合はnullを返してください。
 
@@ -131,7 +131,7 @@ ${recordsText}
     try {
       const response = await this.llm.generateResponse([], prompt);
       const matchedId = response.trim();
-      return matchedId === 'null' ? null : matchedId;
+      return matchedId === "null" ? null : matchedId;
     } catch (error) {
       console.error("Error finding matching record:", error);
       return null;
@@ -195,7 +195,7 @@ ${recordsText}
       });
 
       // ログ
-      console.log(`LearningRecord ${matchedId ? 'linked' : 'created'}: ${learningRecordId} for session ${sessionId}`);
+      console.log(`LearningRecord ${matchedId ? "linked" : "created"}: ${learningRecordId} for session ${sessionId}`);
 
       return learningRecordId;
     });
