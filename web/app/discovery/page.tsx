@@ -95,12 +95,12 @@ export default function DiscoveryPage() {
 
       {/* Header */}
       <header className="bg-[var(--color-bg-light)] dark:bg-[var(--color-bg-dark)] border-b border-[var(--color-border)] px-4 py-6">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center">
-            <h1 className="text-3xl text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-2 font-semibold">
+            <h1 className="text-2xl sm:text-3xl text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-2 font-semibold">
               📚 学習発見・興味拡張
             </h1>
-            <p className="text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)] text-lg">
+            <p className="text-sm sm:text-base text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)] max-w-2xl mx-auto">
               新しい知識との出会いを通じて、学習意欲を高めましょう
             </p>
           </div>
@@ -108,12 +108,12 @@ export default function DiscoveryPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* 今日の豆知識 */}
-          <section className="bg-white rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
-            <h2 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 flex items-center gap-2">
-              <span className="text-2xl">�</span>
+          <section className="bg-white dark:bg-[var(--color-bg-dark)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
+            <h2 className="text-xl font-semibold text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-6 flex items-center gap-2">
+              <span className="text-2xl">📚</span>
               今日の豆知識
             </h2>
             {todayKnowledge ? (
@@ -121,7 +121,7 @@ export default function DiscoveryPage() {
             ) : (
               <div className="text-center py-8">
                 <div className="text-4xl mb-4">📚</div>
-                <p className="text-[var(--color-muted-foreground)]">知識を準備中...</p>
+                <p className="text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)]">知識を準備中...</p>
               </div>
             )}
           </section>
@@ -155,26 +155,26 @@ export default function DiscoveryPage() {
               </div>
             )}
           </section>
-        </div>
 
-        {/* 興味マップ */}
-        <section className="bg-white rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
-          <h2 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 flex items-center gap-2">
-            <span className="text-2xl">🗺️</span>
-            興味マップ
-          </h2>
-          {interestMapData ? (
-            <BasicInterestMap
-              mapData={interestMapData}
-              hasData={interestMapData.hasData}
-            />
-          ) : (
-            <div className="text-center py-12">
-              <div className="text-4xl mb-4">🌟</div>
-              <p className="text-[var(--color-muted-foreground)]">興味マップを探索中...</p>
-            </div>
-          )}
-        </section>
+          {/* 興味マップ */}
+          <section className="bg-white dark:bg-[var(--color-bg-dark)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
+            <h2 className="text-xl font-semibold text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-6 flex items-center gap-2">
+              <span className="text-2xl">🗺️</span>
+              興味マップ
+            </h2>
+            {interestMapData ? (
+              <BasicInterestMap
+                mapData={interestMapData}
+                hasData={interestMapData.hasData}
+              />
+            ) : (
+              <div className="text-center py-12">
+                <div className="text-4xl mb-4">🌟</div>
+                <p className="text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)]">興味マップを探索中...</p>
+              </div>
+            )}
+          </section>
+        </div>
       </main>
     </div>
   );

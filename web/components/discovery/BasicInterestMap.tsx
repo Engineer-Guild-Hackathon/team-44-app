@@ -9,16 +9,16 @@ interface BasicInterestMapProps {
 export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, hasData }) => {
   if (!hasData || !mapData.nodes || mapData.nodes.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-[var(--shadow-md)] p-8 border border-[var(--color-border)] text-center">
+      <div className="bg-white dark:bg-[var(--color-bg-dark)] rounded-lg shadow-[var(--shadow-md)] p-8 border border-[var(--color-border)] text-center">
         <div className="text-6xl mb-4">🗺️</div>
-        <h3 className="text-xl font-semibold text-[var(--color-text-light)] mb-3">
+        <h3 className="text-xl font-semibold text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-3">
           興味マップ
         </h3>
-        <p className="text-[var(--color-muted-foreground)] mb-6">
+        <p className="text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)] mb-6">
           {mapData.placeholderMessage || '学習データを集めて興味マップを作成しましょう'}
         </p>
-        <div className="bg-[var(--color-muted)] rounded-lg p-6 border border-[var(--color-border)]">
-          <p className="text-sm text-[var(--color-muted-foreground)]">
+        <div className="bg-[var(--color-muted)] dark:bg-[var(--color-bg-dark)] rounded-lg p-6 border border-[var(--color-border)]">
+          <p className="text-sm text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)]">
             学習を続けると、あなたの興味分野が可視化され、新しい発見につながります
           </p>
         </div>
@@ -27,8 +27,8 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, has
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
-      <h3 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 text-center">
+    <div className="bg-white dark:bg-[var(--color-bg-dark)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
+      <h3 className="text-xl font-semibold text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-6 text-center">
         あなたの興味マップ
       </h3>
 
@@ -37,15 +37,15 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, has
         {mapData.nodes.map((node) => (
           <div
             key={node.id}
-            className="bg-gradient-to-br from-[var(--color-accent)] from-opacity-5 to-[var(--color-primary)] to-opacity-5 rounded-lg p-4 text-center hover:shadow-[var(--shadow-md)] transition-shadow cursor-pointer border border-[var(--color-border)]"
+            className="bg-gradient-to-br from-[var(--color-accent)] from-opacity-5 to-[var(--color-primary)] to-opacity-5 dark:from-[var(--color-accent)] dark:to-[var(--color-primary)] rounded-lg p-4 text-center hover:shadow-[var(--shadow-md)] transition-shadow cursor-pointer border border-[var(--color-border)]"
           >
             <div className="text-2xl mb-2">
               {getCategoryEmoji(node.category)}
             </div>
-            <h4 className="font-medium text-[var(--color-text-light)] mb-1">
+            <h4 className="font-medium text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-1">
               {node.category}
             </h4>
-            <div className="text-sm text-[var(--color-muted-foreground)]">
+            <div className="text-sm text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)]">
               学習回数: {node.itemsViewed}
             </div>
             <div className="mt-2 bg-[var(--color-muted)] rounded-full h-2">
