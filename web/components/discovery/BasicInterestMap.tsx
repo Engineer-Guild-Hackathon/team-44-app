@@ -1,4 +1,5 @@
 import React from 'react';
+import { MdMap, MdCalculate, MdScience, MdBiotech, MdHistory, MdPublic, MdMenuBook, MdLanguage, MdCode, MdPalette, MdMusicNote, MdPsychology, MdLightbulb } from 'react-icons/md';
 import { InterestMapData } from '../../types/discovery';
 
 interface BasicInterestMapProps {
@@ -10,16 +11,16 @@ interface BasicInterestMapProps {
 export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, hasData, onNodeClick }) => {
   if (!hasData || !mapData.nodes || mapData.nodes.length === 0) {
     return (
-      <div className="bg-white dark:bg-[var(--color-bg-dark)] rounded-lg shadow-[var(--shadow-md)] p-8 border border-[var(--color-border)] text-center">
-        <div className="text-6xl mb-4">🗺️</div>
-        <h3 className="text-xl font-semibold text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-3">
+      <div className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-8 border border-[var(--color-border)] text-center">
+        <div className="text-6xl mb-4"> <MdMap /> </div>
+        <h3 className="text-xl font-semibold text-[var(--color-text-light)] mb-3">
           興味マップ
         </h3>
-        <p className="text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)] mb-6">
+        <p className="text-[var(--color-muted-foreground)] mb-6">
           {mapData.placeholderMessage || '学習データを集めて興味マップを作成しましょう'}
         </p>
-        <div className="bg-[var(--color-muted)] dark:bg-[var(--color-bg-dark)] rounded-lg p-6 border border-[var(--color-border)]">
-          <p className="text-sm text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)]">
+        <div className="bg-[var(--color-muted)] rounded-lg p-6 border border-[var(--color-border)]">
+          <p className="text-sm text-[var(--color-muted-foreground)]">
             学習を続けると、あなたの興味分野が可視化され、新しい発見につながります
           </p>
         </div>
@@ -28,8 +29,8 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, has
   }
 
   return (
-    <div className="bg-white dark:bg-[var(--color-bg-dark)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
-      <h3 className="text-xl font-semibold text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-6 text-center">
+    <div className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
+      <h3 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 text-center">
         あなたの興味マップ
       </h3>
 
@@ -42,12 +43,12 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, has
             onClick={() => onNodeClick?.(node.category)}
           >
             <div className="text-2xl mb-2">
-              {getCategoryEmoji(node.category)}
+              {getCategoryIcon(node.category)}
             </div>
-            <h4 className="font-medium text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-1">
+            <h4 className="font-medium text-[var(--color-text-dark)] mb-1">
               {node.category}
             </h4>
-            <div className="text-sm text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)]">
+            <div className="text-sm text-[var(--color-text-dark)]">
               学習回数: {node.itemsViewed}
             </div>
             <div className="mt-2 bg-[var(--color-muted)] rounded-full h-2">
@@ -68,9 +69,9 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, has
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {mapData.suggestions.map((suggestion, index) => (
-              <div key={index} className="bg-[var(--color-success)] bg-opacity-5 rounded-lg p-4 border border-[var(--color-success)] border-opacity-20">
+              <div key={index} className="bg-[var(--color-dark)] bg-opacity-5 rounded-lg p-4 border border-[var(--color-dark)] border-opacity-20">
                 <div className="flex items-center mb-2">
-                  <span className="text-2xl mr-3">💡</span>
+                  <MdLightbulb className="text-2xl mr-3 text-[var(--color-warning)]" />
                   <h5 className="font-medium text-[var(--color-text-light)]">
                     {suggestion.category}
                   </h5>
@@ -87,22 +88,22 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, has
   );
 };
 
-// カテゴリに応じた絵文字を返す関数
-function getCategoryEmoji(category: string): string {
-  const emojiMap: { [key: string]: string } = {
-    '数学': '🔢',
-    '物理': '⚛️',
-    '化学': '🧪',
-    '生物': '🧬',
-    '歴史': '📜',
-    '地理': '🌍',
-    '文学': '📚',
-    '言語': '🗣️',
-    'プログラミング': '💻',
-    '芸術': '🎨',
-    '音楽': '🎵',
-    '哲学': '🤔',
+// カテゴリに応じたアイコンを返す関数
+function getCategoryIcon(category: string): JSX.Element {
+  const iconMap: { [key: string]: JSX.Element } = {
+    '数学': <MdCalculate />,
+    '物理': <MdScience />,
+    '化学': <MdScience />,
+    '生物': <MdBiotech />,
+    '歴史': <MdHistory />,
+    '地理': <MdPublic />,
+    '文学': <MdMenuBook />,
+    '言語': <MdLanguage />,
+    'プログラミング': <MdCode />,
+    '芸術': <MdPalette />,
+    '音楽': <MdMusicNote />,
+    '哲学': <MdPsychology />,
   };
 
-  return emojiMap[category] || '📖';
+  return iconMap[category] || <MdMenuBook />;
 }

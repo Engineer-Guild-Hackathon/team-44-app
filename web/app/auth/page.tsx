@@ -52,7 +52,7 @@ export default function AuthPage() {
       )}
 
       <div className="flex-1 flex flex-col">
-        <div className={`pt-16 pb-20 md:pb-6 px-4 py-8 flex items-center justify-center min-h-screen ${isNavOpen ? '' : 'md:max-w-md md:mx-auto'}`}>
+        <div className={`pt-16 pb-20 md:pb-6 px-4 py-8 flex items-center justify-center min-h-screen md:max-w-md md:mx-auto`}>
           <div className="w-full max-w-md">
             {/* tothlus Logo */}
             <div className="text-center mb-8">

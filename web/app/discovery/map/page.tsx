@@ -7,6 +7,7 @@ import { BasicInterestMap } from '../../../components/discovery/BasicInterestMap
 import Header from '../../../components/common/Header';
 import Navigation from '../../../components/common/Navigation';
 import { ErrorNavigationButtons } from '../../../components/common/ErrorNavigationButtons';
+import { MdMap } from 'react-icons/md';
 
 export default function MapPage() {
   const { interestMapData, isLoading, error, loadInterestMap } = useDiscoveryStore();
@@ -37,7 +38,7 @@ export default function MapPage() {
         <div className="flex-1 flex items-center justify-center pt-16">
           <div className="text-center max-w-md mx-auto px-4">
             <div className="mb-8">
-              <div className="text-[var(--color-error)] mb-4 text-4xl">🗺️</div>
+              <div className="text-[var(--color-error)] mb-4 text-4xl"><MdMap /></div>
               <h2 className="text-2xl font-semibold text-[var(--color-text-light)] mb-4">
                 エラーが発生しました
               </h2>
@@ -60,17 +61,17 @@ export default function MapPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-light)] dark:bg-[var(--color-bg-dark)] flex">
+    <div className="min-h-screen bg-[var(--color-bg-light)] flex">
       <Header onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
       <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 
       <div className="flex-1 pt-16">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-2">
+            <h1 className="text-3xl font-bold text-[var(--color-text-light)] mb-2">
               興味領域マップ
             </h1>
-            <p className="text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)]">
+            <p className="text-[var(--color-muted-foreground)]">
               あなたの学習分野を可視化し、新しい興味の発見をサポートします
             </p>
           </div>
@@ -81,8 +82,8 @@ export default function MapPage() {
               hasData={interestMapData.hasData}
             />
           ) : (
-            <div className="bg-white dark:bg-[var(--color-bg-dark)] rounded-lg shadow-[var(--shadow-md)] p-6 text-center border border-[var(--color-border)]">
-              <p className="text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)]">興味マップを読み込み中...</p>
+            <div className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 text-center border border-[var(--color-border)]">
+              <p className="text-[var(--color-muted-foreground)]">興味マップを読み込み中...</p>
             </div>
           )}
 

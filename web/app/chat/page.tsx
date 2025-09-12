@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { ChatMessage } from '../../types/api'
 import ChatView from './components/ChatView'
 import MessageInput from './components/MessageInput'
@@ -9,6 +10,7 @@ import Navigation from '../../components/common/Navigation'
 import { useAuth } from '../../hooks/useAuth'
 import { getAuthClient } from '../../lib/firebase'
 import { useDiscoveryStore } from '../../store/discoveryStore'
+import apiClient from '../../lib/apiClient'
 
 export default function ChatPage() {
   const [message, setMessage] = useState('')
@@ -16,6 +18,14 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [isNavOpen, setIsNavOpen] = useState(false) // デフォルトで閉じる
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+
+  // URLからrecordIdを取得
+  const getRecordId = () => {
+    if (typeof window === 'undefined') return null
+    const urlParams = new URLSearchParams(window.location.search)
+    return urlParams.get('recordId')
+  }
+  const recordId = getRecordId()
 
   // ルートが変わったら自動でサイドバーを閉じる
   useEffect(() => {
@@ -46,6 +56,55 @@ export default function ChatPage() {
       loadTodayKnowledge();
     }
   }, [user, authLoading, loadTodayKnowledge])
+
+  // recordId があれば、関連するセッションを読み込んで続きから学習
+  useEffect(() => {
+    if (recordId && user && !authLoading) {
+      loadExistingSession(recordId)
+    }
+  }, [recordId, user, authLoading])
+
+  // 既存のセッションを読み込む関数
+  const loadExistingSession = useCallback(async (recordId: string) => {
+    try {
+      setIsLoading(true)
+
+      // 学習記録に関連するセッションを取得
+      const userSessions = await apiClient.getUserSessions()
+      const relatedSessions = userSessions
+        .filter(session => session.learningRecordId === recordId)
+        .sort((a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime()) // 最新のセッションを先頭に
+
+      if (relatedSessions.length === 0) {
+        addErrorMessage('この学習記録に関連するセッションが見つかりません。')
+        return
+      }
+
+      const latestSession = relatedSessions[0]
+      setCurrentSessionId(latestSession.id)
+
+      // セッションのメッセージを取得
+      if (latestSession.messages && latestSession.messages.length > 0) {
+        // APIレスポンスのメッセージ形式をChatMessage形式に変換
+        const chatMessages: ChatMessage[] = latestSession.messages.map(msg => ({
+          role: msg.role,
+          parts: [{ text: msg.parts[0]?.text || '' }],
+          timestamp: new Date(msg.timestamp || Date.now())
+        }))
+        setMessages(chatMessages)
+      } else {
+        // メッセージがない場合は空の状態から開始
+        setMessages([])
+      }
+
+      console.log('Loaded existing session:', latestSession.id)
+    } catch (error) {
+      console.error('Failed to load existing session:', error)
+      addErrorMessage('セッションの読み込みに失敗しました。')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
 
   // 認証トークンを取得する関数
   const getAuthToken = useCallback(async (): Promise<string | null> => {

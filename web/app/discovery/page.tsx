@@ -11,6 +11,7 @@ import Header from '../../components/common/Header';
 import Navigation from '../../components/common/Navigation';
 import { ErrorNavigationButtons } from '../../components/common/ErrorNavigationButtons';
 import { useAuth } from '../../hooks/useAuth';
+import { MenuBook, Psychology, Help, Map, Star } from '@mui/icons-material';
 
 export default function DiscoveryPage() {
   const {
@@ -55,7 +56,7 @@ export default function DiscoveryPage() {
         <div className="flex-1 flex items-center justify-center pt-16">
           <div className="text-center max-w-md mx-auto px-4">
             <div className="mb-8">
-              <div className="text-[var(--color-error)] mb-4 text-4xl">📚</div>
+              <div className="text-[var(--color-error)] mb-4 text-4xl"><MenuBook /></div>
               <h2 className="text-2xl font-semibold text-[var(--color-text-light)] mb-4">
                 エラーが発生しました
               </h2>
@@ -81,7 +82,7 @@ export default function DiscoveryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-light)]">
+    <div className="pt-16 min-h-screen bg-[var(--color-bg-light)]">
       {user && (
         <>
           <Header
@@ -98,13 +99,13 @@ export default function DiscoveryPage() {
       )}
 
       {/* Header */}
-      <header className="bg-[var(--color-bg-light)] dark:bg-[var(--color-bg-dark)] border-b border-[var(--color-border)] px-4 py-6">
+      <header className="bg-[var(--color-bg-light)] border-b border-[var(--color-border)] px-4 py-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
-            <h1 className="text-2xl sm:text-3xl text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-2 font-semibold">
+            <h1 className="text-2xl sm:text-3xl text-[var(--color-text-light)] mb-2 font-semibold">
               📚 学習発見・興味拡張
             </h1>
-            <p className="text-sm sm:text-base text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)] max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base text-[var(--color-muted-foreground)] max-w-2xl mx-auto">
               新しい知識との出会いを通じて、学習意欲を高めましょう
             </p>
           </div>
@@ -117,7 +118,7 @@ export default function DiscoveryPage() {
           {/* 今日の豆知識 */}
           <section className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
             <h2 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 flex items-center gap-2">
-              <span className="text-2xl">📚</span>
+              <span className="text-2xl"><MenuBook /></span>
               今日の豆知識
             </h2>
             {todayKnowledge ? (
@@ -133,7 +134,7 @@ export default function DiscoveryPage() {
               />
             ) : (
               <div className="text-center py-8">
-                <div className="text-4xl mb-4">📚</div>
+                <div className="text-4xl mb-4"><MenuBook /></div>
                 <p className="text-[var(--color-text-light)]">知識を準備中...</p>
               </div>
             )}
@@ -162,9 +163,9 @@ export default function DiscoveryPage() {
           </section>
 
           {/* 週次クイズ */}
-          <section className="bg-white dark:bg-[var(--color-bg-dark)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
-            <h2 className="text-xl font-semibold text-[var(--color-text-dark)] mb-6 flex items-center gap-2">
-              <span className="text-2xl">🧠</span>
+          <section className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
+            <h2 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 flex items-center gap-2">
+              <span className="text-2xl"><Psychology /></span>
               週次クイズ
             </h2>
             {currentQuiz ? (
@@ -177,8 +178,8 @@ export default function DiscoveryPage() {
               />
             ) : (
               <div className="text-center py-8">
-                <div className="text-4xl mb-4">❓</div>
-                <p className="text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)] mb-4">クイズを準備中...</p>
+                <div className="text-4xl mb-4"><Help /></div>
+                <p className="text-[var(--color-muted-foreground)] mb-4">クイズを準備中...</p>
                 <button
                   onClick={() => {
                     // クイズ読み込み処理
@@ -192,9 +193,9 @@ export default function DiscoveryPage() {
           </section>
 
           {/* 興味マップ */}
-          <section className="bg-white dark:bg-[var(--color-bg-dark)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
-            <h2 className="text-xl font-semibold text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-6 flex items-center gap-2">
-              <span className="text-2xl">🗺️</span>
+          <section className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
+            <h2 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 flex items-center gap-2">
+              <span className="text-2xl"><Map /></span>
               興味マップ
             </h2>
             {interestMapData ? (
@@ -208,8 +209,8 @@ export default function DiscoveryPage() {
               />
             ) : (
               <div className="text-center py-12">
-                <div className="text-4xl mb-4">🌟</div>
-                <p className="text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)]">興味マップを探索中...</p>
+                <div className="text-4xl mb-4"><Star /></div>
+                <p className="text-[var(--color-muted-foreground)]">興味マップを探索中...</p>
               </div>
             )}
           </section>

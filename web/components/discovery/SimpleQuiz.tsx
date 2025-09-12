@@ -39,7 +39,7 @@ export const SimpleQuiz: React.FC<SimpleQuizProps> = ({ quiz, onAnswer }) => {
 
   if (showResult) {
     return (
-      <div className="bg-white dark:bg-[var(--color-bg-dark)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
+      <div className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
         <div className="text-center mb-4">
           <div className={`text-4xl mb-2 ${isCorrect ? 'text-[var(--color-success)]' : 'text-[var(--color-error)]'}`}>
             {isCorrect ? '✓' : '✗'}
@@ -50,12 +50,12 @@ export const SimpleQuiz: React.FC<SimpleQuizProps> = ({ quiz, onAnswer }) => {
         </div>
 
         <div className="mb-4">
-          <p className="text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-2 font-medium">解説:</p>
-          <p className="text-[var(--color-text-light)] dark:text-[var(--color-text-dark)]">{quiz.explanation}</p>
+          <p className="text-[var(--color-text-light)] mb-2 font-medium">解説:</p>
+          <p className="text-[var(--color-text-light)]">{quiz.explanation}</p>
         </div>
 
         <div className="flex justify-between items-center">
-          <span className="text-sm text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)]">
+          <span className="text-sm text-[var(--color-muted-foreground)]">
             正解: {quiz.options[quiz.correctAnswer]}
           </span>
 
@@ -73,12 +73,12 @@ export const SimpleQuiz: React.FC<SimpleQuizProps> = ({ quiz, onAnswer }) => {
   }
 
   return (
-    <div className="bg-white dark:bg-[var(--color-bg-dark)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
+    <div className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-2">
+        <h3 className="text-lg font-semibold text-[var(--color-text-light)] mb-2">
           {quiz.primaryCategory} × {quiz.secondaryCategory}
         </h3>
-        <p className="text-[var(--color-text-light)] dark:text-[var(--color-text-dark)]">{quiz.question}</p>
+        <p className="text-[var(--color-text-light)]">{quiz.question}</p>
       </div>
 
       <div className="space-y-3 mb-6">
@@ -87,14 +87,14 @@ export const SimpleQuiz: React.FC<SimpleQuizProps> = ({ quiz, onAnswer }) => {
             key={index}
             onClick={() => handleOptionSelect(index)}
             className={`w-full text-left p-4 rounded-lg border-2 transition-colors ${selectedOption === index
-              ? 'border-[var(--color-accent)] bg-[var(--color-accent)] bg-opacity-5 dark:bg-opacity-10'
-              : 'border-[var(--color-border)] hover:border-[var(--color-primary)] hover:bg-[var(--color-muted)] dark:hover:bg-[var(--color-bg-dark)]'
+              ? 'border-[var(--color-accent)] bg-[var(--color-accent)] bg-opacity-5'
+              : 'border-[var(--color-border)] hover:border-[var(--color-primary)] hover:bg-[var(--color-muted)]'
               }`}
           >
             <span className="font-medium text-[var(--color-primary)] mr-3">
               {String.fromCharCode(65 + index)}.
             </span>
-            <span className="text-[var(--color-text-light)] dark:text-[var(--color-text-dark)]">{option}</span>
+            <span className="text-[var(--color-text-light)]">{option}</span>
           </button>
         ))}
       </div>
@@ -104,7 +104,7 @@ export const SimpleQuiz: React.FC<SimpleQuizProps> = ({ quiz, onAnswer }) => {
         disabled={selectedOption === null}
         className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${selectedOption !== null
           ? 'bg-[var(--color-primary)] hover:bg-opacity-90 text-[var(--color-text-dark)]'
-          : 'bg-[var(--color-muted)] dark:bg-[var(--color-bg-dark)] text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)] cursor-not-allowed'
+          : 'bg-[var(--color-muted)] text-[var(--color-muted-foreground)] cursor-not-allowed'
           }`}
       >
         回答する
