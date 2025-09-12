@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
-import { Star } from '@mui/icons-material'
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -57,8 +56,8 @@ export default function AuthPage() {
           <div className="w-full max-w-md">
             {/* tothlus Logo */}
             <div className="text-center mb-8">
-              <div className="w-16 h-16 bg-[var(--color-primary)] rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Star className="w-8 h-8 text-[var(--color-text-dark)]" />
+              <div className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <img src="/icon-192.svg" alt="tothlus logo" className="w-16 h-16" />
               </div>
               <h1 className="text-2xl font-bold text-[var(--color-text-light)] mb-2">
                 tothlus

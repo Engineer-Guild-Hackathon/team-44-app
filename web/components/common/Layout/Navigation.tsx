@@ -155,9 +155,7 @@ export default function Navigation() {
         <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-[var(--color-primary)] rounded-md flex items-center justify-center">
-              <svg className="w-5 h-5 text-[var(--color-text-dark)]" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-              </svg>
+              <img src="/icon-192.svg" alt="tothlus logo" className="w-5 h-5" />
             </div>
             <span className="font-bold text-[var(--color-text-light)]">tothlus</span>
           </div>
@@ -192,8 +190,8 @@ export default function Navigation() {
                   href={item.href}
                   onClick={closeMenu}
                   className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group ${isActiveRoute(item.href)
-                      ? 'bg-[var(--color-accent)] bg-opacity-10 text-[var(--color-accent)] border-l-4 border-[var(--color-accent)] shadow-sm'
-                      : 'text-[var(--color-text-light)] hover:bg-[var(--color-muted)] hover:text-[var(--color-accent)] hover:shadow-sm'
+                    ? 'bg-[var(--color-accent)] bg-opacity-10 text-[var(--color-accent)] border-l-4 border-[var(--color-accent)] shadow-sm'
+                    : 'text-[var(--color-text-light)] hover:bg-[var(--color-muted)] hover:text-[var(--color-accent)] hover:shadow-sm'
                     }`}
                 >
                   <span className="text-xl group-hover:scale-110 transition-transform duration-200">
@@ -265,8 +263,8 @@ export default function Navigation() {
             key={item.href}
             href={item.href}
             className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActiveRoute(item.href)
-                ? 'bg-[var(--color-accent)] bg-opacity-10 text-[var(--color-accent)]'
-                : 'text-[var(--color-text-light)] hover:text-[var(--color-accent)]'
+              ? 'bg-[var(--color-accent)] bg-opacity-10 text-[var(--color-accent)]'
+              : 'text-[var(--color-text-light)] hover:text-[var(--color-accent)]'
               }`}
           >
             {item.label}
