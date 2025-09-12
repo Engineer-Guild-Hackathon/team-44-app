@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { LearningRecord, ChatSession } from '../../types/api'
 import apiClient from '../../lib/apiClient'
-import { MdCalculate, MdScience, MdLanguage, MdHistory, MdCode, MdMenuBook } from 'react-icons/md'
+import { MdCalculate, MdScience, MdLanguage, MdHistory, MdCode, MdMenuBook, MdExpandMore } from 'react-icons/md'
 
 interface LearningRecordDetailProps {
   isOpen: boolean
@@ -23,6 +23,7 @@ export default function LearningRecordDetail({
   const [selectedSession, setSelectedSession] = useState<ChatSession | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   // データ取得
   useEffect(() => {
@@ -76,6 +77,23 @@ export default function LearningRecordDetail({
       document.removeEventListener('keydown', handleEscape)
     }
   }, [isOpen, onClose])
+
+  // ドロップダウンの外側クリックで閉じる
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isDropdownOpen && !(event.target as Element).closest('.dropdown-container')) {
+        setIsDropdownOpen(false)
+      }
+    }
+
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isDropdownOpen])
 
   // 時間を分から時間:分の形式に変換
   const formatDuration = (minutes: number): string => {
@@ -147,29 +165,71 @@ export default function LearningRecordDetail({
         <div className="flex flex-col h-full">
           {/* セッション選択 */}
           <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-bg-light)]">
-            <div className="flex items-center space-x-4">
-              <label className="text-sm font-medium text-[var(--color-text-light]">セッションを選択:</label>
-              <select
-                value={selectedSession?.id || ''}
-                onChange={(e) => {
-                  const session = sessions.find(s => s.id === e.target.value);
-                  setSelectedSession(session || null);
-                }}
-                className="flex-1 px-3 py-2 border border-[var(--color-border)] rounded-lg bg-[var(--color-bg-light)] text-[var(--color-text-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+            <div className="relative dropdown-container">
+              <label className="block text-sm font-medium text-[var(--color-text-light)] mb-2">セッションを選択:</label>
+              <button
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="w-full px-4 py-3 text-left bg-[var(--color-bg-light)] border border-[var(--color-border)] rounded-lg hover:border-[var(--color-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] focus:ring-opacity-50 transition-colors flex items-center justify-between"
               >
-                <option value="">セッションを選択してください</option>
-                {sessions.map((session, index) => (
-                  <option key={session.id} value={session.id}>
-                    セッション{index + 1} - {formatDuration(session.duration)} - {new Date(session.startedAt).toLocaleString('ja-JP', {
+                <span className="text-[var(--color-text-light)]">
+                  {selectedSession
+                    ? `セッション${sessions.indexOf(selectedSession) + 1} - ${formatDuration(selectedSession.duration)} - ${new Date(selectedSession.startedAt).toLocaleString('ja-JP', {
                       month: 'short',
                       day: 'numeric',
                       hour: '2-digit',
                       minute: '2-digit'
-                    })}
-                    {session.title && ` - ${session.title}`}
-                  </option>
-                ))}
-              </select>
+                    })}${selectedSession.title ? ` - ${selectedSession.title}` : ''}`
+                    : 'セッションを選択してください'
+                  }
+                </span>
+                <MdExpandMore className={`w-5 h-5 text-[var(--color-text-secondary)] transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isDropdownOpen && (
+                <div className="absolute z-10 w-full mt-1 bg-[var(--color-bg-light)] border border-[var(--color-border)] rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  {sessions.length === 0 ? (
+                    <div className="px-4 py-3 text-[var(--color-text-secondary)] text-sm">
+                      セッションが見つかりません
+                    </div>
+                  ) : (
+                    sessions.map((session, index) => (
+                      <button
+                        key={session.id}
+                        onClick={() => {
+                          setSelectedSession(session);
+                          setIsDropdownOpen(false);
+                        }}
+                        className={`w-full px-4 py-3 text-left hover:bg-[var(--color-accent)] hover:bg-opacity-10 transition-colors border-b border-[var(--color-border)] last:border-b-0 ${selectedSession?.id === session.id ? 'bg-[var(--color-accent)] bg-opacity-20' : ''
+                          }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="font-medium text-[var(--color-text-light)]">
+                              セッション{index + 1}
+                            </div>
+                            <div className="text-sm text-[var(--color-text-secondary)]">
+                              {formatDuration(session.duration)} • {new Date(session.startedAt).toLocaleString('ja-JP', {
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                              {session.title && (
+                                <div className="truncate text-xs mt-1">
+                                  {session.title}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          {session.status === 'completed' && (
+                            <span className="text-[var(--color-success)] ml-2">✅</span>
+                          )}
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
