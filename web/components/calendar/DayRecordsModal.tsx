@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { LearningRecord } from '../../types/api'
+import { MdCalculate, MdScience, MdLanguage, MdHistory, MdCode, MdMenuBook } from 'react-icons/md'
 
 interface DayRecordsModalProps {
   isOpen: boolean
@@ -49,14 +50,14 @@ export default function DayRecordsModal({
   }
 
   // 教科アイコンを取得
-  const getSubjectIcon = (subject: string): string => {
-    const icons: { [key: string]: string } = {
-      'math': '📐',
-      'science': '🔬',
-      'english': '🔤',
-      'history': '📚',
-      'programming': '💻',
-      'general': '📝'
+  const getSubjectIcon = (subject: string): JSX.Element => {
+    const icons: { [key: string]: JSX.Element } = {
+      'math': <MdCalculate />,
+      'science': <MdScience />,
+      'english': <MdLanguage />,
+      'history': <MdHistory />,
+      'programming': <MdCode />,
+      'general': <MdMenuBook />
     }
     return icons[subject] || icons['general']
   }
@@ -83,7 +84,7 @@ export default function DayRecordsModal({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div
-        className="bg-[var(--color-bg-light)] rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden animate-in fade-in-0 zoom-in-95 duration-300"
+        className="bg-[var(--color-bg-light)] rounded-xl shadow-4xl max-w-4xl w-full max-h-[80vh] overflow-hidden animate-in fade-in-0 zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ヘッダー */}
@@ -110,7 +111,7 @@ export default function DayRecordsModal({
         <div className="p-6 overflow-y-auto max-h-[60vh]">
           {records.length === 0 ? (
             <div className="text-center py-8">
-              <div className="text-[var(--color-text-secondary)] text-4xl mb-4">📚</div>
+              <div className="text-[var(--color-text-secondary)] text-4xl mb-4"><MdMenuBook /></div>
               <p className="text-[var(--color-text-secondary)]">この日の学習記録はありません</p>
             </div>
           ) : (

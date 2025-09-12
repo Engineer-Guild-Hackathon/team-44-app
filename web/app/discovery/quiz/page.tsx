@@ -8,6 +8,7 @@ import { QuizItem } from '../../../types/discovery';
 import Header from '../../../components/common/Header';
 import Navigation from '../../../components/common/Navigation';
 import { ErrorNavigationButtons } from '../../../components/common/ErrorNavigationButtons';
+import { MdHelp } from 'react-icons/md';
 
 export default function QuizPage() {
   const { currentQuiz, isLoading, error, completeQuiz, loadInterestMap } = useDiscoveryStore();
@@ -70,7 +71,7 @@ export default function QuizPage() {
         <div className="flex-1 flex items-center justify-center pt-16">
           <div className="text-center max-w-md mx-auto px-4">
             <div className="mb-8">
-              <div className="text-[var(--color-error)] mb-4 text-4xl">❓</div>
+              <div className="text-[var(--color-error)] mb-4 text-4xl"><MdHelp /></div>
               <h2 className="text-2xl font-semibold text-[var(--color-text-light)] mb-4">
                 エラーが発生しました
               </h2>
@@ -96,17 +97,17 @@ export default function QuizPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-light)] dark:bg-[var(--color-bg-dark)] flex">
+    <div className="min-h-screen bg-[var(--color-bg-light)] flex">
       <Header onMenuClick={() => setIsNavOpen(true)} isNavOpen={isNavOpen} onToggleNav={() => setIsNavOpen(!isNavOpen)} />
       <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />
 
       <div className="flex-1 pt-16">
         <div className="max-w-2xl mx-auto px-4 py-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-2">
+            <h1 className="text-3xl font-bold text-[var(--color-text-light)] mb-2">
               異分野横断クイズ
             </h1>
-            <p className="text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)]">
+            <p className="text-[var(--color-muted-foreground)]">
               異なる分野の意外なつながりを発見しましょう
             </p>
           </div>
@@ -114,8 +115,8 @@ export default function QuizPage() {
           {quiz ? (
             <SimpleQuiz quiz={quiz} onAnswer={handleQuizComplete} />
           ) : (
-            <div className="bg-white dark:bg-[var(--color-bg-dark)] rounded-lg shadow-[var(--shadow-md)] p-6 text-center border border-[var(--color-border)]">
-              <p className="text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)]">クイズを準備中...</p>
+            <div className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 text-center border border-[var(--color-border)]">
+              <p className="text-[var(--color-muted-foreground)]">クイズを準備中...</p>
             </div>
           )}
 

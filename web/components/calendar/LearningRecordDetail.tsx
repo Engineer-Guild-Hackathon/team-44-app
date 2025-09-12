@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { LearningRecord, ChatSession } from '../../types/api'
 import apiClient from '../../lib/apiClient'
+import { MdCalculate, MdScience, MdLanguage, MdHistory, MdCode, MdMenuBook } from 'react-icons/md'
 
 interface LearningRecordDetailProps {
   isOpen: boolean
@@ -41,12 +42,12 @@ export default function LearningRecordDetail({
 
       // 関連するセッションを取得
       const userSessions = await apiClient.getUserSessions()
-      const relatedSessions = userSessions.filter(session => 
+      const relatedSessions = userSessions.filter(session =>
         session.learningRecordId === recordId
       ).sort((a, b) => new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime())
 
       setSessions(relatedSessions)
-      
+
       // 最初のセッションを選択
       if (relatedSessions.length > 0) {
         setSelectedSession(relatedSessions[0])
@@ -87,14 +88,14 @@ export default function LearningRecordDetail({
   }
 
   // 教科アイコンを取得
-  const getSubjectIcon = (subject: string): string => {
-    const icons: { [key: string]: string } = {
-      'math': '📐',
-      'science': '🔬',
-      'english': '🔤',
-      'history': '📚',
-      'programming': '💻',
-      'general': '📝'
+  const getSubjectIcon = (subject: string): JSX.Element => {
+    const icons: { [key: string]: JSX.Element } = {
+      'math': <MdCalculate />,
+      'science': <MdScience />,
+      'english': <MdLanguage />,
+      'history': <MdHistory />,
+      'programming': <MdCode />,
+      'general': <MdMenuBook />
     }
     return icons[subject] || icons['general']
   }
@@ -103,7 +104,7 @@ export default function LearningRecordDetail({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div 
+      <div
         className="bg-[var(--color-bg-light)] rounded-xl shadow-2xl w-full max-w-6xl h-[80vh] overflow-hidden animate-in fade-in-0 zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
@@ -122,10 +123,10 @@ export default function LearningRecordDetail({
               <div className="flex items-center space-x-3">
                 <span className="text-3xl">{getSubjectIcon(record.subject)}</span>
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900">
+                  <h2 className="text-xl font-semibold text-[var(--color-text-light)]">
                     {record.subject} - {record.topic}
                   </h2>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-[var(--color-muted-foreground)]">
                     レベル{record.difficulty} • {formatDuration(record.totalDuration)} • {record.sessionCount}セッション
                   </p>
                 </div>
@@ -143,14 +144,14 @@ export default function LearningRecordDetail({
         </div>
 
         {/* メインコンテンツ */}
-        <div className="flex h-full">
+        <div className="flex flex-col md:flex-row h-full">
           {/* 左パネル: セッション一覧 */}
-          <div className="w-1/3 border-r border-[var(--color-border)] bg-[var(--color-bg-light)] bg-opacity-50">
+          <div className="w-full md:w-1/3 border-b md:border-b-0 md:border-r border-[var(--color-border)] bg-[var(--color-bg-light)] bg-opacity-50">
             <div className="p-4 border-b border-[var(--color-border)]">
               <h3 className="font-medium text-[var(--color-text-light)]">セッション一覧</h3>
               <p className="text-sm text-[var(--color-text-secondary)]">{sessions.length}セッション</p>
             </div>
-            
+
             <div className="overflow-y-auto h-full pb-32">
               {isLoading ? (
                 <div className="flex items-center justify-center p-8">
@@ -170,11 +171,10 @@ export default function LearningRecordDetail({
                     <button
                       key={session.id}
                       onClick={() => setSelectedSession(session)}
-                      className={`w-full text-left p-3 rounded-lg transition-colors ${
-                        selectedSession?.id === session.id
-                          ? 'bg-[var(--color-accent)] bg-opacity-20 border-2 border-[var(--color-accent)]'
-                          : 'bg-[var(--color-bg-light)] hover:bg-[var(--color-accent)] hover:bg-opacity-10 border border-[var(--color-border)]'
-                      }`}
+                      className={`w-full text-left p-3 rounded-lg transition-colors ${selectedSession?.id === session.id
+                        ? 'bg-[var(--color-accent)] bg-opacity-20 border-2 border-[var(--color-accent)]'
+                        : 'bg-[var(--color-bg-light)] hover:bg-[var(--color-accent)] hover:bg-opacity-10 border border-[var(--color-border)]'
+                        }`}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
@@ -214,7 +214,7 @@ export default function LearningRecordDetail({
           </div>
 
           {/* 右パネル: チャット履歴 */}
-          <div className="flex-1 flex flex-col">
+          <div className="w-full md:flex-1 flex flex-col">
             {selectedSession ? (
               <>
                 <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-bg-light)]">
@@ -225,7 +225,7 @@ export default function LearningRecordDetail({
                     {new Date(selectedSession.startedAt).toLocaleString('ja-JP')} • {selectedSession.messageCount}メッセージ
                   </p>
                 </div>
-                
+
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                   {selectedSession.messages.map((message, index) => (
                     <div
@@ -233,19 +233,17 @@ export default function LearningRecordDetail({
                       className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
                       <div
-                        className={`max-w-[80%] p-3 rounded-lg ${
-                          message.role === 'user'
-                            ? 'bg-[var(--color-primary)] text-[var(--color-text-dark)]'
-                            : 'bg-[var(--color-accent)] bg-opacity-10 text-[var(--color-text-light)]'
-                        }`}
+                        className={`max-w-[80%] p-3 rounded-lg ${message.role === 'user'
+                          ? 'bg-[var(--color-primary)] text-[var(--color-text-dark)]'
+                          : 'bg-[var(--color-accent)] bg-opacity-10 text-[var(--color-text-light)]'
+                          }`}
                       >
                         <div className="whitespace-pre-wrap">
                           {message.parts[0]?.text || ''}
                         </div>
                         {message.timestamp && (
-                          <div className={`text-xs mt-1 ${
-                            message.role === 'user' ? 'text-[var(--color-text-dark)] opacity-70' : 'text-[var(--color-text-secondary)]'
-                          }`}>
+                          <div className={`text-xs mt-1 ${message.role === 'user' ? 'text-[var(--color-text-dark)] opacity-70' : 'text-[var(--color-text-secondary)]'
+                            }`}>
                             {new Date(message.timestamp).toLocaleTimeString('ja-JP', {
                               hour: '2-digit',
                               minute: '2-digit'
@@ -266,8 +264,8 @@ export default function LearningRecordDetail({
         </div>
 
         {/* フッター */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-[var(--color-bg-light)] border-t border-[var(--color-border)]">
-          <div className="flex items-center justify-between">
+        <div className="p-4 bg-[var(--color-bg-light)] border-t border-[var(--color-border)]">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             {/* 学習サマリー */}
             {record && (
               <div className="flex-1">
@@ -295,11 +293,11 @@ export default function LearningRecordDetail({
                 )}
               </div>
             )}
-            
+
             {/* 続きから学習ボタン */}
             <button
               onClick={() => onContinueLearning(recordId)}
-              className="ml-4 px-6 py-2 bg-[var(--color-primary)] text-[var(--color-text-dark)] rounded-lg hover:bg-[var(--color-accent)] transition-colors font-medium"
+              className="px-6 py-2 bg-[var(--color-primary)] text-[var(--color-text-dark)] rounded-lg hover:bg-[var(--color-accent)] transition-colors font-medium"
             >
               続きから学習
             </button>
