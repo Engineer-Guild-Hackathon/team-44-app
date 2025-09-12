@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { initializeFirebaseMessaging, getFCMToken, isFCMSupported, registerFCMTokenWithBackend } from '../../../lib/firebaseMessaging';
 
 interface NotificationPromptProps {
   onPermissionResult?: (granted: boolean) => void;
@@ -11,6 +12,8 @@ export const NotificationPrompt: React.FC<NotificationPromptProps> = ({
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [permissionState, setPermissionState] = useState<NotificationPermission>('default');
+  const [fcmToken, setFcmToken] = useState<string | null>(null);
+  const [isRegistering, setIsRegistering] = useState(false);
 
   useEffect(() => {
     // 現在の通知許可状態を確認
@@ -31,24 +34,59 @@ export const NotificationPrompt: React.FC<NotificationPromptProps> = ({
       return;
     }
 
+    if (!isFCMSupported()) {
+      console.warn('FCM is not supported in this browser');
+      onPermissionResult?.(false);
+      return;
+    }
+
+    setIsRegistering(true);
+
     try {
+      // Request notification permission
       const permission = await Notification.requestPermission();
       setPermissionState(permission);
       setIsVisible(false);
 
       const granted = permission === 'granted';
-      onPermissionResult?.(granted);
 
       if (granted) {
-        // テスト通知を送信
-        new Notification('学習リマインド設定完了', {
-          body: '通知が有効になりました。学習の復習タイミングをお知らせします。',
-          icon: '/icons/icon-192x192.png'
-        });
+        try {
+          // Initialize FCM and get token
+          await initializeFirebaseMessaging();
+          const token = await getFCMToken();
+          
+          if (token) {
+            setFcmToken(token);
+            
+            // Register token with backend
+            const backendRegistered = await registerFCMTokenWithBackend(token);
+            if (backendRegistered) {
+              console.log('FCM token registered with backend successfully');
+            } else {
+              console.warn('Failed to register FCM token with backend');
+            }
+            
+            // テスト通知を送信
+            new Notification('学習リマインド設定完了', {
+              body: '通知が有効になりました。学習の復習タイミングをお知らせします。',
+              icon: '/icons/icon-192x192.png'
+            });
+          } else {
+            console.warn('Failed to get FCM token');
+          }
+        } catch (fcmError) {
+          console.error('FCM setup failed:', fcmError);
+          // Still call success if basic notification permission was granted
+        }
       }
+
+      onPermissionResult?.(granted);
     } catch (error) {
       console.error('Failed to request notification permission:', error);
       onPermissionResult?.(false);
+    } finally {
+      setIsRegistering(false);
     }
   };
 
@@ -119,9 +157,10 @@ export const NotificationPrompt: React.FC<NotificationPromptProps> = ({
             </button>
             <button
               onClick={handleAllow}
-              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              disabled={isRegistering}
+              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              許可する
+              {isRegistering ? '設定中...' : '許可する'}
             </button>
           </div>
 
@@ -141,6 +180,23 @@ export const checkNotificationPermission = (): NotificationPermission => {
     return 'denied';
   }
   return Notification.permission;
+};
+
+// FCM対応状況を確認するヘルパー関数
+export const checkFCMSupport = (): {
+  supported: boolean;
+  permission: NotificationPermission;
+  serviceWorkerSupported: boolean;
+} => {
+  const permission = checkNotificationPermission();
+  const serviceWorkerSupported = 'serviceWorker' in navigator;
+  const supported = isFCMSupported();
+  
+  return {
+    supported,
+    permission,
+    serviceWorkerSupported
+  };
 };
 
 // 通知を送信するヘルパー関数
