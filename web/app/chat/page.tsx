@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { ChatMessage } from '../../types/api'
-import ChatView from '../../components/common/ChatView'
-import MessageInput from '../../components/common/MessageInput'
+import ChatView from './components/ChatView'
+import MessageInput from './components/MessageInput'
 import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
 import { useAuth } from '../../hooks/useAuth'
