@@ -32,10 +32,10 @@ export default function ChatView({ messages, isLoading = false, todayKnowledge }
           {todayKnowledge ? (
             <div className="max-w-md mx-auto">
               <div className="mb-4">
-                <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mb-2">
+                <span className="inline-block bg-[var(--color-info)] text-[var(--color-text-dark)] text-xs px-2 py-1 rounded-full mb-2">
                   {todayKnowledge.category}
                 </span>
-                <p className="text-gray-800 text-lg leading-relaxed mb-4">
+                <p className="text-[var(--color-text-light)] text-lg leading-relaxed mb-4">
                   {todayKnowledge.content}
                 </p>
                 {todayKnowledge.googleSearchQuery && (
