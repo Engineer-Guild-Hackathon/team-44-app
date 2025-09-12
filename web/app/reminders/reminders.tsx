@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
-import { ReminderSettings } from '../../components/common/ReminderSettings'
-import { NotificationPrompt } from '../../components/common/NotificationPrompt'
+import { ReminderSettings } from './components/ReminderSettings'
+import { NotificationPrompt } from './components/NotificationPrompt'
 
 interface ReminderPageProps {
   // 必要に応じてpropsを追加
@@ -87,7 +87,7 @@ export default function RemindersComponent() {
                   <h2 className="text-lg font-semibold text-[var(--color-text-light)] mb-4">通知の状態</h2>
                   <div className="flex items-center space-x-3">
                     <div className={`w-4 h-4 rounded-full ${notificationPermission === 'granted' ? 'bg-[var(--color-success)]' :
-                        notificationPermission === 'denied' ? 'bg-[var(--color-error)]' : 'bg-[var(--color-warning)]'
+                      notificationPermission === 'denied' ? 'bg-[var(--color-error)]' : 'bg-[var(--color-warning)]'
                       }`}></div>
                     <span className="text-sm text-[var(--color-text-light)]">
                       {notificationPermission === 'granted' && '通知が有効です'}

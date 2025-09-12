@@ -1,5 +1,5 @@
 import { render, screen } from '../setup/testUtils';
-import ChatView from '../../components/common/ChatView';
+import ChatView from '../../app/chat/components/ChatView';
 import { ChatMessage } from '../../types/api';
 
 // Mock scrollIntoView since JSDOM doesn't support it

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { ChatMessage } from '../../types/api'
+import { ChatMessage } from '../../../types/api'
 import { KnowledgeItem } from '../../types/discovery'
 
 interface ChatViewProps {
