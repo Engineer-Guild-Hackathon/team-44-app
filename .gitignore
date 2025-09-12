@@ -86,4 +86,4 @@ desktop.ini
 *.iml
 
 firestore-data
-firestore-export-*
+firebase-export-*
