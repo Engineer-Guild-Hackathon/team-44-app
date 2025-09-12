@@ -77,12 +77,12 @@ export const NotificationPrompt: React.FC<NotificationPromptProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-sm mx-4 shadow-xl">
+      <div className="bg-[var(--color-bg-light)] rounded-lg p-6 max-w-sm mx-4 shadow-xl">
         <div className="text-center">
           {/* アイコン */}
-          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
+          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-[var(--color-accent)] bg-opacity-10 mb-4">
             <svg
-              className="h-6 w-6 text-blue-600"
+              className="h-6 w-6 text-[var(--color-accent)]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -97,12 +97,12 @@ export const NotificationPrompt: React.FC<NotificationPromptProps> = ({
           </div>
 
           {/* タイトル */}
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <h3 className="text-lg font-medium text-[var(--color-text-light)] mb-2">
             通知を許可しますか？
           </h3>
 
           {/* 説明 */}
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-[var(--color-muted-foreground)] mb-6">
             学習リマインドを受け取るために<br />
             通知を有効にしてください。<br />
             忘却曲線に基づいて最適なタイミングで<br />
