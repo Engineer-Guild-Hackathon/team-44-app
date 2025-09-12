@@ -81,7 +81,7 @@ export async function submitQuizResult(req: Request, res: Response): Promise<voi
     const userId = await validateAuth(req);
     const { quizId, selectedOption } = req.body;
 
-    if (!quizId || typeof selectedOption !== 'number') {
+    if (!quizId || typeof selectedOption !== "number") {
       res.status(400).json({ error: "quizId and selectedOption are required" });
       return;
     }

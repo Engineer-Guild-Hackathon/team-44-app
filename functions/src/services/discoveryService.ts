@@ -7,7 +7,7 @@ interface KnowledgeItem {
   category: string;
   content: string;
   googleSearchQuery?: string;
-  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  difficulty: "beginner" | "intermediate" | "advanced";
   tags: string[];
   relatedTopics: string[];
   createdAt: Date;
@@ -78,7 +78,7 @@ export class DiscoveryService {
       const knowledge = await this.llm.generateKnowledge(subjects, topics);
 
       // Firestoreに保存
-      const knowledgeRef = this.db.collection('knowledge_items').doc();
+      const knowledgeRef = this.db.collection("knowledge_items").doc();
       const knowledgeData = this.sanitizeForFirestore({
         ...knowledge,
         id: knowledgeRef.id,
@@ -98,7 +98,7 @@ export class DiscoveryService {
         views: 0
       };
     } catch (error) {
-      console.error('Error generating knowledge:', error);
+      console.error("Error generating knowledge:", error);
       return this.getDefaultKnowledge();
     }
   }
@@ -117,7 +117,7 @@ export class DiscoveryService {
 
       const quiz = await this.llm.generateQuiz(subjects);
 
-      const quizRef = this.db.collection('quiz_items').doc();
+      const quizRef = this.db.collection("quiz_items").doc();
       const quizData = this.sanitizeForFirestore({
         ...quiz,
         id: quizRef.id,
@@ -132,7 +132,7 @@ export class DiscoveryService {
         createdAt: new Date()
       };
     } catch (error) {
-      console.error('Error generating quiz:', error);
+      console.error("Error generating quiz:", error);
       return this.getDefaultQuiz();
     }
   }
@@ -142,16 +142,16 @@ export class DiscoveryService {
    */
   async recordQuizResult(userId: string, quizId: string, selectedOption: number): Promise<QuizResult> {
     try {
-      const quizDoc = await this.db.collection('quiz_items').doc(quizId).get();
+      const quizDoc = await this.db.collection("quiz_items").doc(quizId).get();
       if (!quizDoc.exists) {
-        throw new Error('Quiz not found');
+        throw new Error("Quiz not found");
       }
 
       const quiz = quizDoc.data() as QuizItem;
       const isCorrect = selectedOption === quiz.correctAnswer;
 
       // 結果を記録
-      await this.db.collection('quiz_results').add(this.sanitizeForFirestore({
+      await this.db.collection("quiz_results").add(this.sanitizeForFirestore({
         userId,
         quizId,
         selectedOption,
@@ -166,7 +166,7 @@ export class DiscoveryService {
         googleSearchQuery: quiz.googleSearchQuery
       };
     } catch (error) {
-      console.error('Error recording quiz result:', error);
+      console.error("Error recording quiz result:", error);
       throw error;
     }
   }
@@ -183,7 +183,7 @@ export class DiscoveryService {
           hasData: false,
           nodes: [],
           edges: [],
-          placeholderMessage: '学習を始めて興味マップを作成しましょう'
+          placeholderMessage: "学習を始めて興味マップを作成しましょう"
         };
       }
 
@@ -217,20 +217,20 @@ export class DiscoveryService {
         suggestions: await this.llm.generateSuggestions(Object.keys(subjectCounts))
       };
     } catch (error) {
-      console.error('Error building interest map:', error);
+      console.error("Error building interest map:", error);
       return {
         hasData: false,
         nodes: [],
         edges: [],
-        placeholderMessage: '興味マップの読み込みに失敗しました'
+        placeholderMessage: "興味マップの読み込みに失敗しました"
       };
     }
   }
 
   private async getUserLearningRecords(userId: string): Promise<LearningRecord[]> {
     const snapshot = await this.db
-      .collection('learningRecords')
-      .where('userId', '==', userId)
+      .collection("learningRecords")
+      .where("userId", "==", userId)
       .get();
 
     return snapshot.docs.map(doc => ({
@@ -240,8 +240,8 @@ export class DiscoveryService {
   }
 
   private async recordDailyKnowledge(userId: string, knowledgeId: string): Promise<void> {
-    const today = new Date().toISOString().split('T')[0];
-    await this.db.collection('daily_knowledge').doc(`${userId}_${today}`).set(this.sanitizeForFirestore({
+    const today = new Date().toISOString().split("T")[0];
+    await this.db.collection("daily_knowledge").doc(`${userId}_${today}`).set(this.sanitizeForFirestore({
       userId,
       knowledgeId,
       date: today,
@@ -251,11 +251,11 @@ export class DiscoveryService {
 
   private getDefaultKnowledge(): KnowledgeItem {
     return {
-      id: 'default',
-      category: 'general',
-      content: '学びは人生を豊かにします。今日も新しいことを発見しましょう！',
-      difficulty: 'beginner',
-      tags: ['motivation'],
+      id: "default",
+      category: "general",
+      content: "学びは人生を豊かにします。今日も新しいことを発見しましょう！",
+      difficulty: "beginner",
+      tags: ["motivation"],
       relatedTopics: [],
       createdAt: new Date(),
       views: 0
@@ -264,13 +264,13 @@ export class DiscoveryService {
 
   private getDefaultQuiz(): QuizItem {
     return {
-      id: 'default',
-      primaryCategory: 'general',
-      secondaryCategory: 'learning',
-      question: '学習の楽しさは何でしょうか？',
-      options: ['知識が増える', '新しい発見がある', '成長を感じる', '全て正解'],
+      id: "default",
+      primaryCategory: "general",
+      secondaryCategory: "learning",
+      question: "学習の楽しさは何でしょうか？",
+      options: ["知識が増える", "新しい発見がある", "成長を感じる", "全て正解"],
       correctAnswer: 3,
-      explanation: '学習には多くの喜びがあります',
+      explanation: "学習には多くの喜びがあります",
       createdAt: new Date()
     };
   }
