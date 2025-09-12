@@ -105,7 +105,7 @@ export default function LearningRecordDetail({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div
-        className="bg-[var(--color-bg-light)] rounded-xl shadow-2xl w-full max-w-6xl h-[80vh] overflow-hidden animate-in fade-in-0 zoom-in-95 duration-300"
+        className="bg-[var(--color-bg-light)] rounded-xl shadow-2xl w-full max-w-7xl h-[90vh] overflow-hidden animate-in fade-in-0 zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ヘッダー */}
@@ -144,77 +144,37 @@ export default function LearningRecordDetail({
         </div>
 
         {/* メインコンテンツ */}
-        <div className="flex flex-col md:flex-row h-full">
-          {/* 左パネル: セッション一覧 */}
-          <div className="w-full md:w-1/3 border-b md:border-b-0 md:border-r border-[var(--color-border)] bg-[var(--color-bg-light)] bg-opacity-50">
-            <div className="p-4 border-b border-[var(--color-border)]">
-              <h3 className="font-medium text-[var(--color-text-light)]">セッション一覧</h3>
-              <p className="text-sm text-[var(--color-text-secondary)]">{sessions.length}セッション</p>
-            </div>
-
-            <div className="overflow-y-auto h-full pb-32">
-              {isLoading ? (
-                <div className="flex items-center justify-center p-8">
-                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-[var(--color-primary)] border-t-transparent"></div>
-                </div>
-              ) : error ? (
-                <div className="p-4 text-center text-[var(--color-error)]">
-                  {error}
-                </div>
-              ) : sessions.length === 0 ? (
-                <div className="p-4 text-center text-[var(--color-text-secondary)]">
-                  セッションが見つかりません
-                </div>
-              ) : (
-                <div className="space-y-2 p-2">
-                  {sessions.map((session, index) => (
-                    <button
-                      key={session.id}
-                      onClick={() => setSelectedSession(session)}
-                      className={`w-full text-left p-3 rounded-lg transition-colors ${selectedSession?.id === session.id
-                        ? 'bg-[var(--color-accent)] bg-opacity-20 border-2 border-[var(--color-accent)]'
-                        : 'bg-[var(--color-bg-light)] hover:bg-[var(--color-accent)] hover:bg-opacity-10 border border-[var(--color-border)]'
-                        }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm font-medium text-[var(--color-text-light)]">
-                            セッション{index + 1}
-                          </span>
-                          {session.status === 'completed' && (
-                            <span className="text-[var(--color-success)]">✅</span>
-                          )}
-                        </div>
-                        <span className="text-xs text-[var(--color-text-secondary)]">
-                          {formatDuration(session.duration)}
-                        </span>
-                      </div>
-                      <div className="text-xs text-[var(--color-text-secondary)] mt-1">
-                        {new Date(session.startedAt).toLocaleString('ja-JP', {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                        {session.completedAt && ` - ${new Date(session.completedAt).toLocaleTimeString('ja-JP', {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}`}
-                      </div>
-                      {session.title && (
-                        <div className="text-xs text-[var(--color-text-secondary)] mt-1 truncate">
-                          {session.title}
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
+        <div className="flex flex-col h-full">
+          {/* セッション選択 */}
+          <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-bg-light)]">
+            <div className="flex items-center space-x-4">
+              <label className="text-sm font-medium text-[var(--color-text-light]">セッションを選択:</label>
+              <select
+                value={selectedSession?.id || ''}
+                onChange={(e) => {
+                  const session = sessions.find(s => s.id === e.target.value);
+                  setSelectedSession(session || null);
+                }}
+                className="flex-1 px-3 py-2 border border-[var(--color-border)] rounded-lg bg-[var(--color-bg-light)] text-[var(--color-text-light)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+              >
+                <option value="">セッションを選択してください</option>
+                {sessions.map((session, index) => (
+                  <option key={session.id} value={session.id}>
+                    セッション{index + 1} - {formatDuration(session.duration)} - {new Date(session.startedAt).toLocaleString('ja-JP', {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                    {session.title && ` - ${session.title}`}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          {/* 右パネル: チャット履歴 */}
-          <div className="w-full md:flex-1 flex flex-col">
+          {/* チャット履歴 */}
+          <div className="flex-1 flex flex-col">
             {selectedSession ? (
               <>
                 <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-bg-light)]">
