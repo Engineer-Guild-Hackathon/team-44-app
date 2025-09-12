@@ -4,11 +4,13 @@ import { initializeFirebaseMessaging, getFCMToken, isFCMSupported, registerFCMTo
 interface NotificationPromptProps {
   onPermissionResult?: (granted: boolean) => void;
   autoShow?: boolean;
+  forceShow?: boolean; // Add prop to force show the prompt
 }
 
 export const NotificationPrompt: React.FC<NotificationPromptProps> = ({
   onPermissionResult,
-  autoShow = false
+  autoShow = false,
+  forceShow = false
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [permissionState, setPermissionState] = useState<NotificationPermission>('default');
@@ -24,8 +26,13 @@ export const NotificationPrompt: React.FC<NotificationPromptProps> = ({
       if (autoShow && Notification.permission === 'default') {
         setIsVisible(true);
       }
+      
+      // 強制表示が有効な場合
+      if (forceShow && Notification.permission === 'default') {
+        setIsVisible(true);
+      }
     }
-  }, [autoShow]);
+  }, [autoShow, forceShow]);
 
   const requestPermission = async () => {
     if (!('Notification' in window)) {

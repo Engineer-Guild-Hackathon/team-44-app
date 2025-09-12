@@ -137,6 +137,7 @@ export default function RemindersComponent() {
                         }
                       }}
                       autoShow={false}
+                      forceShow={true}
                     />
                   </div>
                 )}
