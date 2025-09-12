@@ -14,7 +14,7 @@ interface HeaderProps {
 
 export default function Header({ onMenuClick, isNavOpen, onToggleNav, user, onNewChat, showNewChatButton }: HeaderProps) {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-[var(--color-bg-light)] border-b border-[var(--color-border)] shadow-sm">
+    <header className={`fixed top-0 left-0 right-0 z-50 bg-[var(--color-bg-light)] border-b border-[var(--color-border)] shadow-sm ${isNavOpen ? 'md:left-80' : ''}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Title */}

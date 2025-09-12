@@ -204,7 +204,7 @@ export default function CalendarPage() {
       {user && <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />}
 
       {/* Main Content */}
-      <div className="flex-1">
+      <div className={`flex-1 ${isNavOpen ? 'md:ml-80' : ''}`}>
         {!user ? (
           <div className="flex items-center justify-center h-full pt-16">
             <div className="text-center max-w-md mx-auto px-4">
