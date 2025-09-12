@@ -55,13 +55,13 @@ export default function AuthPage() {
       <div className="flex-1 flex flex-col">
         <div className={`pt-16 pb-20 md:pb-6 px-4 py-8 flex items-center justify-center min-h-screen ${isNavOpen ? '' : 'md:max-w-md md:mx-auto'}`}>
           <div className="w-full max-w-md">
-            {/* Libraria Logo */}
+            {/* tothlus Logo */}
             <div className="text-center mb-8">
               <div className="w-16 h-16 bg-[var(--color-primary)] rounded-xl flex items-center justify-center mx-auto mb-4">
                 <Star className="w-8 h-8 text-[var(--color-text-dark)]" />
               </div>
               <h1 className="text-2xl font-bold text-[var(--color-text-light)] mb-2">
-                Libraria
+                tothlus
               </h1>
               <p className="text-[var(--color-muted-foreground)]">
                 あなたの知識の図書館
@@ -160,7 +160,7 @@ export default function AuthPage() {
             {/* Footer */}
             <div className="text-center mt-8">
               <p className="text-xs text-[var(--color-muted-foreground)]">
-                © 2025 Libraria - あなたの知識の図書館
+                © 2025 tothlus - あなたの知識の図書館
               </p>
             </div>
           </div>

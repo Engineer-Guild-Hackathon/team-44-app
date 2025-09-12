@@ -10,7 +10,7 @@ export const useTheme = () => {
 
   useEffect(() => {
     setMounted(true)
-    const savedTheme = localStorage.getItem('libraria-theme') as Theme
+    const savedTheme = localStorage.getItem('tothlus-theme') as Theme
     if (savedTheme) {
       setTheme(savedTheme)
       applyTheme(savedTheme)
@@ -36,7 +36,7 @@ export const useTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light'
     setTheme(newTheme)
     applyTheme(newTheme)
-    localStorage.setItem('libraria-theme', newTheme)
+    localStorage.setItem('tothlus-theme', newTheme)
   }
 
   return {

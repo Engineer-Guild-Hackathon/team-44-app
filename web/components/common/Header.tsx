@@ -50,7 +50,7 @@ export default function Header({ onMenuClick, isNavOpen, onToggleNav, user, onNe
                 </svg>
               </div>
               <h1 className="text-xl font-bold text-[var(--color-text-light)]">
-                Libraria
+                tothlus
               </h1>
             </div>
           </div>

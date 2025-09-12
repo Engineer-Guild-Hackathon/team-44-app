@@ -147,7 +147,7 @@ export default function CalendarPage() {
     setDetailRecordId(null)
   }
 
-  // 教科別の色分け（Librariaテーマ対応）
+  // 教科別の色分け（tothlusテーマ対応）
   const getSubjectColor = (subject: string): string => {
     const colors: { [key: string]: string } = {
       'math': 'bg-[var(--color-accent)] bg-opacity-20 text-[var(--color-accent)] border border-[var(--color-accent)] border-opacity-30',

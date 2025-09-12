@@ -119,19 +119,16 @@ export default function Navigation() {
       >
         <div className="w-6 h-6 flex flex-col justify-center items-center">
           <span
-            className={`block w-5 h-0.5 bg-current transition-all duration-300 ${
-              isOpen ? 'rotate-45 translate-y-1' : '-translate-y-1'
-            }`}
+            className={`block w-5 h-0.5 bg-current transition-all duration-300 ${isOpen ? 'rotate-45 translate-y-1' : '-translate-y-1'
+              }`}
           />
           <span
-            className={`block w-5 h-0.5 bg-current transition-all duration-300 ${
-              isOpen ? 'opacity-0' : 'opacity-100'
-            }`}
+            className={`block w-5 h-0.5 bg-current transition-all duration-300 ${isOpen ? 'opacity-0' : 'opacity-100'
+              }`}
           />
           <span
-            className={`block w-5 h-0.5 bg-current transition-all duration-300 ${
-              isOpen ? '-rotate-45 -translate-y-1' : 'translate-y-1'
-            }`}
+            className={`block w-5 h-0.5 bg-current transition-all duration-300 ${isOpen ? '-rotate-45 -translate-y-1' : 'translate-y-1'
+              }`}
           />
         </div>
       </button>
@@ -148,9 +145,8 @@ export default function Navigation() {
       {/* サイドメニュー */}
       <div
         ref={menuRef}
-        className={`fixed top-0 right-0 h-full w-80 bg-[var(--color-bg-light)] border-l border-[var(--color-border)] shadow-xl z-50 transform transition-transform duration-300 ease-in-out md:hidden slide-in ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
+        className={`fixed top-0 right-0 h-full w-80 bg-[var(--color-bg-light)] border-l border-[var(--color-border)] shadow-xl z-50 transform transition-transform duration-300 ease-in-out md:hidden slide-in ${isOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
@@ -160,10 +156,10 @@ export default function Navigation() {
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 bg-[var(--color-primary)] rounded-md flex items-center justify-center">
               <svg className="w-5 h-5 text-[var(--color-text-dark)]" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
               </svg>
             </div>
-            <span className="font-bold text-[var(--color-text-light)]">Libraria</span>
+            <span className="font-bold text-[var(--color-text-light)]">tothlus</span>
           </div>
           <button
             onClick={closeMenu}
@@ -195,11 +191,10 @@ export default function Navigation() {
                   key={item.href}
                   href={item.href}
                   onClick={closeMenu}
-                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group ${
-                    isActiveRoute(item.href)
+                  className={`flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 group ${isActiveRoute(item.href)
                       ? 'bg-[var(--color-accent)] bg-opacity-10 text-[var(--color-accent)] border-l-4 border-[var(--color-accent)] shadow-sm'
                       : 'text-[var(--color-text-light)] hover:bg-[var(--color-muted)] hover:text-[var(--color-accent)] hover:shadow-sm'
-                  }`}
+                    }`}
                 >
                   <span className="text-xl group-hover:scale-110 transition-transform duration-200">
                     {item.icon}
@@ -256,8 +251,8 @@ export default function Navigation() {
 
           {/* アプリ情報 */}
           <div className="text-xs text-[var(--color-muted-foreground)] text-center">
-            <p>Libraria v1.0</p>
-            <p className="mt-1">© 2025 Libraria</p>
+            <p>tothlus v1.0</p>
+            <p className="mt-1">© 2025 tothlus</p>
             <p className="mt-1 text-[var(--color-accent)]">あなたの知識の図書館 ✨</p>
           </div>
         </div>
@@ -269,11 +264,10 @@ export default function Navigation() {
           <Link
             key={item.href}
             href={item.href}
-            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-              isActiveRoute(item.href)
+            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActiveRoute(item.href)
                 ? 'bg-[var(--color-accent)] bg-opacity-10 text-[var(--color-accent)]'
                 : 'text-[var(--color-text-light)] hover:text-[var(--color-accent)]'
-            }`}
+              }`}
           >
             {item.label}
           </Link>
