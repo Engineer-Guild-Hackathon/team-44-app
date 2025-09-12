@@ -204,7 +204,7 @@ export default function CalendarPage() {
       {user && <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />}
 
       {/* Main Content */}
-      <div className={`flex-1 ${isNavOpen ? 'md:ml-80' : ''}`}>
+      <div className="flex-1">
         {!user ? (
           <div className="flex items-center justify-center h-full pt-16">
             <div className="text-center max-w-md mx-auto px-4">
@@ -223,7 +223,7 @@ export default function CalendarPage() {
             </div>
           </div>
         ) : (
-          <main className={`pt-16 pb-20 md:pb-6 px-4 sm:px-6 lg:px-8 ${isNavOpen ? 'max-w-7xl mx-auto' : 'md:max-w-7xl md:mx-auto'}`}>
+          <main className="pt-16 pb-20 md:pb-6 px-4 sm:px-6 lg:px-8 md:max-w-7xl md:mx-auto">
             <div className="py-6">
               {/* カレンダーヘッダー */}
               <div className="bg-[var(--color-bg-light)] border border-[var(--color-border)] rounded-xl shadow-lg mb-6 overflow-hidden">

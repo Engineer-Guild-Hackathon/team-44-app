@@ -358,7 +358,7 @@ export default function ChatPage() {
       {user && <Navigation isOpen={isNavOpen} onClose={() => setIsNavOpen(false)} />}
 
       {/* Main Content */}
-      <div className={`flex-1 flex flex-col ${isNavOpen ? 'md:ml-80' : ''}`}>
+      <div className="flex-1 flex flex-col">
         {/* Chat Content */}
         <div className="flex-1 flex flex-col pt-16 min-h-0">
           <div className="flex-1 overflow-hidden">
@@ -396,7 +396,7 @@ export default function ChatPage() {
           </div>
 
           {/* Fixed Message Input at Bottom */}
-          <div className={`fixed left-0 right-0 bottom-0 z-40 border-t border-[var(--color-border)] bg-[var(--color-bg-light)] ${isNavOpen ? 'md:left-80' : ''}`}>
+          <div className="fixed left-0 right-0 bottom-0 z-40 border-t border-[var(--color-border)] bg-[var(--color-bg-light)]">
             <div className={`max-w-4xl mx-auto px-4 py-4`}>
               <MessageInput
                 onSendMessage={handleSendMessage}
