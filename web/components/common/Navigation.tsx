@@ -90,8 +90,8 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
         {/* Desktop Header */}
         <div className={`hidden md:flex items-center justify-between p-6 border-b border-[var(--color-border)] ${!isOpen ? 'md:hidden' : ''}`}>
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-[var(--color-primary)] rounded-lg flex items-center justify-center">
-              <img src="/icon-192.svg" alt="tothlus logo" className="w-5 h-5" />
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+              <img src="/icon-192.svg" alt="tothlus logo" className="w-8 h-8" />
             </div>
             <span className="text-lg font-bold text-[var(--color-text-light)]">tothlus</span>
           </div>
