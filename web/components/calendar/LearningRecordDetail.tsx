@@ -123,7 +123,7 @@ export default function LearningRecordDetail({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div
-        className="bg-[var(--color-bg-light)] rounded-xl shadow-2xl w-full max-w-7xl h-[90vh] overflow-hidden animate-in fade-in-0 zoom-in-95 duration-300"
+        className="bg-[var(--color-bg-light)] rounded-xl shadow-2xl w-full max-w-7xl max-h-[90vh] flex flex-col animate-in fade-in-0 zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ヘッダー */}
@@ -162,7 +162,7 @@ export default function LearningRecordDetail({
         </div>
 
         {/* メインコンテンツ */}
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col min-h-0 flex-1">
           {/* セッション選択 */}
           <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-bg-light)]">
             <div className="relative dropdown-container">
@@ -234,10 +234,10 @@ export default function LearningRecordDetail({
           </div>
 
           {/* チャット履歴 */}
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col min-h-0">
             {selectedSession ? (
               <>
-                <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-bg-light)]">
+                <div className="p-4 border-b border-[var(--color-border)] bg-[var(--color-bg-light)] flex-shrink-0">
                   <h3 className="font-medium text-[var(--color-text-light)]">
                     {selectedSession.title || `セッション${sessions.indexOf(selectedSession) + 1}`}
                   </h3>
@@ -246,7 +246,7 @@ export default function LearningRecordDetail({
                   </p>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
                   {selectedSession.messages.map((message, index) => (
                     <div
                       key={index}
