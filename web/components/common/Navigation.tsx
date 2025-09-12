@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import ConfirmDialog from './ConfirmDialog'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '../../hooks/useAuth'
@@ -18,6 +19,7 @@ interface NavigationProps {
 export default function Navigation({ isOpen, onClose }: NavigationProps) {
   const pathname = usePathname()
   const { logout } = useAuth()
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
   // ESCキーで閉じる
   useEffect(() => {
@@ -140,15 +142,23 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
             })}
             <li>
               <button
-                onClick={() => {
-                  logout()
-                  onClose()
-                }}
+                onClick={() => setConfirmOpen(true)}
                 className="flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 text-[var(--color-text-light)] hover:bg-[var(--color-error)] hover:bg-opacity-15 hover:text-[var(--color-error)] w-full text-left"
               >
                 <LogoutIcon className="w-5 h-5 flex-shrink-0 text-[var(--color-error)]" />
                 <span className="font-medium">ログアウト</span>
               </button>
+              <ConfirmDialog
+                open={confirmOpen}
+                title="ログアウト確認"
+                message="本当にログアウトしますか？"
+                onConfirm={() => {
+                  logout();
+                  onClose();
+                  setConfirmOpen(false);
+                }}
+                onCancel={() => setConfirmOpen(false)}
+              />
             </li>
           </ul>
           {/* Divider */}
