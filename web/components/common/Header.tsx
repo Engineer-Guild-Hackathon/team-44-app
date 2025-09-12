@@ -44,13 +44,11 @@ export default function Header({ onMenuClick, isNavOpen, onToggleNav, user, onNe
             )}
 
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-[var(--color-primary)] rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-[var(--color-text-dark)]" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </svg>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+                <img src="/icon-192.svg" alt="tothlus logo" className="w-8 h-8" />
               </div>
               <h1 className="text-xl font-bold text-[var(--color-text-light)]">
-                Libraria
+                tothlus
               </h1>
             </div>
           </div>

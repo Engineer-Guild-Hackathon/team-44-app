@@ -1,6 +1,6 @@
 {
-  "name": "Libraria - あなたの知識の図書館",
-  "short_name": "Libraria",
+  "name": "tothlus - あなたの知識の図書館",
+  "short_name": "tothlus",
   "description": "AIを活用した学習支援アプリケーション",
   "start_url": "/",
   "display": "standalone",
