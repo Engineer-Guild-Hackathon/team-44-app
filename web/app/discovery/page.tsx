@@ -8,6 +8,7 @@ import { SimpleQuiz } from '../../components/discovery/SimpleQuiz';
 import { BasicInterestMap } from '../../components/discovery/BasicInterestMap';
 import Header from '../../components/common/Header';
 import Navigation from '../../components/common/Navigation';
+import { ErrorNavigationButtons } from '../../components/common/ErrorNavigationButtons';
 import { useAuth } from '../../hooks/useAuth';
 
 export default function DiscoveryPage() {
@@ -59,33 +60,16 @@ export default function DiscoveryPage() {
               </p>
             </div>
 
-            <div className="space-y-4">
-              <button
-                onClick={() => {
-                  loadTodayKnowledge();
-                  loadInterestMap();
-                }}
-                className="w-full bg-[var(--color-primary)] text-[var(--color-text-dark)] px-6 py-3 rounded-lg hover:bg-opacity-90 transition-colors font-medium"
-              >
-                再試行
-              </button>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => router.push('/chat')}
-                  className="flex-1 bg-[var(--color-bg-light)] border border-[var(--color-border)] text-[var(--color-text-light)] px-4 py-2 rounded hover:bg-[var(--color-accent)] hover:bg-opacity-10 transition-colors font-medium"
-                >
-                  ホームに戻る
-                </button>
-
-                <button
-                  onClick={() => router.push('/auth')}
-                  className="flex-1 bg-[var(--color-bg-light)] border border-[var(--color-border)] text-[var(--color-text-light)] px-4 py-2 rounded hover:bg-[var(--color-accent)] hover:bg-opacity-10 transition-colors font-medium"
-                >
-                  ログイン画面へ
-                </button>
-              </div>
-            </div>
+            <ErrorNavigationButtons
+              showRetry={true}
+              onRetry={() => {
+                loadTodayKnowledge();
+                loadInterestMap();
+              }}
+              retryLabel="再試行"
+              homeLabel="ホームに戻る"
+              loginLabel="ログイン画面へ"
+            />
           </div>
         </div>
       </div>
