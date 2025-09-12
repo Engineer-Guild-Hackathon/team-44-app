@@ -1,16 +1,19 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
 import DayRecordsModal from '../../components/calendar/DayRecordsModal'
 import LearningRecordDetail from '../../components/calendar/LearningRecordDetail'
+import { ErrorNavigationButtons } from '../../components/common/ErrorNavigationButtons'
 import { useAuth } from '../../hooks/useAuth'
 import apiClient from '../../lib/apiClient'
 import { LearningRecord } from '../../types/api'
 
 export default function CalendarPage() {
   const { user } = useAuth();
+  const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
   const [learningRecords, setLearningRecords] = useState<LearningRecord[]>([])
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null)
@@ -184,20 +187,11 @@ export default function CalendarPage() {
               </p>
             </div>
 
-            <div className="space-y-4">
-              <a
-                href="/"
-                className="block w-full bg-[var(--color-primary)] text-[var(--color-text-dark)] px-6 py-3 rounded-lg hover:bg-[var(--color-accent)] transition-colors font-medium"
-              >
-                ホームに戻る
-              </a>
-              <a
-                href="/auth"
-                className="block w-full bg-[var(--color-bg-light)] border border-[var(--color-border)] text-[var(--color-text-light)] px-6 py-3 rounded-lg hover:bg-[var(--color-accent)] hover:bg-opacity-10 transition-colors"
-              >
-                ログイン画面へ
-              </a>
-            </div>
+            <ErrorNavigationButtons
+              showRetry={false}
+              homeLabel="ホームに戻る"
+              loginLabel="ログイン画面へ"
+            />
           </div>
         </div>
       </div>

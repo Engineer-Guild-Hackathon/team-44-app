@@ -36,5 +36,33 @@ service cloud.firestore {
       allow read, write: if request.auth != null
         && request.auth.uid == userId;
     }
+
+    // knowledge_items の読み書きルール（豆知識データ）
+    match /knowledge_items/{itemId} {
+      allow read: if request.auth != null;
+      allow write: if false; // サーバー側でのみ書き込み
+    }
+
+    // quiz_items の読み書きルール（クイズデータ）
+    match /quiz_items/{itemId} {
+      allow read: if request.auth != null;
+      allow write: if false; // サーバー側でのみ書き込み
+    }
+
+    // quiz_results の読み書きルール（クイズ結果）
+    match /quiz_results/{resultId} {
+      allow read, write: if request.auth != null
+        && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.userId;
+    }
+
+    // daily_knowledge の読み書きルール（日次豆知識）
+    match /daily_knowledge/{dailyId} {
+      allow read, write: if request.auth != null
+        && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.userId;
+    }
   }
 }

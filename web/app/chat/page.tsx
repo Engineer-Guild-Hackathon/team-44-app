@@ -8,6 +8,7 @@ import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
 import { useAuth } from '../../hooks/useAuth'
 import { getAuthClient } from '../../lib/firebase'
+import { useDiscoveryStore } from '../../store/discoveryStore'
 
 export default function ChatPage() {
   const [message, setMessage] = useState('')
@@ -20,9 +21,12 @@ export default function ChatPage() {
   useEffect(() => {
     setIsNavOpen(false);
   }, [pathname]);
+
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [isCreatingSession, setIsCreatingSession] = useState(false)
   const [errorMessage, setErrorMessage] = useState<ChatMessage | null>(null)
+
+  const { todayKnowledge, loadTodayKnowledge } = useDiscoveryStore()
 
   // エラーメッセージをチャット形式で追加
   const addErrorMessage = (errorText: string) => {
@@ -35,6 +39,13 @@ export default function ChatPage() {
     setErrorMessage(errorMsg)
   }
   const { user, loading: authLoading } = useAuth()
+
+  // 豆知識を読み込む
+  useEffect(() => {
+    if (user && !authLoading) {
+      loadTodayKnowledge();
+    }
+  }, [user, authLoading, loadTodayKnowledge])
 
   // 認証トークンを取得する関数
   const getAuthToken = useCallback(async (): Promise<string | null> => {
@@ -319,7 +330,7 @@ export default function ChatPage() {
             ) : (
               <div>
                 <div className="pb-24">
-                  <ChatView messages={messages} isLoading={isLoading} />
+                  <ChatView messages={messages} isLoading={isLoading} todayKnowledge={todayKnowledge} />
                 </div>
               </div>
             )}

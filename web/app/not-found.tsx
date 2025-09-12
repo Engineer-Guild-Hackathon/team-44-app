@@ -2,6 +2,7 @@
 
 import Header from '../components/common/Header'
 import Navigation from '../components/common/Navigation'
+import { ErrorNavigationButtons } from '../components/common/ErrorNavigationButtons'
 import { useState } from 'react'
 
 export default function NotFound() {
@@ -34,20 +35,11 @@ export default function NotFound() {
             </p>
           </div>
 
-          <div className="space-y-4">
-            <a
-              href="/"
-              className="block w-full bg-[var(--color-primary)] text-[var(--color-text-dark)] px-6 py-3 rounded-lg hover:bg-[var(--color-accent)] transition-colors font-medium"
-            >
-              ホームに戻る
-            </a>
-            <a
-              href="/auth"
-              className="block w-full bg-[var(--color-bg-light)] border border-[var(--color-border)] text-[var(--color-text-light)] px-6 py-3 rounded-lg hover:bg-[var(--color-accent)] hover:bg-opacity-10 transition-colors"
-            >
-              ログインする
-            </a>
-          </div>
+          <ErrorNavigationButtons
+            showRetry={false}
+            homeLabel="ホームに戻る"
+            loginLabel="ログインする"
+          />
         </div>
       </div>
     </div>
