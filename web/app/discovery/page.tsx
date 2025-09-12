@@ -77,7 +77,7 @@ export default function DiscoveryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-light)] dark:bg-[var(--color-bg-dark)]">
+    <div className="min-h-screen bg-[var(--color-bg-light)]">
       {user && (
         <>
           <Header
@@ -111,8 +111,8 @@ export default function DiscoveryPage() {
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* 今日の豆知識 */}
-          <section className="bg-white dark:bg-[var(--color-bg-dark)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
-            <h2 className="text-xl font-semibold text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-6 flex items-center gap-2">
+          <section className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
+            <h2 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 flex items-center gap-2">
               <span className="text-2xl">📚</span>
               今日の豆知識
             </h2>
@@ -121,14 +121,14 @@ export default function DiscoveryPage() {
             ) : (
               <div className="text-center py-8">
                 <div className="text-4xl mb-4">📚</div>
-                <p className="text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)]">知識を準備中...</p>
+                <p className="text-[var(--color-text-light)]">知識を準備中...</p>
               </div>
             )}
           </section>
 
           {/* 週次クイズ */}
           <section className="bg-white dark:bg-[var(--color-bg-dark)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
-            <h2 className="text-xl font-semibold text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-6 flex items-center gap-2">
+            <h2 className="text-xl font-semibold text-[var(--color-text-dark)] mb-6 flex items-center gap-2">
               <span className="text-2xl">🧠</span>
               週次クイズ
             </h2>
