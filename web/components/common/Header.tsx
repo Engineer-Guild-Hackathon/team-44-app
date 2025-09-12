@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useState } from 'react'
 import ThemeToggle from './ThemeToggle'
 
@@ -43,14 +44,14 @@ export default function Header({ onMenuClick, isNavOpen, onToggleNav, user, onNe
               </button>
             )}
 
-            <div className="flex items-center space-x-3">
+            <Link href="/" className="flex items-center space-x-3">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center">
                 <img src="/icon-192.svg" alt="tothlus logo" className="w-8 h-8" />
               </div>
               <h1 className="text-xl font-bold text-[var(--color-text-light)]">
                 tothlus
               </h1>
-            </div>
+            </Link>
           </div>
 
           {/* Right side actions */}
