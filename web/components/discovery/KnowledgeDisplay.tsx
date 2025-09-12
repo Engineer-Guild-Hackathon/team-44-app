@@ -16,28 +16,28 @@ export const KnowledgeDisplay: React.FC<KnowledgeDisplayProps> = ({ knowledge, o
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 max-w-md mx-auto">
+    <div className="bg-white rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
       <div className="mb-4">
-        <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mb-2">
+        <span className="inline-block bg-[var(--color-accent)] bg-opacity-10 text-[var(--color-primary)] text-xs px-3 py-1 rounded-full mb-3 font-medium">
           {knowledge.category}
         </span>
-        <p className="text-gray-800 text-lg leading-relaxed">
+        <p className="text-[var(--color-text-light)] text-lg leading-relaxed">
           {knowledge.content}
         </p>
       </div>
 
       {knowledge.mermaidDiagram && (
-        <div className="mb-4 p-4 bg-gray-50 rounded">
-          <pre className="text-sm text-gray-600 whitespace-pre-wrap">
+        <div className="mb-4 p-4 bg-[var(--color-muted)] rounded border border-[var(--color-border)]">
+          <pre className="text-sm text-[var(--color-text-light)] whitespace-pre-wrap">
             {knowledge.mermaidDiagram}
           </pre>
         </div>
       )}
 
       <div className="flex justify-between items-center">
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-2">
           {knowledge.tags.map((tag, index) => (
-            <span key={index} className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+            <span key={index} className="text-xs text-[var(--color-muted-foreground)] bg-[var(--color-muted)] px-2 py-1 rounded border border-[var(--color-border)]">
               #{tag}
             </span>
           ))}
@@ -46,7 +46,7 @@ export const KnowledgeDisplay: React.FC<KnowledgeDisplayProps> = ({ knowledge, o
         {knowledge.googleSearchQuery && (
           <button
             onClick={handleSearchClick}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium underline"
+            className="text-[var(--color-accent)] hover:text-[var(--color-primary)] text-sm font-medium underline transition-colors"
           >
             もっと詳しく調べる
           </button>

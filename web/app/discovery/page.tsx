@@ -24,10 +24,10 @@ export default function DiscoveryPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--color-bg-light)] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">読み込み中...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-accent)] mx-auto mb-4"></div>
+          <p className="text-[var(--color-text-light)]">知識を探索中...</p>
         </div>
       </div>
     );
@@ -35,16 +35,16 @@ export default function DiscoveryPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--color-bg-light)] flex items-center justify-center">
         <div className="text-center">
-          <div className="text-red-500 mb-4">⚠️</div>
-          <p className="text-gray-800">{error}</p>
+          <div className="text-[var(--color-error)] mb-4 text-4xl">📚</div>
+          <p className="text-[var(--color-text-light)] mb-4">{error}</p>
           <button
             onClick={() => {
               loadTodayKnowledge();
               loadInterestMap();
             }}
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="bg-[var(--color-primary)] text-[var(--color-text-dark)] px-6 py-3 rounded hover:bg-opacity-90 transition-colors font-medium"
           >
             再試行
           </button>
@@ -54,36 +54,45 @@ export default function DiscoveryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">
-            学習発見・興味拡張
-          </h1>
-          <p className="text-gray-600">
-            新しい知識との出会いを通じて、学習意欲を高めましょう
-          </p>
+    <div className="min-h-screen bg-[var(--color-bg-light)]">
+      {/* Header */}
+      <header className="bg-[var(--color-bg-light)] border-b border-[var(--color-border)] px-4 py-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center">
+            <h1 className="text-3xl text-[var(--color-text-light)] mb-2 font-semibold">
+              📚 学習発見・興味拡張
+            </h1>
+            <p className="text-[var(--color-muted-foreground)] text-lg">
+              新しい知識との出会いを通じて、学習意欲を高めましょう
+            </p>
+          </div>
         </div>
+      </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+      {/* Main Content */}
+      <main className="max-w-6xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* 今日の豆知識 */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              📚 今日の豆知識
+          <section className="bg-white rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
+            <h2 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 flex items-center gap-2">
+              <span className="text-2xl">�</span>
+              今日の豆知識
             </h2>
             {todayKnowledge ? (
               <KnowledgeDisplay knowledge={todayKnowledge} />
             ) : (
-              <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                <p className="text-gray-600">豆知識を読み込み中...</p>
+              <div className="text-center py-8">
+                <div className="text-4xl mb-4">📚</div>
+                <p className="text-[var(--color-muted-foreground)]">知識を準備中...</p>
               </div>
             )}
-          </div>
+          </section>
 
           {/* 週次クイズ */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              🧠 週次クイズ
+          <section className="bg-white rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
+            <h2 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 flex items-center gap-2">
+              <span className="text-2xl">🧠</span>
+              週次クイズ
             </h2>
             {currentQuiz ? (
               <SimpleQuiz
@@ -94,25 +103,27 @@ export default function DiscoveryPage() {
                 }}
               />
             ) : (
-              <div className="bg-white rounded-lg shadow-md p-6 text-center">
-                <p className="text-gray-600">クイズを読み込み中...</p>
+              <div className="text-center py-8">
+                <div className="text-4xl mb-4">❓</div>
+                <p className="text-[var(--color-muted-foreground)] mb-4">クイズを準備中...</p>
                 <button
                   onClick={() => {
                     // クイズ読み込み処理
                   }}
-                  className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                  className="bg-[var(--color-primary)] text-[var(--color-text-dark)] px-6 py-3 rounded hover:bg-opacity-90 transition-colors font-medium"
                 >
                   クイズに挑戦
                 </button>
               </div>
             )}
-          </div>
+          </section>
         </div>
 
         {/* 興味マップ */}
-        <div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            🗺️ 興味マップ
+        <section className="bg-white rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
+          <h2 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 flex items-center gap-2">
+            <span className="text-2xl">🗺️</span>
+            興味マップ
           </h2>
           {interestMapData ? (
             <BasicInterestMap
@@ -120,12 +131,13 @@ export default function DiscoveryPage() {
               hasData={interestMapData.hasData}
             />
           ) : (
-            <div className="bg-white rounded-lg shadow-md p-6 text-center">
-              <p className="text-gray-600">興味マップを読み込み中...</p>
+            <div className="text-center py-12">
+              <div className="text-4xl mb-4">🌟</div>
+              <p className="text-[var(--color-muted-foreground)]">興味マップを探索中...</p>
             </div>
           )}
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }

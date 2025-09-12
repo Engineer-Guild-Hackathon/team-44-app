@@ -9,28 +9,26 @@ interface BasicInterestMapProps {
 export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, hasData }) => {
   if (!hasData || !mapData.nodes || mapData.nodes.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-6 max-w-2xl mx-auto">
-        <div className="text-center">
-          <div className="text-6xl mb-4">🗺️</div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
-            興味マップ
-          </h3>
-          <p className="text-gray-600 mb-4">
-            {mapData.placeholderMessage || '学習データを集めて興味マップを作成しましょう'}
+      <div className="bg-white rounded-lg shadow-[var(--shadow-md)] p-8 border border-[var(--color-border)] text-center">
+        <div className="text-6xl mb-4">🗺️</div>
+        <h3 className="text-xl font-semibold text-[var(--color-text-light)] mb-3">
+          興味マップ
+        </h3>
+        <p className="text-[var(--color-muted-foreground)] mb-6">
+          {mapData.placeholderMessage || '学習データを集めて興味マップを作成しましょう'}
+        </p>
+        <div className="bg-[var(--color-muted)] rounded-lg p-6 border border-[var(--color-border)]">
+          <p className="text-sm text-[var(--color-muted-foreground)]">
+            学習を続けると、あなたの興味分野が可視化され、新しい発見につながります
           </p>
-          <div className="bg-gray-100 rounded-lg p-4">
-            <p className="text-sm text-gray-500">
-              学習を続けると、あなたの興味分野が可視化され、新しい発見につながります
-            </p>
-          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 max-w-4xl mx-auto">
-      <h3 className="text-xl font-semibold text-gray-800 mb-6 text-center">
+    <div className="bg-white rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
+      <h3 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 text-center">
         あなたの興味マップ
       </h3>
 
@@ -39,20 +37,20 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, has
         {mapData.nodes.map((node) => (
           <div
             key={node.id}
-            className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg p-4 text-center hover:shadow-md transition-shadow cursor-pointer"
+            className="bg-gradient-to-br from-[var(--color-accent)] from-opacity-5 to-[var(--color-primary)] to-opacity-5 rounded-lg p-4 text-center hover:shadow-[var(--shadow-md)] transition-shadow cursor-pointer border border-[var(--color-border)]"
           >
             <div className="text-2xl mb-2">
               {getCategoryEmoji(node.category)}
             </div>
-            <h4 className="font-medium text-gray-800 mb-1">
+            <h4 className="font-medium text-[var(--color-text-light)] mb-1">
               {node.category}
             </h4>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-[var(--color-muted-foreground)]">
               学習回数: {node.itemsViewed}
             </div>
-            <div className="mt-2 bg-blue-300 rounded-full h-2">
+            <div className="mt-2 bg-[var(--color-muted)] rounded-full h-2">
               <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-500"
+                className="bg-[var(--color-accent)] h-2 rounded-full transition-all duration-500"
                 style={{ width: `${node.level}%` }}
               ></div>
             </div>
@@ -62,20 +60,20 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, has
 
       {/* 提案セクション */}
       {mapData.suggestions && mapData.suggestions.length > 0 && (
-        <div className="border-t pt-6">
-          <h4 className="text-lg font-medium text-gray-800 mb-4">
+        <div className="border-t border-[var(--color-border)] pt-6">
+          <h4 className="text-lg font-medium text-[var(--color-text-light)] mb-4">
             次の興味分野の提案
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {mapData.suggestions.map((suggestion, index) => (
-              <div key={index} className="bg-green-50 rounded-lg p-4">
+              <div key={index} className="bg-[var(--color-success)] bg-opacity-5 rounded-lg p-4 border border-[var(--color-success)] border-opacity-20">
                 <div className="flex items-center mb-2">
                   <span className="text-2xl mr-3">💡</span>
-                  <h5 className="font-medium text-gray-800">
+                  <h5 className="font-medium text-[var(--color-text-light)]">
                     {suggestion.category}
                   </h5>
                 </div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-[var(--color-muted-foreground)]">
                   {suggestion.reason}
                 </p>
               </div>
