@@ -26,6 +26,9 @@ export default function ChatView({ messages, isLoading = false, todayKnowledge }
     <div ref={containerRef} className="flex-1 overflow-y-auto p-4 space-y-6">
       {messages.length === 0 && !isLoading && (
         <div className="text-center text-[var(--color-muted-foreground)] py-12">
+          <div className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <img src="/icon-192.svg" alt="tothlus logo" className="w-16 h-16" />
+          </div>
           {todayKnowledge ? (
             <div className="max-w-md mx-auto">
               <div className="mb-4">

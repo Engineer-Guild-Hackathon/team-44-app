@@ -15,18 +15,18 @@ import type { Metadata } from 'next'
 // })
 
 export const metadata: Metadata = {
-  title: 'Libraria - あなたの知識の図書館',
+  title: 'tothlus - あなたの知識の図書館',
   description: 'AIを活用した学習支援アプリケーション。チャット、学習記録、カレンダー、リマインダー機能を備えています。',
   manifest: '/manifest.json',
   openGraph: {
     type: 'website',
-    siteName: 'Libraria',
-    title: 'Libraria - あなたの知識の図書館',
+    siteName: 'tothlus',
+    title: 'tothlus - あなたの知識の図書館',
     description: 'AIを活用した学習支援アプリケーション',
   },
   twitter: {
     card: 'summary',
-    title: 'Libraria - あなたの知識の図書館',
+    title: 'tothlus - あなたの知識の図書館',
     description: 'AIを活用した学習支援アプリケーション',
   },
 }
@@ -49,7 +49,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Libraria" />
+        <meta name="apple-mobile-web-app-title" content="tothlus" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#C4A676" />

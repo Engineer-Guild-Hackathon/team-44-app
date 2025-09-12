@@ -1,4 +1,4 @@
-# AI学習サポートアプリ (Team 44 - オランダ)
+# tothlus (Team 44 - オランダ)
 
 AIとの対話を通じて学習を継続的にサポートするアプリケーション
 
@@ -86,7 +86,7 @@ cd functions && npm run deploy
 ## チーム情報
 - チーム番号: 44
 - チーム名: オランダ
-- プロダクト名: AI学習サポートアプリ
+- プロダクト名: tothlus
 - メンバー: soranjiro, Sora4431, Won-CCS
 
 ---

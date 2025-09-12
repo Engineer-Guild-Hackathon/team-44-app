@@ -1,7 +1,7 @@
-# Libraria フロントエンドデザイン仕様書
+# tothlus フロントエンドデザイン仕様書
 
 ## プロジェクト情報
-- **アプリ名**: Libraria
+- **アプリ名**: tothlus
 - **ベースプロジェクト**: `/Users/user/Documents/03_app/feat#24`
 - **参照ドキュメント**:
   - `docs/prd/v1.md` - 基本要件とMVPスコープ
@@ -9,7 +9,7 @@
   - `.github/instructions/frontend.instructions.md` - フロントエンド開発規約
 
 ## 概要
-学習継続サポートアプリ「Libraria」のフロントエンドデザインを、古代から現代までの膨大な知識が蓄積された個人専用図書館をイメージした、シンプル・高級感・落ち着いた印象のUIとして実装する。PWA対応のモバイルファーストなレスポンシブデザインを実装し、テーマカラーを簡単に変更可能な仕組みとダークモード対応を提供する。
+学習継続サポートアプリ「tothlus」のフロントエンドデザインを、古代から現代までの膨大な知識が蓄積された個人専用図書館をイメージした、シンプル・高級感・落ち着いた印象のUIとして実装する。PWA対応のモバイルファーストなレスポンシブデザインを実装し、テーマカラーを簡単に変更可能な仕組みとダークモード対応を提供する。
 
 ## デザインコンセプト
 
@@ -179,7 +179,7 @@
 
 ### ローディングアニメーション
 1. **初期ローディング**:
-   - Librariaロゴの書籍アイコンがページをめくるアニメーション
+   - tothlusロゴの書籍アイコンがページをめくるアニメーション
    - 背景: グラデーション（ライト/ダーク対応）
    - 時間: 2-3秒、実際のロード時間に応じて調整
 
@@ -200,8 +200,8 @@
 ## PWA対応仕様
 
 ### マニフェスト設定
-- **アプリ名**: "Libraria"
-- **短縮名**: "Libraria"
+- **アプリ名**: "tothlus"
+- **短縮名**: "tothlus"
 - **説明**: "あなただけの知識の図書館"
 - **テーマカラー**: CSS変数 `var(--color-primary)`
 - **背景色**: CSS変数 `var(--color-bg-light)`
@@ -291,7 +291,7 @@ web/
 ### 主要コンポーネントの役割
 
 #### Layout Components
-- **Header.tsx**: Librariaロゴ、ハンバーガーメニュー、テーマ切り替え
+- **Header.tsx**: tothlusロゴ、ハンバーガーメニュー、テーマ切り替え
 - **Navigation.tsx**: スライドイン式サイドメニュー、ページ遷移
 - **Footer.tsx**: 最小限の情報表示
 
@@ -339,12 +339,12 @@ web/
 | 対応するフォルダ | 対応するファイル | 修正内容の概要 |
 |---|---|---|
 | web/app/ | globals.css | CSS Custom Properties によるテーマカラーシステム実装、アニメーション定義追加 |
-| web/app/ | layout.tsx | Librariaブランドに更新、テーマプロバイダー追加、ヘッダーレイアウト簡素化 |
+| web/app/ | layout.tsx | tothlusブランドに更新、テーマプロバイダー追加、ヘッダーレイアウト簡素化 |
 | web/app/ | page.tsx | ログイン後チャット画面への直接リダイレクト実装 |
-| web/app/ | loading.tsx | Librariaテーマのグローバルローディング画面新規作成 |
+| web/app/ | loading.tsx | tothlusテーマのグローバルローディング画面新規作成 |
 | web/app/chat/ | page.tsx | フルスクリーンチャットインターフェース、ローディング状態改善 |
 | web/app/chat/ | loading.tsx | チャット専用ローディングアニメーション新規作成 |
-| web/components/common/Layout/ | Header.tsx | Librariaロゴ、シンプルヘッダーに変更、テーマ切り替えボタン追加 |
+| web/components/common/Layout/ | Header.tsx | tothlusロゴ、シンプルヘッダーに変更、テーマ切り替えボタン追加 |
 | web/components/common/Layout/ | Navigation.tsx | HamburgerMenu.tsxから分離、サイドメニュー専用コンポーネント作成 |
 | web/components/common/UI/ | Button.tsx | 新デザインガイドライン準拠、アニメーション対応ボタン新規作成 |
 | web/components/common/UI/ | Input.tsx | テーマ対応入力フィールド、フォーカスアニメーション新規作成 |
@@ -365,9 +365,9 @@ web/
 | web/app/calendar/ | page.tsx | 新デザインガイドライン準拠のカレンダー画面更新 |
 | web/app/reminders/ | page.tsx | カード形式設定画面、新デザイン適用 |
 | web/ | tailwind.config.js | 新カラーパレット定義、カスタムアニメーション追加 |
-| web/public/ | manifest.json | Libraria PWA設定、動的テーマカラー対応 |
+| web/public/ | manifest.json | tothlus PWA設定、動的テーマカラー対応 |
 | web/public/ | sw.js | Service Worker実装、オフライン対応 |
-| web/public/icons/ | (各種アイコンファイル) | Librariaアプリアイコン作成、maskable対応 |
+| web/public/icons/ | (各種アイコンファイル) | tothlusアプリアイコン作成、maskable対応 |
 
 ## 実装順序
 
@@ -420,7 +420,7 @@ web/
 
 **Q6**: アニメーションについて、図書館の静寂さを保ちつつ、ページめくりのような書籍に関連した軽やかなアニメーションは適切でしょうか？
 
-**Q7**: ローディング画面で、本がページをめくるようなアニメーションを使用することで、Librariaのブランドイメージを強化できるでしょうか？
+**Q7**: ローディング画面で、本がページをめくるようなアニメーションを使用することで、tothlusのブランドイメージを強化できるでしょうか？
 
 **Q8**: PWAアプリアイコンを、開いた本と知識の光をモチーフにしたデザインにすることで、個人図書館のコンセプトを適切に表現できるでしょうか？
 
