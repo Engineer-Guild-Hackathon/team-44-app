@@ -1,5 +1,5 @@
 import React from 'react';
-import { MdMap, MdCalculate, MdScience, MdBiotech, MdHistory, MdPublic, MdMenuBook, MdLanguage, MdCode, MdPalette, MdMusicNote, MdPsychology } from 'react-icons/md';
+import { MdMap, MdCalculate, MdScience, MdBiotech, MdHistory, MdPublic, MdMenuBook, MdLanguage, MdCode, MdPalette, MdMusicNote, MdPsychology, MdLightbulb } from 'react-icons/md';
 import { InterestMapData } from '../../types/discovery';
 
 interface BasicInterestMapProps {
@@ -43,10 +43,10 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, has
             <div className="text-2xl mb-2">
               {getCategoryIcon(node.category)}
             </div>
-            <h4 className="font-medium text-[var(--color-text-light)] mb-1">
+            <h4 className="font-medium text-[var(--color-text-dark)] mb-1">
               {node.category}
             </h4>
-            <div className="text-sm text-[var(--color-muted-foreground)]">
+            <div className="text-sm text-[var(--color-text-dark)]">
               学習回数: {node.itemsViewed}
             </div>
             <div className="mt-2 bg-[var(--color-muted)] rounded-full h-2">
@@ -67,9 +67,9 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, has
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {mapData.suggestions.map((suggestion, index) => (
-              <div key={index} className="bg-[var(--color-success)] bg-opacity-5 rounded-lg p-4 border border-[var(--color-success)] border-opacity-20">
+              <div key={index} className="bg-[var(--color-dark)] bg-opacity-5 rounded-lg p-4 border border-[var(--color-dark)] border-opacity-20">
                 <div className="flex items-center mb-2">
-                  <span className="text-2xl mr-3">💡</span>
+                  <MdLightbulb className="text-2xl mr-3 text-[var(--color-warning)]" />
                   <h5 className="font-medium text-[var(--color-text-light)]">
                     {suggestion.category}
                   </h5>

@@ -12,7 +12,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ open, title, message, onC
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--color-modal-overlay)] bg-opacity-40">
-      <div className="bg-[var(--color-bg-light)] text-[var(--color-text-light)] rounded-lg shadow-lg p-6 w-full max-w-xs" style={{background: 'var(--color-bg-light)', color: 'var(--color-text-light)'}}>
+      <div className="bg-[var(--color-bg-light)] text-[var(--color-text-light)] rounded-lg shadow-lg p-6 w-full max-w-xs border border-[var(--color-primary)]" style={{ background: 'var(--color-bg-light)', color: 'var(--color-text-light)' }}>
         {title && <h2 className="text-lg font-bold mb-2">{title}</h2>}
         <p className="mb-4 text-sm">{message}</p>
         <div className="flex justify-end space-x-2">
