@@ -1,4 +1,5 @@
 import React from 'react';
+import { MdFavorite, MdSearch } from 'react-icons/md';
 import { KnowledgeItem } from '../../types/discovery';
 
 interface KnowledgeDisplayProps {
@@ -47,17 +48,18 @@ export const KnowledgeDisplay: React.FC<KnowledgeDisplayProps> = ({ knowledge, o
         <div className="flex gap-2">
           <button
             onClick={onLike}
-            className="text-red-500 hover:text-red-600 text-sm font-medium flex items-center gap-1 transition-colors"
+            className="text-[var(--color-error)] hover:text-[var(--color-warning)] text-sm font-medium flex items-center gap-1 transition-colors"
           >
-            <span>❤️</span>
+            <MdFavorite />
             いいね
           </button>
 
           {knowledge.googleSearchQuery && (
             <button
               onClick={handleSearchClick}
-              className="text-[var(--color-info)] hover:text-[var(--color-info-hover)] text-sm font-medium underline transition-colors"
+              className="text-[var(--color-info)] hover:text-[var(--color-info-hover)] text-sm font-medium underline transition-colors flex items-center gap-1"
             >
+              <MdSearch />
               もっと詳しく調べる
             </button>
           )}
