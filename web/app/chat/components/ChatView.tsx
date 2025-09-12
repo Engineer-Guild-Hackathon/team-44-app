@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { ChatMessage } from '../../../types/api'
-import { KnowledgeItem } from '../../types/discovery'
+import { KnowledgeItem } from '@/types/discovery'
 
 interface ChatViewProps {
   messages: ChatMessage[]
@@ -72,8 +72,8 @@ export default function ChatView({ messages, isLoading = false, todayKnowledge }
         >
           <div
             className={`max-w-[85%] md:max-w-[70%] rounded-xl px-4 py-3 shadow-sm ${message.role === 'user'
-                ? 'message-bubble-user'
-                : 'message-bubble-ai'
+              ? 'message-bubble-user'
+              : 'message-bubble-ai'
               }`}
           >
             <div className="whitespace-pre-wrap text-sm leading-relaxed">

@@ -1,10 +1,13 @@
 'use client'
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDiscoveryStore } from '../../store/discoveryStore';
 import { KnowledgeDisplay } from '../../components/discovery/KnowledgeDisplay';
 import { SimpleQuiz } from '../../components/discovery/SimpleQuiz';
 import { BasicInterestMap } from '../../components/discovery/BasicInterestMap';
+import Header from '../../components/common/Header';
+import Navigation from '../../components/common/Navigation';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function DiscoveryPage() {
   const {
@@ -16,6 +19,9 @@ export default function DiscoveryPage() {
     loadTodayKnowledge,
     loadInterestMap
   } = useDiscoveryStore();
+
+  const { user } = useAuth();
+  const [isNavOpen, setIsNavOpen] = useState(false);
 
   useEffect(() => {
     loadTodayKnowledge();
@@ -54,15 +60,30 @@ export default function DiscoveryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-light)]">
+    <div className="min-h-screen bg-[var(--color-bg-light)] dark:bg-[var(--color-bg-dark)]">
+      {user && (
+        <>
+          <Header
+            user={user}
+            onMenuClick={() => setIsNavOpen(true)}
+            isNavOpen={isNavOpen}
+            onToggleNav={() => setIsNavOpen(!isNavOpen)}
+          />
+          <Navigation
+            isOpen={isNavOpen}
+            onClose={() => setIsNavOpen(false)}
+          />
+        </>
+      )}
+
       {/* Header */}
-      <header className="bg-[var(--color-bg-light)] border-b border-[var(--color-border)] px-4 py-6">
+      <header className="bg-[var(--color-bg-light)] dark:bg-[var(--color-bg-dark)] border-b border-[var(--color-border)] px-4 py-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center">
-            <h1 className="text-3xl text-[var(--color-text-light)] mb-2 font-semibold">
+            <h1 className="text-3xl text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-2 font-semibold">
               📚 学習発見・興味拡張
             </h1>
-            <p className="text-[var(--color-muted-foreground)] text-lg">
+            <p className="text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)] text-lg">
               新しい知識との出会いを通じて、学習意欲を高めましょう
             </p>
           </div>
@@ -89,8 +110,8 @@ export default function DiscoveryPage() {
           </section>
 
           {/* 週次クイズ */}
-          <section className="bg-white rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
-            <h2 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 flex items-center gap-2">
+          <section className="bg-white dark:bg-[var(--color-bg-dark)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
+            <h2 className="text-xl font-semibold text-[var(--color-text-light)] dark:text-[var(--color-text-dark)] mb-6 flex items-center gap-2">
               <span className="text-2xl">🧠</span>
               週次クイズ
             </h2>
@@ -105,7 +126,7 @@ export default function DiscoveryPage() {
             ) : (
               <div className="text-center py-8">
                 <div className="text-4xl mb-4">❓</div>
-                <p className="text-[var(--color-muted-foreground)] mb-4">クイズを準備中...</p>
+                <p className="text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)] mb-4">クイズを準備中...</p>
                 <button
                   onClick={() => {
                     // クイズ読み込み処理
