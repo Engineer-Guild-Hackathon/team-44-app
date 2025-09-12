@@ -8,6 +8,7 @@ import HomeIcon from '@mui/icons-material/Home'
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday'
 import NotificationsIcon from '@mui/icons-material/Notifications'
 import LogoutIcon from '@mui/icons-material/Logout'
+import ExploreIcon from '@mui/icons-material/Explore'
 
 interface NavigationProps {
   isOpen: boolean
@@ -52,6 +53,11 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
       href: '/reminders',
       label: 'リマインダー',
       icon: <NotificationsIcon className="w-5 h-5" />
+    },
+    {
+      href: '/discovery',
+      label: '発見',
+      icon: <ExploreIcon className="w-5 h-5" />
     },
   ]
 

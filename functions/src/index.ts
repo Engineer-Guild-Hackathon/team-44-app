@@ -5,9 +5,17 @@ import dotenv from "dotenv";
 
 // .envファイルを読み込む
 dotenv.config();
+
+// Firebase Admin SDK の初期化
+import * as admin from "firebase-admin";
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
+
 import { createSession, createSmartSession, postMessage, getUserSessions, getSession, completeSession } from "./controllers/chatController";
 import { generateLearningRecord, getUserLearningRecords, getLearningRecord, getLearningRecordsForPeriod, createManualLearningRecord } from "./controllers/learningRecordController";
 import { getReminders, getReminderSettings, updateReminderSettings, updateReminderStatus } from "./controllers/reminderController";
+import { getLoginKnowledge, getWeeklyQuiz, submitQuizResult, getInterestMap } from "./controllers/discoveryController";
 
 const app = express();
 
@@ -43,6 +51,12 @@ app.get("/reminders", getReminders);
 app.get("/reminderSettings", getReminderSettings);
 app.put("/reminderSettings", updateReminderSettings);
 app.put("/reminders/:reminderId/status", updateReminderStatus);
+
+// Discovery routes
+app.get("/discovery/knowledge", getLoginKnowledge);
+app.get("/discovery/quiz", getWeeklyQuiz);
+app.post("/discovery/quiz/result", submitQuizResult);
+app.get("/discovery/map", getInterestMap);
 
 // ヘルスチェック用エンドポイント
 app.get("/health", async (req: Request, res: Response) => {

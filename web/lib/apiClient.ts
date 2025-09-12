@@ -1,8 +1,8 @@
 import axios, { AxiosInstance } from "axios";
 import { getAuthClient } from "./firebase";
-import { 
-  ChatSession, 
-  CreateSessionResponse, 
+import {
+  ChatSession,
+  CreateSessionResponse,
   PostMessageResponse,
   SmartSessionResponse,
   LearningRecord,
@@ -202,6 +202,38 @@ class ApiClient {
   async healthCheck(): Promise<{ status: string; timestamp: string }> {
     const response = await this.client.get('/health');
     return response.data;
+  }
+
+  /**
+   * ログイン時の豆知識を取得
+   */
+  async getTodayKnowledge(): Promise<{ knowledge: any; connectionToUserInterests?: string }> {
+    const response = await this.client.get('/discovery/knowledge');
+    return response.data.data;
+  }
+
+  /**
+   * 週次クイズを取得
+   */
+  async getWeeklyQuiz(): Promise<{ quiz: any; contextExplanation: string }> {
+    const response = await this.client.get('/discovery/quiz');
+    return response.data.data;
+  }
+
+  /**
+   * クイズ結果を送信
+   */
+  async submitQuizResult(quizId: string, selectedOption: number): Promise<{ isCorrect: boolean; correctAnswer: number; explanation: string; googleSearchQuery?: string }> {
+    const response = await this.client.post('/discovery/quiz/result', { quizId, selectedOption });
+    return response.data.data;
+  }
+
+  /**
+   * 興味マップデータを取得
+   */
+  async getInterestMap(): Promise<any> {
+    const response = await this.client.get('/discovery/map');
+    return response.data.data;
   }
 }
 
