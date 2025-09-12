@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '../setup/testUtils';
 import userEvent from '@testing-library/user-event';
 import { act } from 'react';
-import MessageInput from '../../components/common/MessageInput';
+import MessageInput from '../../app/chat/components/MessageInput';
 
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
@@ -26,8 +26,8 @@ describe('MessageInput', () => {
 
   it('should render with custom placeholder', () => {
     render(
-      <MessageInput 
-        onSendMessage={mockOnSendMessage} 
+      <MessageInput
+        onSendMessage={mockOnSendMessage}
         placeholder="質問を入力してください"
       />
     );
@@ -206,7 +206,7 @@ describe('MessageInput', () => {
 
     expect(textarea).toBeInTheDocument();
     expect(sendButton).toBeInTheDocument();
-    
+
     // Check that form has proper structure
     const form = textarea.closest('form');
     expect(form).toBeInTheDocument();
