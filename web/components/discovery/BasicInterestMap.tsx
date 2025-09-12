@@ -4,9 +4,10 @@ import { InterestMapData } from '../../types/discovery';
 interface BasicInterestMapProps {
   mapData: InterestMapData;
   hasData: boolean;
+  onNodeClick?: (category: string) => void;
 }
 
-export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, hasData }) => {
+export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, hasData, onNodeClick }) => {
   if (!hasData || !mapData.nodes || mapData.nodes.length === 0) {
     return (
       <div className="bg-white dark:bg-[var(--color-bg-dark)] rounded-lg shadow-[var(--shadow-md)] p-8 border border-[var(--color-border)] text-center">
@@ -38,6 +39,7 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, has
           <div
             key={node.id}
             className="bg-gradient-to-br from-[var(--color-accent)] from-opacity-5 to-[var(--color-primary)] to-opacity-5 dark:from-[var(--color-accent)] dark:to-[var(--color-primary)] rounded-lg p-4 text-center hover:shadow-[var(--shadow-md)] transition-shadow cursor-pointer border border-[var(--color-border)]"
+            onClick={() => onNodeClick?.(node.category)}
           >
             <div className="text-2xl mb-2">
               {getCategoryEmoji(node.category)}

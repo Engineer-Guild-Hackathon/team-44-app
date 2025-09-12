@@ -6,6 +6,7 @@ import { useDiscoveryStore } from '../../store/discoveryStore';
 import { KnowledgeDisplay } from '../../components/discovery/KnowledgeDisplay';
 import { SimpleQuiz } from '../../components/discovery/SimpleQuiz';
 import { BasicInterestMap } from '../../components/discovery/BasicInterestMap';
+import { UntappedKnowledge } from '../../components/discovery/UntappedKnowledge';
 import Header from '../../components/common/Header';
 import Navigation from '../../components/common/Navigation';
 import { ErrorNavigationButtons } from '../../components/common/ErrorNavigationButtons';
@@ -16,10 +17,12 @@ export default function DiscoveryPage() {
     todayKnowledge,
     currentQuiz,
     interestMapData,
+    untappedKnowledge,
     isLoading,
     error,
     loadTodayKnowledge,
-    loadInterestMap
+    loadInterestMap,
+    loadUntappedKnowledge
   } = useDiscoveryStore();
 
   const { user } = useAuth();
@@ -29,7 +32,8 @@ export default function DiscoveryPage() {
   useEffect(() => {
     loadTodayKnowledge();
     loadInterestMap();
-  }, [loadTodayKnowledge, loadInterestMap]);
+    loadUntappedKnowledge();
+  }, [loadTodayKnowledge, loadInterestMap, loadUntappedKnowledge]);
 
   if (isLoading) {
     return (
@@ -109,7 +113,7 @@ export default function DiscoveryPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           {/* 今日の豆知識 */}
           <section className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
             <h2 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 flex items-center gap-2">
@@ -117,11 +121,42 @@ export default function DiscoveryPage() {
               今日の豆知識
             </h2>
             {todayKnowledge ? (
-              <KnowledgeDisplay knowledge={todayKnowledge} />
+              <KnowledgeDisplay
+                knowledge={todayKnowledge}
+                onDetailView={() => {
+                  console.log('Detail view clicked');
+                }}
+                onLike={() => {
+                  console.log('Like clicked');
+                  // interactWithKnowledge を呼び出す
+                }}
+              />
             ) : (
               <div className="text-center py-8">
                 <div className="text-4xl mb-4">📚</div>
                 <p className="text-[var(--color-text-light)]">知識を準備中...</p>
+              </div>
+            )}
+          </section>
+
+          {/* 未開拓知識の提案 */}
+          <section className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
+            <h2 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 flex items-center gap-2">
+              <span className="text-2xl">🌟</span>
+              新しい発見
+            </h2>
+            {untappedKnowledge ? (
+              <UntappedKnowledge
+                untappedKnowledge={untappedKnowledge}
+                onExplore={(category) => {
+                  console.log(`Exploring ${category}`);
+                  // 興味マップの更新や詳細ページへの遷移など
+                }}
+              />
+            ) : (
+              <div className="text-center py-8">
+                <div className="text-4xl mb-4">🌟</div>
+                <p className="text-[var(--color-muted-foreground)] dark:text-[var(--color-muted-foreground-dark)]">新しい発見を準備中...</p>
               </div>
             )}
           </section>
@@ -166,6 +201,10 @@ export default function DiscoveryPage() {
               <BasicInterestMap
                 mapData={interestMapData}
                 hasData={interestMapData.hasData}
+                onNodeClick={(category) => {
+                  console.log(`Node clicked: ${category}`);
+                  // モーダル表示や関連コンテンツの表示など
+                }}
               />
             ) : (
               <div className="text-center py-12">

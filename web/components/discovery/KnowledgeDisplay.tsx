@@ -4,9 +4,10 @@ import { KnowledgeItem } from '../../types/discovery';
 interface KnowledgeDisplayProps {
   knowledge: KnowledgeItem;
   onDetailView?: () => void;
+  onLike?: () => void;
 }
 
-export const KnowledgeDisplay: React.FC<KnowledgeDisplayProps> = ({ knowledge, onDetailView }) => {
+export const KnowledgeDisplay: React.FC<KnowledgeDisplayProps> = ({ knowledge, onDetailView, onLike }) => {
   const handleSearchClick = () => {
     if (knowledge.googleSearchQuery) {
       const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(knowledge.googleSearchQuery)}`;
@@ -43,14 +44,24 @@ export const KnowledgeDisplay: React.FC<KnowledgeDisplayProps> = ({ knowledge, o
           ))}
         </div>
 
-        {knowledge.googleSearchQuery && (
+        <div className="flex gap-2">
           <button
-            onClick={handleSearchClick}
-            className="text-[var(--color-accent)] hover:text-[var(--color-primary)] text-sm font-medium underline transition-colors"
+            onClick={onLike}
+            className="text-red-500 hover:text-red-600 text-sm font-medium flex items-center gap-1 transition-colors"
           >
-            もっと詳しく調べる
+            <span>❤️</span>
+            いいね
           </button>
-        )}
+
+          {knowledge.googleSearchQuery && (
+            <button
+              onClick={handleSearchClick}
+              className="text-[var(--color-accent)] hover:text-[var(--color-primary)] text-sm font-medium underline transition-colors"
+            >
+              もっと詳しく調べる
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

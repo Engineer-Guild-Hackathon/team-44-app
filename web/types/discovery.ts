@@ -56,11 +56,20 @@ export interface InterestMapData {
   placeholderMessage?: string;
 }
 
+export interface UntappedKnowledgeItem {
+  category: string;
+  content: string;
+  appeal: string;
+  googleSearchQuery?: string;
+  nextAvailable: Date;
+}
+
 export interface DiscoveryState {
   todayKnowledge: KnowledgeItem | null;
   currentQuiz: QuizItem | null;
   quizResults: QuizResult[];
   interestMapData: InterestMapData | null;
+  untappedKnowledge: UntappedKnowledgeItem | null;
   isLoading: boolean;
   error: string | null;
 }

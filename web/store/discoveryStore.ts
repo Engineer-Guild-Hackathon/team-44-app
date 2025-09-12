@@ -7,6 +7,8 @@ export const useDiscoveryStore = create<DiscoveryState & {
   loadTodayKnowledge: () => Promise<void>;
   completeQuiz: (result: QuizResult) => Promise<void>;
   loadInterestMap: () => Promise<void>;
+  interactWithKnowledge: (knowledgeId: string, action: 'like' | 'view_detail') => Promise<void>;
+  loadUntappedKnowledge: () => Promise<void>;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
 }>((set, get) => ({
@@ -30,6 +32,7 @@ export const useDiscoveryStore = create<DiscoveryState & {
   },
   quizResults: [],
   interestMapData: null,
+  untappedKnowledge: null,
   isLoading: false,
   error: null,
 
@@ -126,4 +129,36 @@ export const useDiscoveryStore = create<DiscoveryState & {
 
   // エラーを設定
   setError: (error: string | null) => set({ error }),
+
+  // 豆知識へのインタラクション
+  interactWithKnowledge: async (knowledgeId: string, action: 'like' | 'view_detail') => {
+    set({ isLoading: true, error: null });
+    try {
+      // API呼び出し（モック）
+      console.log(`Interacting with knowledge ${knowledgeId}: ${action}`);
+      set({ isLoading: false });
+    } catch (error) {
+      console.error('Error interacting with knowledge:', error);
+      set({ error: 'インタラクションの記録に失敗しました', isLoading: false });
+    }
+  },
+
+  // 未開拓知識を読み込む
+  loadUntappedKnowledge: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      // モックデータを使用
+      const mockUntapped = {
+        category: '哲学',
+        content: '哲学は根本的な問いを探求する学問です。',
+        appeal: '哲学を学ぶことで、思考力が養われ、日常生活での判断力が向上します。',
+        googleSearchQuery: '哲学 学ぶ メリット',
+        nextAvailable: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      };
+      set({ untappedKnowledge: mockUntapped, isLoading: false });
+    } catch (error) {
+      console.error('Error loading untapped knowledge:', error);
+      set({ error: '未開拓知識の読み込みに失敗しました', isLoading: false });
+    }
+  },
 }));

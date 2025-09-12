@@ -126,3 +126,57 @@ export async function getInterestMap(req: Request, res: Response): Promise<void>
     }
   }
 }
+
+/**
+ * 豆知識へのインタラクションを記録
+ */
+export async function interactWithKnowledge(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = await validateAuth(req);
+    const { knowledgeId, action } = req.body;
+
+    if (!knowledgeId || !action || !['like', 'view_detail'].includes(action)) {
+      res.status(400).json({ error: "knowledgeId and valid action are required" });
+      return;
+    }
+
+    const result = await discoveryService.recordKnowledgeInteraction(userId, knowledgeId, action);
+
+    res.status(200).json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error("Error recording knowledge interaction:", error);
+
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+}
+
+/**
+ * 未開拓ジャンルの魅力を説明する豆知識を取得
+ */
+export async function getUntappedKnowledge(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = await validateAuth(req);
+
+    const untappedKnowledge = await discoveryService.generateUntappedKnowledge(userId);
+
+    res.status(200).json({
+      success: true,
+      data: untappedKnowledge
+    });
+  } catch (error) {
+    console.error("Error getting untapped knowledge:", error);
+
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+}

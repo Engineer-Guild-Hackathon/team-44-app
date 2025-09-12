@@ -185,4 +185,41 @@ export class DiscoveryLLM {
       ];
     }
   }
+
+  /**
+   * 未開拓ジャンルの魅力を説明
+   */
+  async generateCategoryAppeal(category: string, learnedSubjects: string[]): Promise<{ content: string; appeal: string }> {
+    const prompt = `
+学習済み分野: ${learnedSubjects.join(', ')}
+提案ジャンル: ${category}
+
+${category}の魅力を、学習済み分野との関連を踏まえて説明してください。
+出力は以下の形式で：
+{
+  "content": "${category}は、[学習済み分野]の理解を深める上で重要な分野です。",
+  "appeal": "${category}を学ぶことで得られる3つのメリットを簡潔に説明"
+}
+`;
+
+    try {
+      const response = await this.llmProvider.generateResponse([], prompt);
+
+      // LLMレスポンスからJSONを抽出
+      let jsonString = response.trim();
+      if (jsonString.startsWith('```json')) {
+        jsonString = jsonString.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+      } else if (jsonString.startsWith('```')) {
+        jsonString = jsonString.replace(/^```\s*/, '').replace(/\s*```$/, '');
+      }
+
+      return JSON.parse(jsonString);
+    } catch (error) {
+      console.error('Error generating category appeal:', error);
+      return {
+        content: `${category}は新しい視点を提供する興味深い分野です。`,
+        appeal: `${category}を学ぶことで、視野が広がり、新しい発見が待っています。`
+      };
+    }
+  }
 }
