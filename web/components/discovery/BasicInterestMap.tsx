@@ -42,7 +42,7 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, has
             className="bg-gradient-to-br from-[var(--color-accent)] from-opacity-5 to-[var(--color-primary)] to-opacity-5 dark:from-[var(--color-accent)] dark:to-[var(--color-primary)] rounded-lg p-4 text-center hover:shadow-[var(--shadow-md)] transition-shadow cursor-pointer border border-[var(--color-border)]"
             onClick={() => onNodeClick?.(node.category)}
           >
-            <div className="text-2xl mb-2">
+            <div className="text-2xl mb-2 text-[var(--color-text-dark)]">
               {getCategoryIcon(node.category)}
             </div>
             <h4 className="font-medium text-[var(--color-text-dark)] mb-1">

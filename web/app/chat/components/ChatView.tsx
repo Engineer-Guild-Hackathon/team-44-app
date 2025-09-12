@@ -44,7 +44,7 @@ export default function ChatView({ messages, isLoading = false, todayKnowledge }
                       const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(todayKnowledge.googleSearchQuery)}`;
                       window.open(searchUrl, '_blank');
                     }}
-                    className="text-blue-600 hover:text-blue-800 text-sm font-medium underline"
+                    className="text-[var(--color-info)] hover:text-[var(--color-info-hover)] text-sm font-medium underline"
                   >
                     もっと詳しく調べる
                   </button>

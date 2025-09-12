@@ -56,7 +56,7 @@ export const KnowledgeDisplay: React.FC<KnowledgeDisplayProps> = ({ knowledge, o
           {knowledge.googleSearchQuery && (
             <button
               onClick={handleSearchClick}
-              className="text-[var(--color-accent)] hover:text-[var(--color-primary)] text-sm font-medium underline transition-colors"
+              className="text-[var(--color-info)] hover:text-[var(--color-info-hover)] text-sm font-medium underline transition-colors"
             >
               もっと詳しく調べる
             </button>
