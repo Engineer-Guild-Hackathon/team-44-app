@@ -1,3 +1,19 @@
+## チーム情報
+- チーム番号: 44
+- チーム名: オランダ
+- プロダクト名: tothlus
+- メンバー: soranjiro, Sora4431, Won-CCS
+
+---
+
+## デモ / プレゼン資料
+- デモURL: https://tothlus.vercel.app/chat/
+- プレゼンURL: https://docs.google.com/presentation/d/1tuaVaOBQiEgH6zRTTIhsU3APmeiQyEirYKwaF8_ImOg/edit?usp=sharing
+
+
+---
+
+
 # tothlus (Team 44 - オランダ)
 
 AIとの対話を通じて学習を継続的にサポートするアプリケーション
@@ -80,21 +96,3 @@ cd functions && npm run deploy
 ## 詳細な開発ガイド
 
 詳しい開発方法については [DEVELOPMENT.md](./DEVELOPMENT.md) をご覧ください。
-
----
-
-## チーム情報
-- チーム番号: 44
-- チーム名: オランダ
-- プロダクト名: tothlus
-- メンバー: soranjiro, Sora4431, Won-CCS
-
----
-
-## デモ / プレゼン資料
-- デモURL: https://tothlus.vercel.app/chat/
-- プレゼンURL: https://docs.google.com/presentation/d/1tuaVaOBQiEgH6zRTTIhsU3APmeiQyEirYKwaF8_ImOg/edit?usp=sharing
-
-## ライセンス
-
-MIT License
