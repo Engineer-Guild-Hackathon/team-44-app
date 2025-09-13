@@ -45,18 +45,59 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ data, error,
   }
 
   if (!data.hasData || !data.nodes || data.nodes.length === 0) {
+    // デフォルトの興味マップデータを表示
+    const defaultNodes = [
+      { id: 'programming', category: 'プログラミング', level: 1, itemsViewed: 0 },
+      { id: 'math', category: '数学', level: 1, itemsViewed: 0 },
+      { id: 'science', category: '科学', level: 1, itemsViewed: 0 },
+      { id: 'history', category: '歴史', level: 1, itemsViewed: 0 },
+      { id: 'language', category: '言語', level: 1, itemsViewed: 0 },
+      { id: 'art', category: '芸術', level: 1, itemsViewed: 0 }
+    ];
+
     return (
-      <div className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-8 border border-[var(--color-border)] text-center">
-        <h3 className="text-xl font-semibold text-[var(--color-text-light)] mb-3">
+      <div className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
+        <h3 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 text-center">
           興味マップ
         </h3>
-        <p className="text-[var(--color-muted-foreground)] mb-6">
-          {data.placeholderMessage || '学習データを集めて興味マップを作成しましょう'}
-        </p>
-        <div className="bg-[var(--color-muted)] rounded-lg p-6 border border-[var(--color-border)]">
-          <p className="text-sm text-[var(--color-muted-foreground)]">
-            学習を続けると、あなたの興味分野が可視化され、新しい発見につながります
+
+        <div className="mb-4 text-center">
+          <p className="text-[var(--color-muted-foreground)] text-sm mb-4">
+            学習を始めるためのサンプルカテゴリ
           </p>
+        </div>
+
+        {/* デフォルトのノード表示 */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+          {defaultNodes.map((node) => (
+            <div
+              key={node.id}
+              className="bg-gradient-to-br from-[var(--color-accent)] from-opacity-5 to-[var(--color-primary)] to-opacity-5 dark:from-[var(--color-accent)] dark:to-[var(--color-primary)] rounded-lg p-4 text-center hover:shadow-[var(--shadow-md)] transition-shadow cursor-pointer border border-[var(--color-border)]"
+              onClick={() => onNodeClick?.(node.category)}
+            >
+              <div className="text-2xl mb-2 text-[var(--color-text-dark)]">
+                {getCategoryIcon(node.category)}
+              </div>
+              <h4 className="font-medium text-[var(--color-text-dark)] mb-1">
+                {node.category}
+              </h4>
+              <p className="text-xs text-[var(--color-muted-foreground)]">
+                レベル {node.level}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="text-center">
+          <p className="text-sm text-[var(--color-muted-foreground)] mb-4">
+            学習を始めると、あなたの興味分野が可視化され、新しい発見につながります
+          </p>
+          <button
+            onClick={onLoad}
+            className="bg-[var(--color-accent)] hover:bg-[var(--color-primary)] text-[var(--color-text-dark)] text-sm py-2 px-4 rounded transition-colors duration-200"
+          >
+            データを更新
+          </button>
         </div>
       </div>
     );

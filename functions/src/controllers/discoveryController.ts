@@ -137,18 +137,25 @@ export async function getInterestMap(req: Request, res: Response): Promise<void>
         data: mapData
       });
     } else {
-      // データが存在しない場合は空のレスポンスを返す（LLM生成はバッチ処理時のみ）
-      console.log(`No cached interest map for user ${userId}, returning empty response`);
+      // データが存在しない場合はデフォルトの興味マップデータを返す
+      console.log(`No cached interest map for user ${userId}, returning default data`);
       res.status(200).json({
         success: true,
         data: {
           hasData: false,
-          nodes: [],
+          nodes: [
+            { id: 'programming', category: 'プログラミング', level: 1, itemsViewed: 0 },
+            { id: 'math', category: '数学', level: 1, itemsViewed: 0 },
+            { id: 'science', category: '科学', level: 1, itemsViewed: 0 },
+            { id: 'history', category: '歴史', level: 1, itemsViewed: 0 },
+            { id: 'language', category: '言語', level: 1, itemsViewed: 0 },
+            { id: 'art', category: '芸術', level: 1, itemsViewed: 0 }
+          ],
           edges: [],
-          placeholderMessage: "学習データを集めて興味マップを作成しましょう",
+          placeholderMessage: "学習を始めるためのサンプルカテゴリ",
           suggestions: []
         },
-        message: "興味マップはまだ作成中です"
+        message: "デフォルトの興味マップを表示しています"
       });
     }
   } catch (error) {

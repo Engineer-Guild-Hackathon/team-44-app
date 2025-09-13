@@ -84,10 +84,39 @@ export class DataService {
         return data.content;
       }
 
-      return null;
+      // データが存在しない場合はデフォルトの興味マップデータを返す
+      console.log(`No interest map data found for user ${userId}, returning default data`);
+      return {
+        hasData: false,
+        nodes: [
+          { id: 'programming', category: 'プログラミング', level: 1, itemsViewed: 0 },
+          { id: 'math', category: '数学', level: 1, itemsViewed: 0 },
+          { id: 'science', category: '科学', level: 1, itemsViewed: 0 },
+          { id: 'history', category: '歴史', level: 1, itemsViewed: 0 },
+          { id: 'language', category: '言語', level: 1, itemsViewed: 0 },
+          { id: 'art', category: '芸術', level: 1, itemsViewed: 0 }
+        ],
+        edges: [],
+        placeholderMessage: "学習を始めるためのサンプルカテゴリ",
+        suggestions: []
+      };
     } catch (error) {
       console.error("Error getting interest map:", error);
-      return null;
+      // エラーの場合もデフォルトデータを返す
+      return {
+        hasData: false,
+        nodes: [
+          { id: 'programming', category: 'プログラミング', level: 1, itemsViewed: 0 },
+          { id: 'math', category: '数学', level: 1, itemsViewed: 0 },
+          { id: 'science', category: '科学', level: 1, itemsViewed: 0 },
+          { id: 'history', category: '歴史', level: 1, itemsViewed: 0 },
+          { id: 'language', category: '言語', level: 1, itemsViewed: 0 },
+          { id: 'art', category: '芸術', level: 1, itemsViewed: 0 }
+        ],
+        edges: [],
+        placeholderMessage: "学習を始めるためのサンプルカテゴリ",
+        suggestions: []
+      };
     }
   }
 
