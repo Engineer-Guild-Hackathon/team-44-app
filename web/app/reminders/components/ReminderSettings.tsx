@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../hooks/useAuth';
+import { sendDemoNotification } from '../../../lib/firebaseMessaging';
 
 interface ReminderSettings {
   enabled: boolean;

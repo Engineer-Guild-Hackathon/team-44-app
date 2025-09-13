@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { LearningRecord, ChatSession } from '../../types/api'
 import apiClient from '../../lib/apiClient'
 import { MdCalculate, MdScience, MdLanguage, MdHistory, MdCode, MdMenuBook, MdExpandMore } from 'react-icons/md'
@@ -25,14 +25,7 @@ export default function LearningRecordDetail({
   const [error, setError] = useState<string | null>(null)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
-  // データ取得
-  useEffect(() => {
-    if (isOpen && recordId) {
-      fetchRecordDetails()
-    }
-  }, [isOpen, recordId])
-
-  const fetchRecordDetails = async () => {
+  const fetchRecordDetails = useCallback(async () => {
     setIsLoading(true)
     setError(null)
 
@@ -59,7 +52,14 @@ export default function LearningRecordDetail({
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [recordId])
+
+  // データ取得
+  useEffect(() => {
+    if (isOpen && recordId) {
+      fetchRecordDetails()
+    }
+  }, [isOpen, recordId, fetchRecordDetails])
 
   // ESCキーでモーダルを閉じる
   useEffect(() => {
