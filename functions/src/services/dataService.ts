@@ -36,14 +36,34 @@ export class DataService {
    */
   async getTodayKnowledge(userId: string): Promise<any | null> {
     try {
-      const docRef = this.db.collection("discovery_data").doc(`${userId}_todayKnowledge`);
+      // 今日の日付を取得（YYYY-MM-DD形式）
+      const today = new Date().toISOString().split('T')[0];
+
+      // daily_knowledgeコレクションから今日のデータを取得
+      const docRef = this.db.collection("daily_knowledge").doc(`${userId}_${today}`);
       const doc = await docRef.get();
 
       if (doc.exists) {
-        const data = doc.data() as DiscoveryData;
-        return data.content;
+        const data = doc.data();
+        console.log(`Found daily knowledge for user ${userId}:`, data);
+
+        // knowledgeIdがある場合は、knowledge_itemsコレクションから詳細を取得
+        if (data?.knowledgeId) {
+          const knowledgeDoc = await this.db.collection("knowledge_items").doc(data.knowledgeId).get();
+          if (knowledgeDoc.exists) {
+            const knowledgeData = knowledgeDoc.data();
+            console.log(`Found knowledge item:`, knowledgeData);
+            return {
+              knowledge: knowledgeData,
+              connectionToUserInterests: data.connectionToUserInterests || null
+            };
+          }
+        }
+
+        return null;
       }
 
+      console.log(`No daily knowledge found for user ${userId} on ${today}`);
       return null;
     } catch (error) {
       console.error("Error getting today knowledge:", error);

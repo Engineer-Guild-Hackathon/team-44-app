@@ -32,7 +32,7 @@ export const KnowledgeDisplay: React.FC<KnowledgeDisplayProps> = ({ knowledge, e
     return (
       <div className="text-center py-8">
         <div className="text-[var(--color-muted-foreground)] mb-4">📚</div>
-        <p className="text-[var(--color-muted-foreground)] text-sm mb-4">豆知識を読み込み中...</p>
+        <p className="text-[var(--color-muted-foreground)] text-sm mb-4">今日の豆知識はまだ準備中です</p>
         {onLoad && (
           <button
             onClick={onLoad}

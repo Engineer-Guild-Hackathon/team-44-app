@@ -48,7 +48,11 @@ export async function getLoginKnowledge(req: Request, res: Response): Promise<vo
       console.log(`No cached data for user ${userId}, returning empty response`);
       res.status(200).json({
         success: true,
-        data: null
+        data: {
+          knowledge: null,
+          connectionToUserInterests: null
+        },
+        message: "今日の豆知識はまだ準備中です"
       });
     }
   } catch (error) {
@@ -137,7 +141,14 @@ export async function getInterestMap(req: Request, res: Response): Promise<void>
       console.log(`No cached interest map for user ${userId}, returning empty response`);
       res.status(200).json({
         success: true,
-        data: null
+        data: {
+          hasData: false,
+          nodes: [],
+          edges: [],
+          placeholderMessage: "学習データを集めて興味マップを作成しましょう",
+          suggestions: []
+        },
+        message: "興味マップはまだ作成中です"
       });
     }
   } catch (error) {
@@ -202,7 +213,8 @@ export async function getUntappedKnowledge(req: Request, res: Response): Promise
       console.log(`No cached untapped knowledge for user ${userId}, returning empty response`);
       res.status(200).json({
         success: true,
-        data: null
+        data: null,
+        message: "新しい発見はまだ準備中です"
       });
     }
   } catch (error) {

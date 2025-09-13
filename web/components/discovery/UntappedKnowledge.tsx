@@ -36,7 +36,7 @@ export const UntappedKnowledge: React.FC<UntappedKnowledgeProps> = ({
     return (
       <div className="text-center py-8">
         <div className="text-[var(--color-muted-foreground)] mb-4">⭐</div>
-        <p className="text-[var(--color-muted-foreground)] text-sm mb-4">未開拓知識を読み込み中...</p>
+        <p className="text-[var(--color-muted-foreground)] text-sm mb-4">新しい発見はまだ準備中です</p>
         {onLoad && (
           <button
             onClick={onLoad}
