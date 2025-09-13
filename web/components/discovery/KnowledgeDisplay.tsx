@@ -1,5 +1,5 @@
 import React from 'react';
-import { MdFavorite, MdSearch } from 'react-icons/md';
+import { MdFavorite, MdSearch, MdMenuBook } from 'react-icons/md';
 import { KnowledgeItem } from '../../types/discovery';
 
 interface KnowledgeDisplayProps {
@@ -31,7 +31,7 @@ export const KnowledgeDisplay: React.FC<KnowledgeDisplayProps> = ({ knowledge, e
   if (!knowledge) {
     return (
       <div className="text-center py-8">
-        <div className="text-[var(--color-muted-foreground)] mb-4">📚</div>
+        <MdMenuBook className="text-[var(--color-muted-foreground)] text-2xl mb-4 mx-auto" />
         <p className="text-[var(--color-muted-foreground)] text-sm mb-4">今日の豆知識はまだ準備中です</p>
         {onLoad && (
           <button
@@ -71,16 +71,17 @@ export const KnowledgeDisplay: React.FC<KnowledgeDisplayProps> = ({ knowledge, e
         </div>
       )}
 
-      <div className="flex justify-between items-center">
-        <div className="flex flex-wrap gap-2">
-          {knowledge.tags.map((tag, index) => (
-            <span key={index} className="text-xs text-[var(--color-muted-foreground)] bg-[var(--color-muted)] px-2 py-1 rounded border border-[var(--color-border)]">
-              #{tag}
-            </span>
-          ))}
-        </div>
+      <div className="flex flex-wrap gap-2">
+        {knowledge.tags.map((tag, index) => (
+          <span key={index} className="text-xs text-[var(--color-muted-foreground)] bg-[var(--color-muted)] px-2 py-1 rounded border border-[var(--color-border)]">
+            #{tag}
+          </span>
+        ))}
+      </div>
 
-        <div className="flex gap-2">
+      <div className="mt-4 flex justify-end items-center">
+
+        <div className="flex gap-4">
           <button
             onClick={onLike}
             className="text-[var(--color-error)] hover:text-[var(--color-warning)] text-sm font-medium flex items-center gap-1 transition-colors"

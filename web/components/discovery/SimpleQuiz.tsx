@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { MdHelp } from 'react-icons/md';
 import { QuizItem, QuizResult } from '../../types/discovery';
 
 interface SimpleQuizProps {
@@ -16,7 +17,7 @@ export const SimpleQuiz: React.FC<SimpleQuizProps> = ({ quiz, error, onLoad, onA
   if (error) {
     return (
       <div className="text-center py-8">
-        <div className="text-[var(--color-error)] mb-2">❓</div>
+        <MdHelp className="text-[var(--color-error)] text-2xl mb-2 mx-auto" />
         <p className="text-[var(--color-error)] text-sm mb-4">{error}</p>
         {onLoad && (
           <button
@@ -33,7 +34,7 @@ export const SimpleQuiz: React.FC<SimpleQuizProps> = ({ quiz, error, onLoad, onA
   if (!quiz) {
     return (
       <div className="text-center py-8">
-        <div className="text-[var(--color-muted-foreground)] mb-4">❓</div>
+        <MdHelp className="text-[var(--color-muted-foreground)] text-2xl mb-4 mx-auto" />
         <p className="text-[var(--color-muted-foreground)] text-sm mb-4">クイズを読み込み中...</p>
         {onLoad && (
           <button

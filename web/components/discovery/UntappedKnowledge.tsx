@@ -18,7 +18,7 @@ export const UntappedKnowledge: React.FC<UntappedKnowledgeProps> = ({
   if (error) {
     return (
       <div className="text-center py-8">
-        <div className="text-[var(--color-error)] mb-2">⭐</div>
+        <MdStar className="text-[var(--color-error)] text-2xl mb-2 mx-auto" />
         <p className="text-[var(--color-error)] text-sm mb-4">{error}</p>
         {onLoad && (
           <button
@@ -35,7 +35,7 @@ export const UntappedKnowledge: React.FC<UntappedKnowledgeProps> = ({
   if (!knowledge) {
     return (
       <div className="text-center py-8">
-        <div className="text-[var(--color-muted-foreground)] mb-4">⭐</div>
+        <MdStar className="text-[var(--color-muted-foreground)] text-2xl mb-4 mx-auto" />
         <p className="text-[var(--color-muted-foreground)] text-sm mb-4">新しい発見はまだ準備中です</p>
         {onLoad && (
           <button

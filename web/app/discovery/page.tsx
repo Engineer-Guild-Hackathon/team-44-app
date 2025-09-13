@@ -12,6 +12,7 @@ import PsychologyIcon from '@mui/icons-material/Psychology';
 import HelpIcon from '@mui/icons-material/Help';
 import MapIcon from '@mui/icons-material/Map';
 import StarIcon from '@mui/icons-material/Star';
+import { MdOutlineStar } from 'react-icons/md';
 
 // ダイナミックインポートでバンドルサイズ削減
 const KnowledgeDisplay = React.lazy(() => import('../../components/discovery/KnowledgeDisplay').then(mod => ({ default: mod.KnowledgeDisplay })));
@@ -96,8 +97,9 @@ export default function DiscoveryPage() {
       <header className="bg-[var(--color-bg-light)] border-b border-[var(--color-border)] px-4 py-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
-            <h1 className="text-2xl sm:text-3xl text-[var(--color-text-light)] mb-2 font-semibold">
-              📚 学習発見・興味拡張
+            <h1 className="text-2xl sm:text-3xl text-[var(--color-text-light)] mb-2 font-semibold flex items-center gap-2">
+              <MdOutlineStar className="text-[var(--color-accent)]" />
+              学習発見・興味拡張
             </h1>
             <p className="text-sm sm:text-base text-[var(--color-muted-foreground)] max-w-2xl mx-auto mb-4">
               新しい知識との出会いを通じて、学習意欲を高めましょう
@@ -169,7 +171,7 @@ export default function DiscoveryPage() {
           {/* 未開拓知識の提案 */}
           <section className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
             <h2 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 flex items-center gap-2">
-              <span className="text-2xl">🌟</span>
+              <MdOutlineStar className="text-[var(--color-accent)]" />
               新しい発見
             </h2>
             <Suspense fallback={<div className="text-center py-4">読み込み中...</div>}>
