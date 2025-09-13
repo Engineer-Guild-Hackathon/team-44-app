@@ -8,6 +8,7 @@ import {
   LearningRecord,
   LearningRecordsResponse
 } from "../types/api";
+import { UntappedKnowledgeItem } from "../types/discovery";
 
 // Additional types for reminders
 interface Reminder {
@@ -234,6 +235,53 @@ class ApiClient {
   async getInterestMap(): Promise<any> {
     const response = await this.client.get('/discovery/map');
     return response.data.data;
+  }
+
+  /**
+   * 未開拓知識を取得
+   */
+  async getUntappedKnowledge(): Promise<UntappedKnowledgeItem> {
+    const response = await this.client.get('/discovery/untapped');
+    return response.data.data;
+  }
+
+  /**
+   * バッチ処理の状態を取得
+   */
+  async getBatchStatus(): Promise<{
+    activeUsersCount: number;
+    checkedUsersCount: number;
+    completeUsersCount: number;
+    completionRate: number;
+    userStatuses: any[];
+  }> {
+    const response = await this.client.get('/batch/status');
+    return response.data.data;
+  }
+
+  /**
+   * ユーザーのデータ状態を取得
+   */
+  async getUserDataStatus(): Promise<{
+    userId: string;
+    todayKnowledge: any;
+    interestMap: any;
+    untappedKnowledge: any;
+    isComplete: boolean;
+  }> {
+    const response = await this.client.get('/batch/user-status');
+    return response.data.data;
+  }
+
+  /**
+   * デモデータ生成をトリガー
+   */
+  async triggerDemoDataGeneration(): Promise<{
+    message: string;
+    results: any[];
+  }> {
+    const response = await this.client.post('/batch/generate-demo');
+    return response.data;
   }
 }
 

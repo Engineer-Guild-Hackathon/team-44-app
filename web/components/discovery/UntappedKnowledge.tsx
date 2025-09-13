@@ -3,20 +3,65 @@ import { MdStar, MdSearch } from 'react-icons/md';
 import { UntappedKnowledgeItem } from '../../types/discovery';
 
 interface UntappedKnowledgeProps {
-  untappedKnowledge: UntappedKnowledgeItem;
+  knowledge: UntappedKnowledgeItem | null;
+  error?: string | null;
+  onLoad?: () => void;
   onExplore: (category: string) => void;
 }
 
 export const UntappedKnowledge: React.FC<UntappedKnowledgeProps> = ({
-  untappedKnowledge,
+  knowledge,
+  error,
+  onLoad,
   onExplore
 }) => {
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-[var(--color-error)] mb-2">⭐</div>
+        <p className="text-[var(--color-error)] text-sm mb-4">{error}</p>
+        {onLoad && (
+          <button
+            onClick={onLoad}
+            className="bg-[var(--color-accent)] hover:bg-[var(--color-primary)] text-[var(--color-text-dark)] text-sm py-2 px-4 rounded transition-colors duration-200"
+          >
+            再試行
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  if (!knowledge) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-[var(--color-muted-foreground)] mb-4">⭐</div>
+        <p className="text-[var(--color-muted-foreground)] text-sm mb-4">未開拓知識を読み込み中...</p>
+        {onLoad && (
+          <button
+            onClick={onLoad}
+            className="bg-[var(--color-accent)] hover:bg-[var(--color-primary)] text-[var(--color-text-dark)] text-sm py-2 px-4 rounded transition-colors duration-200"
+          >
+            読み込む
+          </button>
+        )}
+      </div>
+    );
+  }
+
   const handleExplore = () => {
-    if (untappedKnowledge.googleSearchQuery) {
-      window.open(`https://www.google.com/search?q=${encodeURIComponent(untappedKnowledge.googleSearchQuery)}`, '_blank');
+    if (knowledge.googleSearchQuery) {
+      window.open(`https://www.google.com/search?q=${encodeURIComponent(knowledge.googleSearchQuery)}`, '_blank');
     }
-    onExplore(untappedKnowledge.category);
+    onExplore(knowledge.category);
   };
+
+  // nextAvailableがDateオブジェクトであることを確認
+  const nextAvailableDate = knowledge.nextAvailable instanceof Date
+    ? knowledge.nextAvailable
+    : new Date(knowledge.nextAvailable);
+
+  const daysUntilNext = Math.ceil((nextAvailableDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
 
   return (
     <div className="bg-gradient-to-br from-[var(--color-info)]/10 to-[var(--color-accent)]/10 rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
@@ -29,13 +74,13 @@ export const UntappedKnowledge: React.FC<UntappedKnowledgeProps> = ({
 
       <div className="mb-4">
         <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-[var(--color-info)]/20 text-[var(--color-info)] mb-3">
-          {untappedKnowledge.category}
+          {knowledge.category}
         </div>
         <p className="text-[var(--color-text-light)] mb-3">
-          {untappedKnowledge.content}
+          {knowledge.content}
         </p>
         <p className="text-sm text-[var(--color-muted-foreground)]">
-          {untappedKnowledge.appeal}
+          {knowledge.appeal}
         </p>
       </div>
 
@@ -44,11 +89,11 @@ export const UntappedKnowledge: React.FC<UntappedKnowledgeProps> = ({
         className="w-full bg-[var(--color-primary)] hover:bg-[var(--color-accent)] text-[var(--color-text-dark)] font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
       >
         <MdSearch />
-        {untappedKnowledge.category} を探索する
+        {knowledge.category} を探索する
       </button>
 
       <div className="mt-4 text-xs text-[var(--color-muted-foreground)] text-center">
-        次回提案まで: {Math.ceil((untappedKnowledge.nextAvailable.getTime() - Date.now()) / (1000 * 60 * 60 * 24))} 日
+        次回提案まで: {daysUntilNext} 日
       </div>
     </div>
   );

@@ -10,7 +10,7 @@ import { ErrorNavigationButtons } from '../../../components/common/ErrorNavigati
 import { MdMap } from 'react-icons/md';
 
 export default function MapPage() {
-  const { interestMapData, isLoading, error, loadInterestMap } = useDiscoveryStore();
+  const { interestMapData, isLoading, error, interestMapError, loadInterestMap } = useDiscoveryStore();
   const router = useRouter();
   const [isNavOpen, setIsNavOpen] = useState(false);
 
@@ -76,16 +76,11 @@ export default function MapPage() {
             </p>
           </div>
 
-          {interestMapData ? (
-            <BasicInterestMap
-              mapData={interestMapData}
-              hasData={interestMapData.hasData}
-            />
-          ) : (
-            <div className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 text-center border border-[var(--color-border)]">
-              <p className="text-[var(--color-muted-foreground)]">興味マップを読み込み中...</p>
-            </div>
-          )}
+          <BasicInterestMap
+            data={interestMapData}
+            error={interestMapError}
+            onLoad={loadInterestMap}
+          />
 
           <div className="mt-8 text-center">
             <button

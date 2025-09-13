@@ -11,6 +11,10 @@ export const useDiscoveryStore = create<DiscoveryState & {
   loadUntappedKnowledge: () => Promise<void>;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
+  // 個別のエラークリア
+  clearTodayKnowledgeError: () => void;
+  clearInterestMapError: () => void;
+  clearUntappedKnowledgeError: () => void;
 }>((set, get) => ({
   // 初期状態
   todayKnowledge: null,
@@ -35,92 +39,71 @@ export const useDiscoveryStore = create<DiscoveryState & {
   untappedKnowledge: null,
   isLoading: false,
   error: null,
+  // 個別のエラー初期化
+  todayKnowledgeError: null,
+  interestMapError: null,
+  untappedKnowledgeError: null,
+  quizError: null,
 
   // 今日の豆知識を読み込む
   loadTodayKnowledge: async () => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, todayKnowledgeError: null });
     try {
-      // モックデータを使用
-      const mockKnowledge = {
-        id: 'mock-1',
-        category: '数学',
-        content: '微分積分は、変化率を扱う数学の分野です。日常生活でも速度や加速度などの概念に応用されています。',
-        difficulty: 'intermediate' as const,
-        tags: ['数学', '微分積分', '変化率'],
-        relatedTopics: ['物理学', '工学'],
-        createdAt: new Date(),
-        views: 0,
-        googleSearchQuery: '微分積分 基本'
-      };
-      set({ todayKnowledge: mockKnowledge, isLoading: false });
+      const response = await apiClient.getTodayKnowledge();
+      set({ todayKnowledge: response.knowledge, isLoading: false });
     } catch (error) {
-      console.error('Error loading knowledge:', error);
-      set({ error: '豆知識の読み込みに失敗しました', isLoading: false });
+      console.error('Error loading today knowledge:', error);
+      set({ todayKnowledgeError: '豆知識の読み込みに失敗しました', isLoading: false });
     }
   },
 
   // クイズを完了する
   completeQuiz: async (result: QuizResult) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, quizError: null });
     try {
-      // モックデータを使用
-      const mockQuiz = {
-        id: 'mock-quiz-1',
-        primaryCategory: 'プログラミング',
-        secondaryCategory: 'TypeScript',
-        question: 'TypeScriptの主な利点は何でしょうか？',
-        options: [
-          '実行速度が速くなる',
-          '型安全性が向上する',
-          'メモリ使用量が減る',
-          'コードの行数が減る'
-        ],
-        correctAnswer: 1,
-        explanation: 'TypeScriptは静的型付けにより、コンパイル時に型の不整合を検出できます。これにより実行時エラーを減らし、コードの品質を向上させます。',
-        googleSearchQuery: 'TypeScript 利点',
-        createdAt: new Date()
-      };
+      const response = await apiClient.submitQuizResult(result.quizId, result.selectedOption);
       const { quizResults } = get();
       set({
         quizResults: [...quizResults, result],
-        currentQuiz: mockQuiz,
         isLoading: false
       });
     } catch (error) {
       console.error('Error completing quiz:', error);
-      set({ error: 'クイズ結果の送信に失敗しました', isLoading: false });
+      set({ quizError: 'クイズ結果の送信に失敗しました', isLoading: false });
     }
   },
 
   // 興味マップを読み込む
   loadInterestMap: async () => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, interestMapError: null });
     try {
-      // モックデータを使用
-      const mockMapData = {
-        hasData: true,
-        nodes: [
-          { id: 'node-1', category: '数学', level: 75, itemsViewed: 5 },
-          { id: 'node-2', category: 'プログラミング', level: 60, itemsViewed: 4 },
-          { id: 'node-3', category: '科学', level: 45, itemsViewed: 3 },
-          { id: 'node-4', category: '歴史', level: 30, itemsViewed: 2 },
-          { id: 'node-5', category: '英語', level: 50, itemsViewed: 3 }
-        ],
-        edges: [
-          { source: 'node-1', target: 'node-2', strength: 60 },
-          { source: 'node-2', target: 'node-3', strength: 40 },
-          { source: 'node-3', target: 'node-4', strength: 30 },
-          { source: 'node-4', target: 'node-5', strength: 25 }
-        ],
-        suggestions: [
-          { category: 'プログラミング', reason: '学習記録が多い分野です' },
-          { category: '数学', reason: '基礎を固めて応用に挑戦しましょう' }
-        ]
-      };
-      set({ interestMapData: mockMapData, isLoading: false });
+      const response = await apiClient.getInterestMap();
+      set({ interestMapData: response, isLoading: false });
     } catch (error) {
       console.error('Error loading interest map:', error);
-      set({ error: '興味マップの読み込みに失敗しました', isLoading: false });
+      set({ interestMapError: '興味マップの読み込みに失敗しました', isLoading: false });
+    }
+  },
+
+  // 豆知識とのインタラクションを記録
+  interactWithKnowledge: async (knowledgeId: string, action: 'like' | 'view_detail') => {
+    try {
+      // インタラクションの記録（オプション）
+      console.log(`Knowledge interaction: ${knowledgeId}, action: ${action}`);
+    } catch (error) {
+      console.error('Error recording knowledge interaction:', error);
+    }
+  },
+
+  // 未開拓知識を読み込む
+  loadUntappedKnowledge: async () => {
+    set({ isLoading: true, untappedKnowledgeError: null });
+    try {
+      const response = await apiClient.getUntappedKnowledge();
+      set({ untappedKnowledge: response, isLoading: false });
+    } catch (error) {
+      console.error('Error loading untapped knowledge:', error);
+      set({ untappedKnowledgeError: '未開拓知識の読み込みに失敗しました', isLoading: false });
     }
   },
 
@@ -130,35 +113,9 @@ export const useDiscoveryStore = create<DiscoveryState & {
   // エラーを設定
   setError: (error: string | null) => set({ error }),
 
-  // 豆知識へのインタラクション
-  interactWithKnowledge: async (knowledgeId: string, action: 'like' | 'view_detail') => {
-    set({ isLoading: true, error: null });
-    try {
-      // API呼び出し（モック）
-      console.log(`Interacting with knowledge ${knowledgeId}: ${action}`);
-      set({ isLoading: false });
-    } catch (error) {
-      console.error('Error interacting with knowledge:', error);
-      set({ error: 'インタラクションの記録に失敗しました', isLoading: false });
-    }
-  },
-
-  // 未開拓知識を読み込む
-  loadUntappedKnowledge: async () => {
-    set({ isLoading: true, error: null });
-    try {
-      // モックデータを使用
-      const mockUntapped = {
-        category: '哲学',
-        content: '哲学は根本的な問いを探求する学問です。',
-        appeal: '哲学を学ぶことで、思考力が養われ、日常生活での判断力が向上します。',
-        googleSearchQuery: '哲学 学ぶ メリット',
-        nextAvailable: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-      };
-      set({ untappedKnowledge: mockUntapped, isLoading: false });
-    } catch (error) {
-      console.error('Error loading untapped knowledge:', error);
-      set({ error: '未開拓知識の読み込みに失敗しました', isLoading: false });
-    }
-  },
+  // 個別のエラークリア
+  clearTodayKnowledgeError: () => set({ todayKnowledgeError: null }),
+  clearInterestMapError: () => set({ interestMapError: null }),
+  clearUntappedKnowledgeError: () => set({ untappedKnowledgeError: null }),
+  clearQuizError: () => set({ quizError: null })
 }));

@@ -3,12 +3,47 @@ import { MdFavorite, MdSearch } from 'react-icons/md';
 import { KnowledgeItem } from '../../types/discovery';
 
 interface KnowledgeDisplayProps {
-  knowledge: KnowledgeItem;
+  knowledge: KnowledgeItem | null;
+  error?: string | null;
+  onLoad?: () => void;
   onDetailView?: () => void;
   onLike?: () => void;
 }
 
-export const KnowledgeDisplay: React.FC<KnowledgeDisplayProps> = ({ knowledge, onDetailView, onLike }) => {
+export const KnowledgeDisplay: React.FC<KnowledgeDisplayProps> = ({ knowledge, error, onLoad, onDetailView, onLike }) => {
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-[var(--color-error)] mb-2">⚠️</div>
+        <p className="text-[var(--color-error)] text-sm mb-4">{error}</p>
+        {onLoad && (
+          <button
+            onClick={onLoad}
+            className="bg-[var(--color-accent)] hover:bg-[var(--color-primary)] text-[var(--color-text-dark)] text-sm py-2 px-4 rounded transition-colors duration-200"
+          >
+            再試行
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  if (!knowledge) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-[var(--color-muted-foreground)] mb-4">📚</div>
+        <p className="text-[var(--color-muted-foreground)] text-sm mb-4">豆知識を読み込み中...</p>
+        {onLoad && (
+          <button
+            onClick={onLoad}
+            className="bg-[var(--color-accent)] hover:bg-[var(--color-primary)] text-[var(--color-text-dark)] text-sm py-2 px-4 rounded transition-colors duration-200"
+          >
+            読み込む
+          </button>
+        )}
+      </div>
+    );
+  }
   const handleSearchClick = () => {
     if (knowledge.googleSearchQuery) {
       const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(knowledge.googleSearchQuery)}`;

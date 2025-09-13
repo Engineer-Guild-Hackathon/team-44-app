@@ -11,7 +11,7 @@ import { ErrorNavigationButtons } from '../../../components/common/ErrorNavigati
 import { MdHelp } from 'react-icons/md';
 
 export default function QuizPage() {
-  const { currentQuiz, isLoading, error, completeQuiz, loadInterestMap } = useDiscoveryStore();
+  const { currentQuiz, isLoading, error, quizError, completeQuiz, loadInterestMap } = useDiscoveryStore();
   const [quiz, setQuiz] = useState<QuizItem | null>(null);
   const router = useRouter();
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -112,13 +112,14 @@ export default function QuizPage() {
             </p>
           </div>
 
-          {quiz ? (
-            <SimpleQuiz quiz={quiz} onAnswer={handleQuizComplete} />
-          ) : (
-            <div className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 text-center border border-[var(--color-border)]">
-              <p className="text-[var(--color-muted-foreground)]">クイズを準備中...</p>
-            </div>
-          )}
+          <SimpleQuiz
+            quiz={quiz}
+            error={quizError}
+            onLoad={() => {
+              // クイズ読み込み処理
+            }}
+            onAnswer={handleQuizComplete}
+          />
 
           <div className="mt-8 text-center">
             <button

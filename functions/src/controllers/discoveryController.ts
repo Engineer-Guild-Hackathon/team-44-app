@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import { DiscoveryService } from "../services/discoveryService";
+import { DataService } from "../services/dataService";
 import * as admin from "firebase-admin";
 
 const discoveryService = new DiscoveryService();
+const dataService = new DataService();
 
 /**
  * Firebase Auth トークンを検証してユーザー情報を取得する
@@ -32,12 +34,23 @@ export async function getLoginKnowledge(req: Request, res: Response): Promise<vo
   try {
     const userId = await validateAuth(req);
 
-    const knowledge = await discoveryService.generateKnowledgeFromHistory(userId);
+    // Firestoreから今日の豆知識を取得
+    const knowledge = await dataService.getTodayKnowledge(userId);
 
-    res.status(200).json({
-      success: true,
-      data: knowledge
-    });
+    if (knowledge) {
+      // データが存在する場合
+      res.status(200).json({
+        success: true,
+        data: knowledge
+      });
+    } else {
+      // データが存在しない場合は空のレスポンスを返す（LLM生成はバッチ処理時のみ）
+      console.log(`No cached data for user ${userId}, returning empty response`);
+      res.status(200).json({
+        success: true,
+        data: null
+      });
+    }
   } catch (error) {
     console.error("Error getting login knowledge:", error);
 
@@ -110,12 +123,23 @@ export async function getInterestMap(req: Request, res: Response): Promise<void>
   try {
     const userId = await validateAuth(req);
 
-    const mapData = await discoveryService.buildBasicInterestMap(userId);
+    // Firestoreから興味マップを取得
+    const mapData = await dataService.getInterestMap(userId);
 
-    res.status(200).json({
-      success: true,
-      data: mapData
-    });
+    if (mapData) {
+      // データが存在する場合
+      res.status(200).json({
+        success: true,
+        data: mapData
+      });
+    } else {
+      // データが存在しない場合は空のレスポンスを返す（LLM生成はバッチ処理時のみ）
+      console.log(`No cached interest map for user ${userId}, returning empty response`);
+      res.status(200).json({
+        success: true,
+        data: null
+      });
+    }
   } catch (error) {
     console.error("Error getting interest map:", error);
 
@@ -164,12 +188,23 @@ export async function getUntappedKnowledge(req: Request, res: Response): Promise
   try {
     const userId = await validateAuth(req);
 
-    const untappedKnowledge = await discoveryService.generateUntappedKnowledge(userId);
+    // Firestoreから未開拓知識を取得
+    const untappedKnowledge = await dataService.getUntappedKnowledge(userId);
 
-    res.status(200).json({
-      success: true,
-      data: untappedKnowledge
-    });
+    if (untappedKnowledge) {
+      // データが存在する場合
+      res.status(200).json({
+        success: true,
+        data: untappedKnowledge
+      });
+    } else {
+      // データが存在しない場合は空のレスポンスを返す（LLM生成はバッチ処理時のみ）
+      console.log(`No cached untapped knowledge for user ${userId}, returning empty response`);
+      res.status(200).json({
+        success: true,
+        data: null
+      });
+    }
   } catch (error) {
     console.error("Error getting untapped knowledge:", error);
 

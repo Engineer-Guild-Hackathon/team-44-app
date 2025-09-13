@@ -3,13 +3,48 @@ import { MdMap, MdCalculate, MdScience, MdBiotech, MdHistory, MdPublic, MdMenuBo
 import { InterestMapData } from '../../types/discovery';
 
 interface BasicInterestMapProps {
-  mapData: InterestMapData;
-  hasData: boolean;
+  data: InterestMapData | null;
+  error?: string | null;
+  onLoad?: () => void;
   onNodeClick?: (category: string) => void;
 }
 
-export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, hasData, onNodeClick }) => {
-  if (!hasData || !mapData.nodes || mapData.nodes.length === 0) {
+export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ data, error, onLoad, onNodeClick }) => {
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-[var(--color-error)] mb-2">🗺️</div>
+        <p className="text-[var(--color-error)] text-sm mb-4">{error}</p>
+        {onLoad && (
+          <button
+            onClick={onLoad}
+            className="bg-[var(--color-accent)] hover:bg-[var(--color-primary)] text-[var(--color-text-dark)] text-sm py-2 px-4 rounded transition-colors duration-200"
+          >
+            再試行
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-[var(--color-muted-foreground)] mb-4">🗺️</div>
+        <p className="text-[var(--color-muted-foreground)] text-sm mb-4">興味マップを読み込み中...</p>
+        {onLoad && (
+          <button
+            onClick={onLoad}
+            className="bg-[var(--color-accent)] hover:bg-[var(--color-primary)] text-[var(--color-text-dark)] text-sm py-2 px-4 rounded transition-colors duration-200"
+          >
+            読み込む
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  if (!data.hasData || !data.nodes || data.nodes.length === 0) {
     return (
       <div className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-8 border border-[var(--color-border)] text-center">
         <div className="text-6xl mb-4"> <MdMap /> </div>
@@ -17,7 +52,7 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, has
           興味マップ
         </h3>
         <p className="text-[var(--color-muted-foreground)] mb-6">
-          {mapData.placeholderMessage || '学習データを集めて興味マップを作成しましょう'}
+          {data.placeholderMessage || '学習データを集めて興味マップを作成しましょう'}
         </p>
         <div className="bg-[var(--color-muted)] rounded-lg p-6 border border-[var(--color-border)]">
           <p className="text-sm text-[var(--color-muted-foreground)]">
@@ -36,7 +71,7 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, has
 
       {/* シンプルなノード表示 */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-        {mapData.nodes.map((node) => (
+        {data.nodes.map((node) => (
           <div
             key={node.id}
             className="bg-gradient-to-br from-[var(--color-accent)] from-opacity-5 to-[var(--color-primary)] to-opacity-5 dark:from-[var(--color-accent)] dark:to-[var(--color-primary)] rounded-lg p-4 text-center hover:shadow-[var(--shadow-md)] transition-shadow cursor-pointer border border-[var(--color-border)]"
@@ -62,13 +97,13 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ mapData, has
       </div>
 
       {/* 提案セクション */}
-      {mapData.suggestions && mapData.suggestions.length > 0 && (
+      {data.suggestions && data.suggestions.length > 0 && (
         <div className="border-t border-[var(--color-border)] pt-6">
           <h4 className="text-lg font-medium text-[var(--color-text-light)] mb-4">
             次の興味分野の提案
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {mapData.suggestions.map((suggestion, index) => (
+            {data.suggestions.map((suggestion, index) => (
               <div key={index} className="bg-[var(--color-dark)] bg-opacity-5 rounded-lg p-4 border border-[var(--color-dark)] border-opacity-20">
                 <div className="flex items-center mb-2">
                   <MdLightbulb className="text-2xl mr-3 text-[var(--color-warning)]" />

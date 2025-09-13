@@ -72,4 +72,9 @@ export interface DiscoveryState {
   untappedKnowledge: UntappedKnowledgeItem | null;
   isLoading: boolean;
   error: string | null;
+  // 個別のコンポーネントエラー
+  todayKnowledgeError: string | null;
+  interestMapError: string | null;
+  untappedKnowledgeError: string | null;
+  quizError: string | null;
 }
