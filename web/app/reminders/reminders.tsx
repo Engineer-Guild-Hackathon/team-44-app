@@ -6,6 +6,8 @@ import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
 import { ReminderSettings } from './components/ReminderSettings'
 import { NotificationPrompt, checkFCMSupport } from './components/NotificationPrompt'
+import { sendDemoNotification } from '../../lib/firebaseMessaging'
+import { FaBell, FaCheckCircle, FaTimesCircle, FaQuestionCircle } from 'react-icons/fa'
 
 interface ReminderPageProps {
   // 必要に応じてpropsを追加
@@ -17,6 +19,7 @@ export default function RemindersComponent() {
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default')
   const [fcmStatus, setFcmStatus] = useState({ supported: false, serviceWorkerSupported: false });
   const [isNavOpen, setIsNavOpen] = useState(false)
+  const [isTestingNotification, setIsTestingNotification] = useState(false)
   const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
 
   // ルートが変わったら自動でサイドバーを閉じる
@@ -48,6 +51,21 @@ export default function RemindersComponent() {
   const handleNotificationPermissionDenied = () => {
     setNotificationPermission('denied')
     setShowNotificationPrompt(false)
+  }
+
+  // デモ通知を送信する関数
+  const handleTestNotification = async () => {
+    setIsTestingNotification(true);
+    try {
+      await sendDemoNotification();
+      // 成功メッセージを表示（オプション）
+      alert('デモ通知を送信しました！通知が表示されない場合は、ブラウザの通知設定を確認してください。');
+    } catch (error) {
+      console.error('デモ通知送信エラー:', error);
+      alert('通知の送信に失敗しました。通知権限が許可されているか確認してください。');
+    } finally {
+      setIsTestingNotification(false);
+    }
   }
 
   return (
@@ -89,30 +107,47 @@ export default function RemindersComponent() {
 
                 {/* 通知権限のステータス表示 */}
                 <div className="mb-6 p-6 bg-[var(--color-bg-light)] border border-[var(--color-border)] rounded-xl shadow-lg">
-                  <h2 className="text-lg font-semibold text-[var(--color-text-light)] mb-4">通知の状態</h2>
-                  
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-[var(--color-text-light)]">通知の状態</h2>
+                    <button
+                      onClick={handleTestNotification}
+                      disabled={isTestingNotification}
+                      className={`btn-secondary disabled:opacity-50 disabled:cursor-not-allowed flex items-center whitespace-nowrap
+                        ${isTestingNotification ? '' : 'bg-[var(--color-muted)] text-[var(--color-muted-foreground)]'
+                        }`}
+                    >
+                      <FaBell size={16} className="mr-2 text-[var(--color-warning)]" />
+                      {isTestingNotification ? '送信中...' : '通知テスト'}
+                    </button>
+                  </div>
+
                   {/* 基本通知権限 */}
                   <div className="flex items-center space-x-3 mb-3">
-                    <div className={`w-4 h-4 rounded-full ${notificationPermission === 'granted' ? 'bg-[var(--color-success)]' :
-                      notificationPermission === 'denied' ? 'bg-[var(--color-error)]' : 'bg-[var(--color-warning)]'
-                      }`}></div>
+                    {notificationPermission === 'granted' && <FaCheckCircle size={16} className="text-[var(--color-success)]" />}
+                    {notificationPermission === 'denied' && <FaTimesCircle size={16} className="text-[var(--color-error)]" />}
+                    {notificationPermission === 'default' && <FaQuestionCircle size={16} className="text-[var(--color-warning)]" />}
                     <span className="text-sm text-[var(--color-text-light)]">
                       {notificationPermission === 'granted' && '通知が有効です'}
                       {notificationPermission === 'denied' && '通知が無効です'}
                       {notificationPermission === 'default' && '通知の許可が必要です'}
                     </span>
                   </div>
+                  {(notificationPermission === 'denied' || notificationPermission === 'default') && (
+                    <div className="text-xs text-[var(--color-muted-foreground)] ml-7 mb-3">
+                      通知を有効にするには、ブラウザの設定から通知を許可してください。
+                    </div>
+                  )}
 
                   {/* PWA/FCMサポート状況 */}
                   <div className="space-y-2 pl-7">
                     <div className="flex items-center space-x-2">
-                      <div className={`w-2 h-2 rounded-full ${fcmStatus.serviceWorkerSupported ? 'bg-[var(--color-success)]' : 'bg-[var(--color-error)]'}`}></div>
+                      {fcmStatus.serviceWorkerSupported ? <FaCheckCircle size={12} className="text-[var(--color-success)]" /> : <FaTimesCircle size={12} className="text-[var(--color-error)]" />}
                       <span className="text-xs text-[var(--color-muted-foreground)]">
                         Service Worker: {fcmStatus.serviceWorkerSupported ? '対応' : '非対応'}
                       </span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <div className={`w-2 h-2 rounded-full ${fcmStatus.supported ? 'bg-[var(--color-success)]' : 'bg-[var(--color-error)]'}`}></div>
+                      {fcmStatus.supported ? <FaCheckCircle size={12} className="text-[var(--color-success)]" /> : <FaTimesCircle size={12} className="text-[var(--color-error)]" />}
                       <span className="text-xs text-[var(--color-muted-foreground)]">
                         PWA通知: {fcmStatus.supported ? '対応' : '非対応'}
                       </span>
