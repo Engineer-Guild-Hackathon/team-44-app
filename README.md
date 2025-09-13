@@ -92,7 +92,7 @@ cd functions && npm run deploy
 ---
 
 ## デモ / プレゼン資料
-- デモURL: (デプロイ後に更新)
+- デモURL: https://tothlus.vercel.app/chat/
 - プレゼンURL: https://docs.google.com/presentation/d/1tuaVaOBQiEgH6zRTTIhsU3APmeiQyEirYKwaF8_ImOg/edit?usp=sharing
 
 ## ライセンス
