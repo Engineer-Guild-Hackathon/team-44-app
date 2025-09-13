@@ -153,7 +153,20 @@ export async function getInterestMap(req: Request, res: Response): Promise<void>
           ],
           edges: [],
           placeholderMessage: "学習を始めるためのサンプルカテゴリ",
-          suggestions: []
+          suggestions: [
+            {
+              category: 'AI・機械学習',
+              reason: 'プログラミングの次のステップとして、AI技術を学ぶことで将来のキャリアに役立ちます'
+            },
+            {
+              category: 'データサイエンス',
+              reason: '数学の知識を活かして、データを分析するスキルを身につけられます'
+            },
+            {
+              category: '環境科学',
+              reason: '科学の基礎知識を活かして、持続可能な未来について学ぶことができます'
+            }
+          ]
         },
         message: "デフォルトの興味マップを表示しています"
       });

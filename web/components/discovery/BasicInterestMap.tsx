@@ -55,6 +55,22 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ data, error,
       { id: 'art', category: '芸術', level: 1, itemsViewed: 0 }
     ];
 
+    // デフォルトの提案データ
+    const defaultSuggestions = [
+      {
+        category: 'AI・機械学習',
+        reason: 'プログラミングの次のステップとして、AI技術を学ぶことで将来のキャリアに役立ちます'
+      },
+      {
+        category: 'データサイエンス',
+        reason: '数学の知識を活かして、データを分析するスキルを身につけられます'
+      },
+      {
+        category: '環境科学',
+        reason: '科学の基礎知識を活かして、持続可能な未来について学ぶことができます'
+      }
+    ];
+
     return (
       <div className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
         <h3 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 text-center">
@@ -88,7 +104,29 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ data, error,
           ))}
         </div>
 
-        <div className="text-center">
+        {/* デフォルトの提案セクション */}
+        <div className="border-t border-[var(--color-border)] pt-6">
+          <h4 className="text-lg font-medium text-[var(--color-text-light)] mb-4">
+            次の興味分野の提案（デモ）
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {defaultSuggestions.map((suggestion, index) => (
+              <div key={index} className="bg-[var(--color-dark)] bg-opacity-5 rounded-lg p-4 border border-[var(--color-dark)] border-opacity-20">
+                <div className="flex items-center mb-2">
+                  <MdLightbulb className="text-2xl mr-3 text-[var(--color-warning)]" />
+                  <h5 className="font-medium text-[var(--color-text-light)]">
+                    {suggestion.category}
+                  </h5>
+                </div>
+                <p className="text-sm text-[var(--color-muted-foreground)]">
+                  {suggestion.reason}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="text-center mt-6">
           <p className="text-sm text-[var(--color-muted-foreground)] mb-4">
             学習を始めると、あなたの興味分野が可視化され、新しい発見につながります
           </p>
