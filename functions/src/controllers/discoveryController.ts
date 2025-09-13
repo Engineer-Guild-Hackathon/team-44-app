@@ -229,12 +229,18 @@ export async function getUntappedKnowledge(req: Request, res: Response): Promise
         data: untappedKnowledge
       });
     } else {
-      // データが存在しない場合は空のレスポンスを返す（LLM生成はバッチ処理時のみ）
-      console.log(`No cached untapped knowledge for user ${userId}, returning empty response`);
+      // データが存在しない場合はデフォルトの未開拓知識データを返す
+      console.log(`No cached untapped knowledge for user ${userId}, returning default data`);
       res.status(200).json({
         success: true,
-        data: null,
-        message: "新しい発見はまだ準備中です"
+        data: {
+          category: '哲学',
+          content: '「なぜ生きるのか？」という根本的な問いから始まる哲学は、日常生活のあらゆる側面に影響を与えます。',
+          appeal: '論理的思考力を養い、人生の意味について深く考えるきっかけになります。',
+          googleSearchQuery: '哲学 入門 なぜ生きるのか',
+          nextAvailable: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7日後
+        },
+        message: "デフォルトの未開拓知識を表示しています"
       });
     }
   } catch (error) {

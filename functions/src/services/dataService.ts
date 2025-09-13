@@ -159,10 +159,25 @@ export class DataService {
         return data.content;
       }
 
-      return null;
+      // データが存在しない場合はデフォルトの未開拓知識データを返す
+      console.log(`No untapped knowledge data found for user ${userId}, returning default data`);
+      return {
+        category: '哲学',
+        content: '「なぜ生きるのか？」という根本的な問いから始まる哲学は、日常生活のあらゆる側面に影響を与えます。',
+        appeal: '論理的思考力を養い、人生の意味について深く考えるきっかけになります。',
+        googleSearchQuery: '哲学 入門 なぜ生きるのか',
+        nextAvailable: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7日後
+      };
     } catch (error) {
       console.error("Error getting untapped knowledge:", error);
-      return null;
+      // エラーの場合もデフォルトデータを返す
+      return {
+        category: '哲学',
+        content: '「なぜ生きるのか？」という根本的な問いから始まる哲学は、日常生活のあらゆる側面に影響を与えます。',
+        appeal: '論理的思考力を養い、人生の意味について深く考えるきっかけになります。',
+        googleSearchQuery: '哲学 入門 なぜ生きるのか',
+        nextAvailable: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7日後
+      };
     }
   }
 
