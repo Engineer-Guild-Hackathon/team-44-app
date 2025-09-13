@@ -1,8 +1,10 @@
 import { Request, Response } from "express";
 import { DiscoveryService } from "../services/discoveryService";
+import { DataService } from "../services/dataService";
 import * as admin from "firebase-admin";
 
 const discoveryService = new DiscoveryService();
+const dataService = new DataService();
 
 /**
  * Firebase Auth トークンを検証してユーザー情報を取得する
@@ -32,12 +34,27 @@ export async function getLoginKnowledge(req: Request, res: Response): Promise<vo
   try {
     const userId = await validateAuth(req);
 
-    const knowledge = await discoveryService.generateKnowledgeFromHistory(userId);
+    // Firestoreから今日の豆知識を取得
+    const knowledge = await dataService.getTodayKnowledge(userId);
 
-    res.status(200).json({
-      success: true,
-      data: knowledge
-    });
+    if (knowledge) {
+      // データが存在する場合
+      res.status(200).json({
+        success: true,
+        data: knowledge
+      });
+    } else {
+      // データが存在しない場合は空のレスポンスを返す（LLM生成はバッチ処理時のみ）
+      console.log(`No cached data for user ${userId}, returning empty response`);
+      res.status(200).json({
+        success: true,
+        data: {
+          knowledge: null,
+          connectionToUserInterests: null
+        },
+        message: "今日の豆知識はまだ準備中です"
+      });
+    }
   } catch (error) {
     console.error("Error getting login knowledge:", error);
 
@@ -110,14 +127,124 @@ export async function getInterestMap(req: Request, res: Response): Promise<void>
   try {
     const userId = await validateAuth(req);
 
-    const mapData = await discoveryService.buildBasicInterestMap(userId);
+    // Firestoreから興味マップを取得
+    const mapData = await dataService.getInterestMap(userId);
+
+    if (mapData) {
+      // データが存在する場合
+      res.status(200).json({
+        success: true,
+        data: mapData
+      });
+    } else {
+      // データが存在しない場合はデフォルトの興味マップデータを返す
+      console.log(`No cached interest map for user ${userId}, returning default data`);
+      res.status(200).json({
+        success: true,
+        data: {
+          hasData: false,
+          nodes: [
+            { id: "programming", category: "プログラミング", level: 1, itemsViewed: 0 },
+            { id: "math", category: "数学", level: 1, itemsViewed: 0 },
+            { id: "science", category: "科学", level: 1, itemsViewed: 0 },
+            { id: "history", category: "歴史", level: 1, itemsViewed: 0 },
+            { id: "language", category: "言語", level: 1, itemsViewed: 0 },
+            { id: "art", category: "芸術", level: 1, itemsViewed: 0 }
+          ],
+          edges: [],
+          placeholderMessage: "学習を始めるためのサンプルカテゴリ",
+          suggestions: [
+            {
+              category: "AI・機械学習",
+              reason: "プログラミングの次のステップとして、AI技術を学ぶことで将来のキャリアに役立ちます"
+            },
+            {
+              category: "データサイエンス",
+              reason: "数学の知識を活かして、データを分析するスキルを身につけられます"
+            },
+            {
+              category: "環境科学",
+              reason: "科学の基礎知識を活かして、持続可能な未来について学ぶことができます"
+            }
+          ]
+        },
+        message: "デフォルトの興味マップを表示しています"
+      });
+    }
+  } catch (error) {
+    console.error("Error getting interest map:", error);
+
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+}
+
+/**
+ * 豆知識へのインタラクションを記録
+ */
+export async function interactWithKnowledge(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = await validateAuth(req);
+    const { knowledgeId, action } = req.body;
+
+    if (!knowledgeId || !action || !["like", "view_detail"].includes(action)) {
+      res.status(400).json({ error: "knowledgeId and valid action are required" });
+      return;
+    }
+
+    const result = await discoveryService.recordKnowledgeInteraction(userId, knowledgeId, action);
 
     res.status(200).json({
       success: true,
-      data: mapData
+      data: result
     });
   } catch (error) {
-    console.error("Error getting interest map:", error);
+    console.error("Error recording knowledge interaction:", error);
+
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+}
+
+/**
+ * 未開拓ジャンルの魅力を説明する豆知識を取得
+ */
+export async function getUntappedKnowledge(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = await validateAuth(req);
+
+    // Firestoreから未開拓知識を取得
+    const untappedKnowledge = await dataService.getUntappedKnowledge(userId);
+
+    if (untappedKnowledge) {
+      // データが存在する場合
+      res.status(200).json({
+        success: true,
+        data: untappedKnowledge
+      });
+    } else {
+      // データが存在しない場合はデフォルトの未開拓知識データを返す
+      console.log(`No cached untapped knowledge for user ${userId}, returning default data`);
+      res.status(200).json({
+        success: true,
+        data: {
+          category: "哲学",
+          content: "「なぜ生きるのか？」という根本的な問いから始まる哲学は、日常生活のあらゆる側面に影響を与えます。",
+          appeal: "論理的思考力を養い、人生の意味について深く考えるきっかけになります。",
+          googleSearchQuery: "哲学 入門 なぜ生きるのか",
+          nextAvailable: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7日後
+        },
+        message: "デフォルトの未開拓知識を表示しています"
+      });
+    }
+  } catch (error) {
+    console.error("Error getting untapped knowledge:", error);
 
     if (error instanceof Error) {
       res.status(500).json({ error: error.message });

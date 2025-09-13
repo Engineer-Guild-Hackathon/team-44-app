@@ -8,6 +8,7 @@ import {
   LearningRecord,
   LearningRecordsResponse
 } from "../types/api";
+import { UntappedKnowledgeItem } from "../types/discovery";
 
 // Additional types for reminders
 interface Reminder {
@@ -209,7 +210,14 @@ class ApiClient {
    */
   async getTodayKnowledge(): Promise<{ knowledge: any; connectionToUserInterests?: string }> {
     const response = await this.client.get('/discovery/knowledge');
-    return response.data.data;
+    const result = response.data;
+
+    if (result.success && result.data) {
+      return result.data;
+    }
+
+    // データが存在しない場合はnullを返す
+    return { knowledge: null, connectionToUserInterests: null };
   }
 
   /**
@@ -233,7 +241,100 @@ class ApiClient {
    */
   async getInterestMap(): Promise<any> {
     const response = await this.client.get('/discovery/map');
+    const result = response.data;
+
+    if (result.success && result.data) {
+      return result.data;
+    }
+
+    // データが存在しない場合はデフォルトの興味マップデータを返す
+    return {
+      hasData: false,
+      nodes: [
+        { id: 'programming', category: 'プログラミング', level: 1, itemsViewed: 0 },
+        { id: 'math', category: '数学', level: 1, itemsViewed: 0 },
+        { id: 'science', category: '科学', level: 1, itemsViewed: 0 },
+        { id: 'history', category: '歴史', level: 1, itemsViewed: 0 },
+        { id: 'language', category: '言語', level: 1, itemsViewed: 0 },
+        { id: 'art', category: '芸術', level: 1, itemsViewed: 0 }
+      ],
+      edges: [],
+      placeholderMessage: "学習を始めるためのサンプルカテゴリ",
+      suggestions: [
+        {
+          category: 'AI・機械学習',
+          reason: 'プログラミングの次のステップとして、AI技術を学ぶことで将来のキャリアに役立ちます'
+        },
+        {
+          category: 'データサイエンス',
+          reason: '数学の知識を活かして、データを分析するスキルを身につけられます'
+        },
+        {
+          category: '環境科学',
+          reason: '科学の基礎知識を活かして、持続可能な未来について学ぶことができます'
+        }
+      ]
+    };
+  }
+
+  /**
+   * 未開拓知識を取得
+   */
+  async getUntappedKnowledge(): Promise<UntappedKnowledgeItem> {
+    const response = await this.client.get('/discovery/untapped');
+    const result = response.data;
+
+    if (result.success && result.data) {
+      return result.data;
+    }
+
+    // データが存在しない場合はデフォルトの未開拓知識データを返す
+    return {
+      category: '哲学',
+      content: '「なぜ生きるのか？」という根本的な問いから始まる哲学は、日常生活のあらゆる側面に影響を与えます。',
+      appeal: '論理的思考力を養い、人生の意味について深く考えるきっかけになります。',
+      googleSearchQuery: '哲学 入門 なぜ生きるのか',
+      nextAvailable: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7日後
+    };
+  }
+
+  /**
+   * バッチ処理の状態を取得
+   */
+  async getBatchStatus(): Promise<{
+    activeUsersCount: number;
+    checkedUsersCount: number;
+    completeUsersCount: number;
+    completionRate: number;
+    userStatuses: any[];
+  }> {
+    const response = await this.client.get('/batch/status');
     return response.data.data;
+  }
+
+  /**
+   * ユーザーのデータ状態を取得
+   */
+  async getUserDataStatus(): Promise<{
+    userId: string;
+    todayKnowledge: any;
+    interestMap: any;
+    untappedKnowledge: any;
+    isComplete: boolean;
+  }> {
+    const response = await this.client.get('/batch/user-status');
+    return response.data.data;
+  }
+
+  /**
+   * デモデータ生成をトリガー
+   */
+  async triggerDemoDataGeneration(): Promise<{
+    message: string;
+    results: any[];
+  }> {
+    const response = await this.client.post('/batch/generate-demo');
+    return response.data;
   }
 }
 

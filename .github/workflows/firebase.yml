@@ -13,11 +13,6 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
 
-    env:
-      LLM_PROVIDER: ${{ secrets.LLM_PROVIDER || 'gemini' }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,7 +29,11 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "LLM_PROVIDER=${{ secrets.LLM_PROVIDER || 'gemini' }}" > .env
+          if [ -n "${{ secrets.LLM_PROVIDER }}" ]; then
+            echo "LLM_PROVIDER=${{ secrets.LLM_PROVIDER }}" > .env
+          else
+            echo "LLM_PROVIDER=gemini" > .env
+          fi
           if [ -n "${{ secrets.OPENAI_API_KEY }}" ]; then
             echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
           fi
@@ -55,7 +54,3 @@ jobs:
             --only functions,firestore:rules \
             --non-interactive \
             --force
-        env:
-          LLM_PROVIDER: ${{ secrets.LLM_PROVIDER || 'gemini' }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}

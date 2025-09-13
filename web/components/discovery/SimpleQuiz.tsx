@@ -1,15 +1,52 @@
 import React, { useState } from 'react';
+import { MdHelp } from 'react-icons/md';
 import { QuizItem, QuizResult } from '../../types/discovery';
 
 interface SimpleQuizProps {
-  quiz: QuizItem;
+  quiz: QuizItem | null;
+  error?: string | null;
+  onLoad?: () => void;
   onAnswer: (result: QuizResult) => void;
 }
 
-export const SimpleQuiz: React.FC<SimpleQuizProps> = ({ quiz, onAnswer }) => {
+export const SimpleQuiz: React.FC<SimpleQuizProps> = ({ quiz, error, onLoad, onAnswer }) => {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <MdHelp className="text-[var(--color-error)] text-2xl mb-2 mx-auto" />
+        <p className="text-[var(--color-error)] text-sm mb-4">{error}</p>
+        {onLoad && (
+          <button
+            onClick={onLoad}
+            className="bg-[var(--color-accent)] hover:bg-[var(--color-primary)] text-[var(--color-text-dark)] text-sm py-2 px-4 rounded transition-colors duration-200"
+          >
+            再試行
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  if (!quiz) {
+    return (
+      <div className="text-center py-8">
+        <MdHelp className="text-[var(--color-muted-foreground)] text-2xl mb-4 mx-auto" />
+        <p className="text-[var(--color-muted-foreground)] text-sm mb-4">クイズを読み込み中...</p>
+        {onLoad && (
+          <button
+            onClick={onLoad}
+            className="bg-[var(--color-accent)] hover:bg-[var(--color-primary)] text-[var(--color-text-dark)] text-sm py-2 px-4 rounded transition-colors duration-200"
+          >
+            読み込む
+          </button>
+        )}
+      </div>
+    );
+  }
 
   const handleOptionSelect = (optionIndex: number) => {
     setSelectedOption(optionIndex);

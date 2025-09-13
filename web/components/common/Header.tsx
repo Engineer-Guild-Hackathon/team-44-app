@@ -45,7 +45,7 @@ export default function Header({ onMenuClick, isNavOpen, onToggleNav, user, onNe
               </button>
             )}
 
-            <Link href="/" className="flex items-center space-x-3">
+            <Link href="/chat/" className="flex items-center space-x-3">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center">
                 <Image src="/icon-192.svg" alt="tothlus logo" width={32} height={32} className="w-8 h-8" />
               </div>

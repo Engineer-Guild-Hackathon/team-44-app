@@ -45,7 +45,7 @@ export default function ChatView({ messages, isLoading = false, todayKnowledge }
                       const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(todayKnowledge.googleSearchQuery)}`;
                       window.open(searchUrl, '_blank');
                     }}
-                    className="text-blue-600 hover:text-blue-800 text-sm font-medium underline"
+                    className="text-[var(--color-info)] hover:text-[var(--color-info-hover)] text-sm font-medium underline"
                   >
                     もっと詳しく調べる
                   </button>
@@ -56,15 +56,10 @@ export default function ChatView({ messages, isLoading = false, todayKnowledge }
               </div>
             </div>
           ) : (
-            <>
-              <div className="mb-4">
-                <svg className="w-16 h-16 mx-auto text-[var(--color-accent)] opacity-50" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </svg>
-              </div>
+            <div>
               <p className="text-lg font-medium mb-2">知識の探求を始めましょう</p>
               <p className="text-sm">わからない問題や疑問を入力してください。AIがヒントを提供します。</p>
-            </>
+            </div>
           )}
         </div>
       )}

@@ -16,7 +16,8 @@ if (!admin.apps.length) {
 import { createSession, createSmartSession, postMessage, getUserSessions, getSession, completeSession } from "./controllers/chatController";
 import { generateLearningRecord, getUserLearningRecords, getLearningRecord, getLearningRecordsForPeriod, createManualLearningRecord } from "./controllers/learningRecordController";
 import { getReminders, getReminderSettings, updateReminderSettings, updateReminderStatus, registerFCMToken } from "./controllers/reminderController";
-import { getLoginKnowledge, getWeeklyQuiz, submitQuizResult, getInterestMap } from "./controllers/discoveryController";
+import { getLoginKnowledge, getWeeklyQuiz, submitQuizResult, getInterestMap, getUntappedKnowledge } from "./controllers/discoveryController";
+import { getBatchStatus, getUserDataStatus, triggerDemoDataGeneration } from "./controllers/batchController";
 
 const app = express();
 
@@ -59,6 +60,12 @@ app.get("/discovery/knowledge", getLoginKnowledge);
 app.get("/discovery/quiz", getWeeklyQuiz);
 app.post("/discovery/quiz/result", submitQuizResult);
 app.get("/discovery/map", getInterestMap);
+app.get("/discovery/untapped", getUntappedKnowledge);
+
+// Batch routes
+app.get("/batch/status", getBatchStatus);
+app.get("/batch/user-status", getUserDataStatus);
+app.post("/batch/generate-demo", triggerDemoDataGeneration);
 
 // ヘルスチェック用エンドポイント
 app.get("/health", async (req: Request, res: Response) => {
@@ -128,6 +135,9 @@ app.use("*", (req: Request, res: Response) => {
 });
 
 export const api = functions.https.onRequest(app);
+
+// Batch functions
+export { generateDiscoveryData, generateUserDiscoveryData, generateDemoData } from './batch';
 
 // Scheduled function to process pending reminders
 export const processReminders = functions.pubsub.schedule('every 10 minutes').onRun(async () => {

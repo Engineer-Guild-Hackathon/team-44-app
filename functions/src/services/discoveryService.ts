@@ -274,4 +274,73 @@ export class DiscoveryService {
       createdAt: new Date()
     };
   }
+
+  /**
+   * 豆知識へのインタラクションを記録
+   */
+  async recordKnowledgeInteraction(userId: string, knowledgeId: string, action: "like" | "view_detail"): Promise<{ success: boolean; message: string }> {
+    try {
+      const interactionRef = this.db.collection("knowledge_interactions").doc();
+      await interactionRef.set(this.sanitizeForFirestore({
+        userId,
+        knowledgeId,
+        action,
+        timestamp: new Date()
+      }));
+
+      return {
+        success: true,
+        message: "インタラクションを記録しました"
+      };
+    } catch (error) {
+      console.error("Error recording knowledge interaction:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * 未開拓ジャンルの魅力を説明する豆知識を生成
+   */
+  async generateUntappedKnowledge(userId: string): Promise<{ untappedKnowledge: any; nextAvailable: Date }> {
+    try {
+      const learningRecords = await this.getUserLearningRecords(userId);
+      const learnedSubjects = [...new Set(learningRecords.map(record => record.subject))];
+
+      // 未開拓ジャンルのリスト（プロトタイプ用）
+      const untappedCategories = ["哲学", "歴史", "芸術", "音楽", "文学", "心理学", "経済学", "社会学"];
+      const learnedCategories = learnedSubjects.filter(subject => untappedCategories.includes(subject));
+      const availableCategories = untappedCategories.filter(category => !learnedCategories.includes(category));
+
+      if (availableCategories.length === 0) {
+        return {
+          untappedKnowledge: null,
+          nextAvailable: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 1週間後
+        };
+      }
+
+      // ランダムに未開拓ジャンルを選択
+      const randomCategory = availableCategories[Math.floor(Math.random() * availableCategories.length)];
+
+      // LLMで魅力説明を生成
+      const appeal = await this.llm.generateCategoryAppeal(randomCategory, learnedSubjects);
+
+      const untappedKnowledge = {
+        category: randomCategory,
+        content: appeal.content,
+        appeal: appeal.appeal,
+        googleSearchQuery: `${randomCategory} 学ぶ メリット`
+      };
+
+      return {
+        untappedKnowledge,
+        nextAvailable: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 1週間後
+      };
+    } catch (error) {
+      console.error("Error generating untapped knowledge:", error);
+      return {
+        untappedKnowledge: null,
+        nextAvailable: new Date(Date.now() + 24 * 60 * 60 * 1000) // 1日後
+      };
+    }
+  }
 }

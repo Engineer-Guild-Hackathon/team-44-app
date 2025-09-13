@@ -29,6 +29,74 @@ export class DiscoveryLLM {
   }
 
   /**
+   * LLMレスポンスからJSONを安全にパースする汎用関数
+   * 複数のケースに対応：
+   * 1. { から始まっている場合
+   * 2. ```json ``` が付いている場合
+   * 3. 初めに文章があってJSONが途中にある場合
+   */
+  private parseLLMResponse(response: string): any {
+    if (!response || typeof response !== 'string') {
+      throw new Error('Invalid response: response must be a non-empty string');
+    }
+
+    let jsonString = response.trim();
+
+    // ケース1: ```json ブロックの場合
+    if (jsonString.includes('```json')) {
+      const jsonMatch = jsonString.match(/```json\s*(\{[\s\S]*?\})\s*```/);
+      if (jsonMatch) {
+        jsonString = jsonMatch[1].trim();
+      } else {
+        // ```json があっても正しい形式でない場合
+        jsonString = jsonString.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+      }
+    }
+    // ケース2: ``` ブロックの場合（json指定なし）
+    else if (jsonString.includes('```')) {
+      const codeMatch = jsonString.match(/```\s*(\{[\s\S]*?\})\s*```/);
+      if (codeMatch) {
+        jsonString = codeMatch[1].trim();
+      } else {
+        jsonString = jsonString.replace(/^```\s*/, '').replace(/\s*```$/, '');
+      }
+    }
+    // ケース3: 文章の後にJSONがある場合
+    else if (!jsonString.startsWith('{')) {
+      // JSONオブジェクトの開始を探す
+      const jsonStartIndex = jsonString.indexOf('{');
+      if (jsonStartIndex !== -1) {
+        // JSONの終わりを探す（最後の } まで）
+        let braceCount = 0;
+        let jsonEndIndex = jsonStartIndex;
+        for (let i = jsonStartIndex; i < jsonString.length; i++) {
+          if (jsonString[i] === '{') {
+            braceCount++;
+          } else if (jsonString[i] === '}') {
+            braceCount--;
+            if (braceCount === 0) {
+              jsonEndIndex = i;
+              break;
+            }
+          }
+        }
+        if (braceCount === 0) {
+          jsonString = jsonString.substring(jsonStartIndex, jsonEndIndex + 1);
+        }
+      }
+    }
+
+    // 最終的にJSONとしてパースを試行
+    try {
+      return JSON.parse(jsonString);
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      console.error('Attempted to parse:', jsonString);
+      throw new Error(`Failed to parse JSON response: ${(parseError as Error).message}`);
+    }
+  }
+
+  /**
    * ユーザーの学習分野から豆知識を生成
    */
   async generateKnowledge(subjects: string[], topics: string[]): Promise<KnowledgeItem> {
@@ -57,15 +125,8 @@ export class DiscoveryLLM {
     try {
       const response = await this.llmProvider.generateResponse([], prompt);
 
-      // LLMレスポンスからJSONを抽出（```json ブロックを考慮）
-      let jsonString = response.trim();
-      if (jsonString.startsWith('```json')) {
-        jsonString = jsonString.replace(/^```json\s*/, '').replace(/\s*```$/, '');
-      } else if (jsonString.startsWith('```')) {
-        jsonString = jsonString.replace(/^```\s*/, '').replace(/\s*```$/, '');
-      }
-
-      const parsed = JSON.parse(jsonString);
+      // LLMレスポンスからJSONを抽出してパース
+      const parsed = this.parseLLMResponse(response);
 
       return {
         category: parsed.category || 'general',
@@ -115,15 +176,8 @@ export class DiscoveryLLM {
     try {
       const response = await this.llmProvider.generateResponse([], prompt);
 
-      // LLMレスポンスからJSONを抽出（```json ブロックを考慮）
-      let jsonString = response.trim();
-      if (jsonString.startsWith('```json')) {
-        jsonString = jsonString.replace(/^```json\s*/, '').replace(/\s*```$/, '');
-      } else if (jsonString.startsWith('```')) {
-        jsonString = jsonString.replace(/^```\s*/, '').replace(/\s*```$/, '');
-      }
-
-      const parsed = JSON.parse(jsonString);
+      // LLMレスポンスからJSONを抽出してパース
+      const parsed = this.parseLLMResponse(response);
 
       return {
         primaryCategory: parsed.primaryCategory || 'general',
@@ -167,15 +221,8 @@ export class DiscoveryLLM {
     try {
       const response = await this.llmProvider.generateResponse([], prompt);
 
-      // LLMレスポンスからJSONを抽出（```json ブロックを考慮）
-      let jsonString = response.trim();
-      if (jsonString.startsWith('```json')) {
-        jsonString = jsonString.replace(/^```json\s*/, '').replace(/\s*```$/, '');
-      } else if (jsonString.startsWith('```')) {
-        jsonString = jsonString.replace(/^```\s*/, '').replace(/\s*```$/, '');
-      }
-
-      return JSON.parse(jsonString);
+      // LLMレスポンスからJSONを抽出してパース
+      return this.parseLLMResponse(response);
     } catch (error) {
       console.error('Error generating suggestions:', error);
       return [
@@ -183,6 +230,36 @@ export class DiscoveryLLM {
         { category: '歴史', reason: '背景知識を深める' },
         { category: '芸術', reason: '創造性を高める' }
       ];
+    }
+  }
+
+  /**
+   * 未開拓ジャンルの魅力を説明
+   */
+  async generateCategoryAppeal(category: string, learnedSubjects: string[]): Promise<{ content: string; appeal: string }> {
+    const prompt = `
+学習済み分野: ${learnedSubjects.join(', ')}
+提案ジャンル: ${category}
+
+${category}の魅力を、学習済み分野との関連を踏まえて説明してください。
+出力は以下の形式で：
+{
+  "content": "${category}は、[学習済み分野]の理解を深める上で重要な分野です。",
+  "appeal": "${category}を学ぶことで得られる3つのメリットを簡潔に説明"
+}
+`;
+
+    try {
+      const response = await this.llmProvider.generateResponse([], prompt);
+
+      // LLMレスポンスからJSONを抽出してパース
+      return this.parseLLMResponse(response);
+    } catch (error) {
+      console.error('Error generating category appeal:', error);
+      return {
+        content: `${category}は新しい視点を提供する興味深い分野です。`,
+        appeal: `${category}を学ぶことで、視野が広がり、新しい発見が待っています。`
+      };
     }
   }
 }

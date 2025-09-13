@@ -28,8 +28,33 @@ const nextConfig = {
       return !plugin.constructor.name.includes('TraceEntryPointsPlugin');
     });
 
+    // MUIの最適化
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      // '@mui/material': '@mui/material/esm',
+      // '@mui/icons-material': '@mui/icons-material/esm',
+    };
+
+    // バンドルアナライザー
+    if (process.env.ANALYZE) {
+      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+      config.plugins.push(
+        new BundleAnalyzerPlugin({
+          analyzerMode: 'static',
+          reportFilename: './analyze/client.html',
+          openAnalyzer: false,
+        })
+      );
+    }
+
     return config;
   },
+  // バンドルサイズ最適化
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  // 不要なpolyfillを除外
+  excludeDefaultMomentLocales: true,
 }
 
 module.exports = nextConfig

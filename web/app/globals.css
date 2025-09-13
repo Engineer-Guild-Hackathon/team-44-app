@@ -17,6 +17,7 @@
   --color-warning: #B8860B; /* アンバー */
   --color-error: #A85A5A; /* ダークローズ */
   --color-info: #70aac9; /* スレートブルー */
+  --color-info-hover: #4682B4; /* スチールブルー */
   --color-border: #E5E5E5;
   --color-muted: #F0F0F0;
   --color-muted-foreground: #888888;
@@ -62,6 +63,7 @@
   --color-warning: #FFD700; /* ブライトアンバー */
   --color-error: #CD5C5C; /* ブライトレッド */
   --color-info: #87CEEB; /* スカイブルー */
+  --color-info-hover: #4682B4; /* スチールブルー */
   --color-border: #404040;
   --color-muted: #2A2A2A;
   --color-muted-foreground: #CCCCCC;
