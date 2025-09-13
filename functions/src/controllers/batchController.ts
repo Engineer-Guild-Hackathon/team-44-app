@@ -66,7 +66,7 @@ export async function getBatchStatus(req: Request, res: Response): Promise<void>
     console.error("Error getting batch status:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
       timestamp: new Date().toISOString()
     });
   }
@@ -108,7 +108,7 @@ export async function getUserDataStatus(req: Request, res: Response): Promise<vo
     console.error("Error getting user data status:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
       timestamp: new Date().toISOString()
     });
   }
@@ -122,7 +122,7 @@ export async function triggerDemoDataGeneration(req: Request, res: Response): Pr
     console.log("Triggering demo data generation...");
 
     // デモユーザー用のデータを生成
-    const demoUsers = ['demo-user-1', 'demo-user-2', 'demo-user-3'];
+    const demoUsers = ["demo-user-1", "demo-user-2", "demo-user-3"];
     const results = [];
 
     for (const userId of demoUsers) {
@@ -132,8 +132,8 @@ export async function triggerDemoDataGeneration(req: Request, res: Response): Pr
         if (existingData.todayKnowledge && existingData.interestMap && existingData.untappedKnowledge) {
           results.push({
             userId,
-            status: 'skipped',
-            reason: 'Data already exists'
+            status: "skipped",
+            reason: "Data already exists"
           });
           continue;
         }
@@ -144,15 +144,15 @@ export async function triggerDemoDataGeneration(req: Request, res: Response): Pr
 
         results.push({
           userId,
-          status: 'success'
+          status: "success"
         });
 
       } catch (error) {
         console.error(`Failed to generate demo data for ${userId}:`, error);
         results.push({
           userId,
-          status: 'error',
-          error: error instanceof Error ? error.message : 'Unknown error'
+          status: "error",
+          error: error instanceof Error ? error.message : "Unknown error"
         });
       }
     }
@@ -168,7 +168,7 @@ export async function triggerDemoDataGeneration(req: Request, res: Response): Pr
     console.error("Error triggering demo data generation:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
       timestamp: new Date().toISOString()
     });
   }
@@ -178,10 +178,10 @@ export async function triggerDemoDataGeneration(req: Request, res: Response): Pr
  * デモユーザー用のデータを生成
  */
 function generateDemoDataForUser(userId: string) {
-  const userIndex = parseInt(userId.split('-').pop() || '1');
+  const userIndex = parseInt(userId.split("-").pop() || "1");
 
   // ユーザーごとに異なるデモデータを生成
-  const categories = ['数学', 'プログラミング', '科学', '歴史', '芸術'];
+  const categories = ["数学", "プログラミング", "科学", "歴史", "芸術"];
   const category = categories[(userIndex - 1) % categories.length];
 
   return {
@@ -189,28 +189,28 @@ function generateDemoDataForUser(userId: string) {
       id: `demo-knowledge-${userId}`,
       category,
       content: `${category}は非常に興味深い分野です。日常生活でも多くの応用が見られます。`,
-      difficulty: 'intermediate' as const,
-      tags: [category, '学習', '発見'],
-      relatedTopics: ['思考力', '問題解決'],
+      difficulty: "intermediate" as const,
+      tags: [category, "学習", "発見"],
+      relatedTopics: ["思考力", "問題解決"],
       createdAt: new Date(),
       views: Math.floor(Math.random() * 100)
     },
     interestMap: {
       hasData: true,
       nodes: [
-        { id: 'node-1', category, level: 70 + Math.floor(Math.random() * 30), itemsViewed: 5 + Math.floor(Math.random() * 10) },
-        { id: 'node-2', category: '基礎', level: 80 + Math.floor(Math.random() * 20), itemsViewed: 8 + Math.floor(Math.random() * 12) }
+        { id: "node-1", category, level: 70 + Math.floor(Math.random() * 30), itemsViewed: 5 + Math.floor(Math.random() * 10) },
+        { id: "node-2", category: "基礎", level: 80 + Math.floor(Math.random() * 20), itemsViewed: 8 + Math.floor(Math.random() * 12) }
       ],
-      edges: [{ source: 'node-1', target: 'node-2', strength: 60 }],
+      edges: [{ source: "node-1", target: "node-2", strength: 60 }],
       suggestions: [
-        { category: '応用', reason: `${category}の応用分野として関連が深い` }
+        { category: "応用", reason: `${category}の応用分野として関連が深い` }
       ]
     },
     untappedKnowledge: {
-      category: '哲学',
-      content: '哲学は根本的な思考力を養う分野です。',
+      category: "哲学",
+      content: "哲学は根本的な思考力を養う分野です。",
       appeal: `${category}の理解を深める上で重要な視点を提供します。`,
-      googleSearchQuery: '哲学 学び方'
+      googleSearchQuery: "哲学 学び方"
     }
   };
 }

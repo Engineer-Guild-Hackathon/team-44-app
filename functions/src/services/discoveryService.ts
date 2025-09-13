@@ -278,7 +278,7 @@ export class DiscoveryService {
   /**
    * 豆知識へのインタラクションを記録
    */
-  async recordKnowledgeInteraction(userId: string, knowledgeId: string, action: 'like' | 'view_detail'): Promise<{ success: boolean; message: string }> {
+  async recordKnowledgeInteraction(userId: string, knowledgeId: string, action: "like" | "view_detail"): Promise<{ success: boolean; message: string }> {
     try {
       const interactionRef = this.db.collection("knowledge_interactions").doc();
       await interactionRef.set(this.sanitizeForFirestore({
@@ -307,7 +307,7 @@ export class DiscoveryService {
       const learnedSubjects = [...new Set(learningRecords.map(record => record.subject))];
 
       // 未開拓ジャンルのリスト（プロトタイプ用）
-      const untappedCategories = ['哲学', '歴史', '芸術', '音楽', '文学', '心理学', '経済学', '社会学'];
+      const untappedCategories = ["哲学", "歴史", "芸術", "音楽", "文学", "心理学", "経済学", "社会学"];
       const learnedCategories = learnedSubjects.filter(subject => untappedCategories.includes(subject));
       const availableCategories = untappedCategories.filter(category => !learnedCategories.includes(category));
 

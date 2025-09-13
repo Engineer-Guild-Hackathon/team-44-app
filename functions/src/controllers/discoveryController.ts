@@ -144,27 +144,27 @@ export async function getInterestMap(req: Request, res: Response): Promise<void>
         data: {
           hasData: false,
           nodes: [
-            { id: 'programming', category: 'プログラミング', level: 1, itemsViewed: 0 },
-            { id: 'math', category: '数学', level: 1, itemsViewed: 0 },
-            { id: 'science', category: '科学', level: 1, itemsViewed: 0 },
-            { id: 'history', category: '歴史', level: 1, itemsViewed: 0 },
-            { id: 'language', category: '言語', level: 1, itemsViewed: 0 },
-            { id: 'art', category: '芸術', level: 1, itemsViewed: 0 }
+            { id: "programming", category: "プログラミング", level: 1, itemsViewed: 0 },
+            { id: "math", category: "数学", level: 1, itemsViewed: 0 },
+            { id: "science", category: "科学", level: 1, itemsViewed: 0 },
+            { id: "history", category: "歴史", level: 1, itemsViewed: 0 },
+            { id: "language", category: "言語", level: 1, itemsViewed: 0 },
+            { id: "art", category: "芸術", level: 1, itemsViewed: 0 }
           ],
           edges: [],
           placeholderMessage: "学習を始めるためのサンプルカテゴリ",
           suggestions: [
             {
-              category: 'AI・機械学習',
-              reason: 'プログラミングの次のステップとして、AI技術を学ぶことで将来のキャリアに役立ちます'
+              category: "AI・機械学習",
+              reason: "プログラミングの次のステップとして、AI技術を学ぶことで将来のキャリアに役立ちます"
             },
             {
-              category: 'データサイエンス',
-              reason: '数学の知識を活かして、データを分析するスキルを身につけられます'
+              category: "データサイエンス",
+              reason: "数学の知識を活かして、データを分析するスキルを身につけられます"
             },
             {
-              category: '環境科学',
-              reason: '科学の基礎知識を活かして、持続可能な未来について学ぶことができます'
+              category: "環境科学",
+              reason: "科学の基礎知識を活かして、持続可能な未来について学ぶことができます"
             }
           ]
         },
@@ -190,7 +190,7 @@ export async function interactWithKnowledge(req: Request, res: Response): Promis
     const userId = await validateAuth(req);
     const { knowledgeId, action } = req.body;
 
-    if (!knowledgeId || !action || !['like', 'view_detail'].includes(action)) {
+    if (!knowledgeId || !action || !["like", "view_detail"].includes(action)) {
       res.status(400).json({ error: "knowledgeId and valid action are required" });
       return;
     }
@@ -234,10 +234,10 @@ export async function getUntappedKnowledge(req: Request, res: Response): Promise
       res.status(200).json({
         success: true,
         data: {
-          category: '哲学',
-          content: '「なぜ生きるのか？」という根本的な問いから始まる哲学は、日常生活のあらゆる側面に影響を与えます。',
-          appeal: '論理的思考力を養い、人生の意味について深く考えるきっかけになります。',
-          googleSearchQuery: '哲学 入門 なぜ生きるのか',
+          category: "哲学",
+          content: "「なぜ生きるのか？」という根本的な問いから始まる哲学は、日常生活のあらゆる側面に影響を与えます。",
+          appeal: "論理的思考力を養い、人生の意味について深く考えるきっかけになります。",
+          googleSearchQuery: "哲学 入門 なぜ生きるのか",
           nextAvailable: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7日後
         },
         message: "デフォルトの未開拓知識を表示しています"

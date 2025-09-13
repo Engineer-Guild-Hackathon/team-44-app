@@ -34,8 +34,8 @@ export const generateDiscoveryData = functions.https.onRequest(async (req, res) 
     );
 
     // 3. 結果の集計
-    const successCount = results.filter(r => r.status === 'fulfilled').length;
-    const failureCount = results.filter(r => r.status === 'rejected').length;
+    const successCount = results.filter(r => r.status === "fulfilled").length;
+    const failureCount = results.filter(r => r.status === "rejected").length;
 
     console.log(`Batch process completed. Success: ${successCount}, Failed: ${failureCount}`);
 
@@ -52,7 +52,7 @@ export const generateDiscoveryData = functions.https.onRequest(async (req, res) 
     console.error("Error in batch process:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
       timestamp: new Date().toISOString()
     });
   }
@@ -123,7 +123,7 @@ export const generateUserDiscoveryData = functions.https.onRequest(async (req, r
     console.error(`Error generating data for user ${req.body.userId}:`, error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
       timestamp: new Date().toISOString()
     });
   }
@@ -137,7 +137,7 @@ export const generateDemoData = functions.https.onRequest(async (req, res) => {
     console.log("Generating demo data...");
 
     // デモユーザー用のデータを生成
-    const demoUsers = ['demo-user-1', 'demo-user-2', 'demo-user-3'];
+    const demoUsers = ["demo-user-1", "demo-user-2", "demo-user-3"];
 
     for (const userId of demoUsers) {
       try {
@@ -160,7 +160,7 @@ export const generateDemoData = functions.https.onRequest(async (req, res) => {
     console.error("Error generating demo data:", error);
     res.status(500).json({
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
       timestamp: new Date().toISOString()
     });
   }
