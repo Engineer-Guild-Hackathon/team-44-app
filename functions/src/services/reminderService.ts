@@ -180,4 +180,101 @@ export class ReminderService {
       }
     };
   }
+
+  /**
+   * FCMトークンを保存
+   */
+  async saveFCMToken(userId: string, token: string): Promise<void> {
+    await db.collection("fcmTokens").doc(userId).set({
+      token,
+      userId,
+      updatedAt: new Date(),
+      createdAt: new Date()
+    }, { merge: true });
+  }
+
+  /**
+   * ユーザーのFCMトークンを取得
+   */
+  async getFCMToken(userId: string): Promise<string | null> {
+    const doc = await db.collection("fcmTokens").doc(userId).get();
+    if (doc.exists) {
+      const data = doc.data();
+      return data?.token || null;
+    }
+    return null;
+  }
+
+  /**
+   * FCMプッシュ通知を送信
+   */
+  async sendFCMNotification(userId: string, notification: {
+    title: string;
+    body: string;
+    data: any;
+  }): Promise<boolean> {
+    try {
+      const token = await this.getFCMToken(userId);
+      if (!token) {
+        console.log(`No FCM token found for user ${userId}`);
+        return false;
+      }
+
+      const message = {
+        notification: {
+          title: notification.title,
+          body: notification.body
+        },
+        data: notification.data,
+        token: token,
+        webpush: {
+          fcmOptions: {
+            link: "/reminders"
+          },
+          notification: {
+            icon: "/icons/icon-192x192.png",
+            badge: "/icons/icon-72x72.png",
+            actions: [
+              { action: "review", title: "復習する" },
+              { action: "later", title: "後で" }
+            ]
+          }
+        }
+      };
+
+      const response = await admin.messaging().send(message);
+      console.log("Successfully sent message:", response);
+      return true;
+    } catch (error) {
+      console.error("Error sending FCM message:", error);
+      // トークンが無効な場合は削除
+      if (error instanceof Error && error.message.includes("registration-token-not-registered")) {
+        await db.collection("fcmTokens").doc(userId).delete();
+      }
+      return false;
+    }
+  }
+
+  /**
+   * 期限が来たリマインドを処理し、通知を送信
+   */
+  async processPendingReminders(): Promise<void> {
+    const pendingReminders = await this.getPendingReminders();
+
+    for (const reminder of pendingReminders) {
+      try {
+        const notification = await this.prepareNotification(reminder);
+        const sent = await this.sendFCMNotification(reminder.userId, notification);
+
+        if (sent) {
+          await this.updateReminderStatus(reminder.id!, "sent");
+          console.log(`Reminder ${reminder.id} sent to user ${reminder.userId}`);
+        } else {
+          console.log(`Failed to send reminder ${reminder.id} to user ${reminder.userId}`);
+        }
+      } catch (error) {
+        console.error(`Error processing reminder ${reminder.id}:`, error);
+      }
+    }
+  }
 }

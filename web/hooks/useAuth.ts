@@ -42,6 +42,21 @@ export const useAuth = () => {
         if (mounted) setAuthState(prev => ({ ...prev, loading: false }));
         return;
       }
+
+      // Check if auth should be skipped for local development
+      if (process.env.NEXT_PUBLIC_SKIP_AUTH === 'true') {
+        const mockUser = {
+          uid: process.env.NEXT_PUBLIC_LOCAL_USER_ID || 'demo-user-123',
+          email: 'demo@example.com',
+          displayName: 'Demo User'
+        } as User;
+        
+        if (mounted) {
+          setAuthState({ user: mockUser, loading: false, error: null });
+        }
+        return;
+      }
+
       try {
         const auth = await getAuthClient();
         const { onAuthStateChanged } = await import('firebase/auth');

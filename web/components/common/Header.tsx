@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import Image from 'next/image'
 import ThemeToggle from './ThemeToggle'
 
 interface HeaderProps {
@@ -46,7 +47,7 @@ export default function Header({ onMenuClick, isNavOpen, onToggleNav, user, onNe
 
             <Link href="/chat/" className="flex items-center space-x-3">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center">
-                <img src="/icon-192.svg" alt="tothlus logo" className="w-8 h-8" />
+                <Image src="/icon-192.svg" alt="tothlus logo" width={32} height={32} className="w-8 h-8" />
               </div>
               <h1 className="text-xl font-bold text-[var(--color-text-light)]">
                 tothlus

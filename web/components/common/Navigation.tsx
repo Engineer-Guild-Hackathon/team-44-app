@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import ConfirmDialog from './ConfirmDialog'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -81,7 +82,7 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
         <div className="flex items-center justify-between p-6 border-b border-[var(--color-border)] md:hidden">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center">
-              <img src="/icon-192.svg" alt="tothlus logo" className="w-5 h-5" />
+              <Image src="/icon-192.svg" alt="tothlus logo" width={20} height={20} className="w-5 h-5" />
             </div>
             <span className="text-lg font-bold text-[var(--color-text-light)]">tothlus</span>
           </div>
@@ -99,7 +100,7 @@ export default function Navigation({ isOpen, onClose }: NavigationProps) {
         <div className={`hidden md:flex items-center justify-between p-6 border-b border-[var(--color-border)] ${!isOpen ? 'md:hidden' : ''}`}>
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center">
-              <img src="/icon-192.svg" alt="tothlus logo" className="w-8 h-8" />
+              <Image src="/icon-192.svg" alt="tothlus logo" width={32} height={32} className="w-8 h-8" />
             </div>
             <span className="text-lg font-bold text-[var(--color-text-light)]">tothlus</span>
           </div>

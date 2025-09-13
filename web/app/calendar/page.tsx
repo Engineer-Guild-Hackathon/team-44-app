@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
@@ -78,7 +79,7 @@ export default function CalendarPage() {
   }
 
   // 月の学習記録を取得
-  const fetchMonthlyRecords = async (date: Date) => {
+  const fetchMonthlyRecords = useCallback(async (date: Date) => {
     setIsLoading(true)
     setError(null)
 
@@ -97,7 +98,7 @@ export default function CalendarPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [])
 
   // 選択日の学習記録をフィルタリング
   const getDayRecords = (date: Date) => {
@@ -110,9 +111,12 @@ export default function CalendarPage() {
   }
 
   // 月が変わった時に記録を取得
+  const selectedMonth = selectedDate.getMonth()
+  const selectedYear = selectedDate.getFullYear()
+
   useEffect(() => {
     fetchMonthlyRecords(selectedDate)
-  }, [selectedDate.getMonth(), selectedDate.getFullYear()])
+  }, [selectedDate, fetchMonthlyRecords])
 
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date)
@@ -177,7 +181,7 @@ export default function CalendarPage() {
           <div className="text-center max-w-md mx-auto px-4">
             <div className="mb-8">
               <div className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <img src="/icon-192.svg" alt="tothlus logo" className="w-16 h-16" />
+                <Image src="/icon-192.svg" alt="tothlus logo" width={64} height={64} className="w-16 h-16" />
               </div>
               <h2 className="text-2xl font-semibold text-[var(--color-text-primary)] mb-4">
                 エラーが発生しました

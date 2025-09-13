@@ -2,6 +2,7 @@ import * as functions from "firebase-functions";
 import express, { Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { ReminderService } from "./services/reminderService";
 
 // .envファイルを読み込む
 dotenv.config();
@@ -14,7 +15,7 @@ if (!admin.apps.length) {
 
 import { createSession, createSmartSession, postMessage, getUserSessions, getSession, completeSession } from "./controllers/chatController";
 import { generateLearningRecord, getUserLearningRecords, getLearningRecord, getLearningRecordsForPeriod, createManualLearningRecord } from "./controllers/learningRecordController";
-import { getReminders, getReminderSettings, updateReminderSettings, updateReminderStatus } from "./controllers/reminderController";
+import { getReminders, getReminderSettings, updateReminderSettings, updateReminderStatus, registerFCMToken } from "./controllers/reminderController";
 import { getLoginKnowledge, getWeeklyQuiz, submitQuizResult, getInterestMap, getUntappedKnowledge } from "./controllers/discoveryController";
 import { getBatchStatus, getUserDataStatus, triggerDemoDataGeneration } from "./controllers/batchController";
 
@@ -52,6 +53,7 @@ app.get("/reminders", getReminders);
 app.get("/reminderSettings", getReminderSettings);
 app.put("/reminderSettings", updateReminderSettings);
 app.put("/reminders/:reminderId/status", updateReminderStatus);
+app.post("/fcm/register", registerFCMToken);
 
 // Discovery routes
 app.get("/discovery/knowledge", getLoginKnowledge);
@@ -136,3 +138,15 @@ export const api = functions.https.onRequest(app);
 
 // Batch functions
 export { generateDiscoveryData, generateUserDiscoveryData, generateDemoData } from './batch';
+
+// Scheduled function to process pending reminders
+export const processReminders = functions.pubsub.schedule('every 10 minutes').onRun(async () => {
+  const reminderService = new ReminderService();
+  try {
+    console.log('Processing pending reminders...');
+    await reminderService.processPendingReminders();
+    console.log('Reminder processing completed');
+  } catch (error) {
+    console.error('Error processing reminders:', error);
+  }
+});

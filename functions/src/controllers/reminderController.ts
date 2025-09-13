@@ -121,6 +121,37 @@ export const updateReminderSettings = async (req: Request, res: Response): Promi
 };
 
 /**
+ * FCMトークンを登録
+ */
+export const registerFCMToken = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = await validateAuth(req);
+    const { token } = req.body;
+
+    if (!token || typeof token !== "string") {
+      res.status(400).json({ error: "FCM token is required" });
+      return;
+    }
+
+    await reminderService.saveFCMToken(userId, token);
+
+    res.json({
+      success: true,
+      message: "FCM token registered successfully"
+    });
+  } catch (error) {
+    console.error("Error registering FCM token:", error);
+
+    if (error instanceof Error && error.message === "認証トークンが必要です") {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    res.status(500).json({ error: "Failed to register FCM token" });
+  }
+};
+
+/**
  * リマインドのステータスを更新
  */
 export const updateReminderStatus = async (req: Request, res: Response): Promise<void> => {

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { useAuth } from '../../hooks/useAuth'
 import Header from '../../components/common/Header'
 import Navigation from '../../components/common/Navigation'
@@ -57,7 +58,7 @@ export default function AuthPage() {
             {/* tothlus Logo */}
             <div className="text-center mb-8">
               <div className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <img src="/icon-192.svg" alt="tothlus logo" className="w-16 h-16" />
+                <Image src="/icon-192.svg" alt="tothlus logo" width={64} height={64} className="w-16 h-16" />
               </div>
               <h1 className="text-2xl font-bold text-[var(--color-text-light)] mb-2">
                 tothlus
