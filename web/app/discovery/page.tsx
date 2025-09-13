@@ -188,7 +188,7 @@ export default function DiscoveryPage() {
           </section>
 
           {/* 週次クイズ */}
-          <section className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
+          {/* <section className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
             <h2 className="text-xl font-semibold text-[var(--color-text-light)] mb-6 flex items-center gap-2">
               <span className="text-2xl"><PsychologyIcon /></span>
               週次クイズ
@@ -206,7 +206,7 @@ export default function DiscoveryPage() {
                 }}
               />
             </Suspense>
-          </section>
+          </section> */}
 
           {/* 興味マップ */}
           <section className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-6 border border-[var(--color-border)]">
