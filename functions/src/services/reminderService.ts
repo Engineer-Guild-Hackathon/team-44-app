@@ -229,26 +229,26 @@ export class ReminderService {
         token: token,
         webpush: {
           fcmOptions: {
-            link: '/reminders'
+            link: "/reminders"
           },
           notification: {
-            icon: '/icons/icon-192x192.png',
-            badge: '/icons/icon-72x72.png',
+            icon: "/icons/icon-192x192.png",
+            badge: "/icons/icon-72x72.png",
             actions: [
-              { action: 'review', title: '復習する' },
-              { action: 'later', title: '後で' }
+              { action: "review", title: "復習する" },
+              { action: "later", title: "後で" }
             ]
           }
         }
       };
 
       const response = await admin.messaging().send(message);
-      console.log('Successfully sent message:', response);
+      console.log("Successfully sent message:", response);
       return true;
     } catch (error) {
-      console.error('Error sending FCM message:', error);
+      console.error("Error sending FCM message:", error);
       // トークンが無効な場合は削除
-      if (error instanceof Error && error.message.includes('registration-token-not-registered')) {
+      if (error instanceof Error && error.message.includes("registration-token-not-registered")) {
         await db.collection("fcmTokens").doc(userId).delete();
       }
       return false;
@@ -260,12 +260,12 @@ export class ReminderService {
    */
   async processPendingReminders(): Promise<void> {
     const pendingReminders = await this.getPendingReminders();
-    
+
     for (const reminder of pendingReminders) {
       try {
         const notification = await this.prepareNotification(reminder);
         const sent = await this.sendFCMNotification(reminder.userId, notification);
-        
+
         if (sent) {
           await this.updateReminderStatus(reminder.id!, "sent");
           console.log(`Reminder ${reminder.id} sent to user ${reminder.userId}`);
