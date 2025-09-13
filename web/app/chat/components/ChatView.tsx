@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import Image from 'next/image'
 import ReactMarkdown from 'react-markdown'
 import { ChatMessage } from '../../../types/api'
 import { KnowledgeItem } from '@/types/discovery'
@@ -27,7 +28,7 @@ export default function ChatView({ messages, isLoading = false, todayKnowledge }
       {messages.length === 0 && !isLoading && (
         <div className="text-center text-[var(--color-muted-foreground)] py-12">
           <div className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
-            <img src="/icon-192.svg" alt="tothlus logo" className="w-16 h-16" />
+            <Image src="/icon-192.svg" alt="tothlus logo" width={64} height={64} className="w-16 h-16" />
           </div>
           {todayKnowledge ? (
             <div className="max-w-md mx-auto">

@@ -4,6 +4,7 @@ import Header from '../components/common/Header'
 import Navigation from '../components/common/Navigation'
 import { ErrorNavigationButtons } from '../components/common/ErrorNavigationButtons'
 import { useState } from 'react'
+import Image from 'next/image'
 
 export default function NotFound() {
   const [isNavOpen, setIsNavOpen] = useState(false)
@@ -24,7 +25,7 @@ export default function NotFound() {
         <div className="text-center max-w-md mx-auto px-4">
           <div className="mb-8">
             <div className="w-16 h-16 rounded-xl flex items-center justify-center mx-auto mb-4">
-              <img src="/icon-192.svg" alt="tothlus logo" className="w-16 h-16" />
+              <Image src="/icon-192.svg" alt="tothlus logo" width={64} height={64} className="w-16 h-16" />
             </div>
             <h1 className="text-6xl font-bold text-[var(--color-text-light)] mb-4">404</h1>
             <h2 className="text-2xl font-semibold text-[var(--color-text-primary)] mb-4">

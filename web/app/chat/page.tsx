@@ -57,13 +57,6 @@ export default function ChatPage() {
     }
   }, [user, authLoading, loadTodayKnowledge])
 
-  // recordId があれば、関連するセッションを読み込んで続きから学習
-  useEffect(() => {
-    if (recordId && user && !authLoading) {
-      loadExistingSession(recordId)
-    }
-  }, [recordId, user, authLoading])
-
   // 既存のセッションを読み込む関数
   const loadExistingSession = useCallback(async (recordId: string) => {
     try {
@@ -105,6 +98,13 @@ export default function ChatPage() {
       setIsLoading(false)
     }
   }, [])
+
+  // recordId があれば、関連するセッションを読み込んで続きから学習
+  useEffect(() => {
+    if (recordId && user && !authLoading) {
+      loadExistingSession(recordId)
+    }
+  }, [recordId, user, authLoading, loadExistingSession])
 
   // 認証トークンを取得する関数
   const getAuthToken = useCallback(async (): Promise<string | null> => {
