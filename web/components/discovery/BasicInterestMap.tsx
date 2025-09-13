@@ -47,7 +47,6 @@ export const BasicInterestMap: React.FC<BasicInterestMapProps> = ({ data, error,
   if (!data.hasData || !data.nodes || data.nodes.length === 0) {
     return (
       <div className="bg-[var(--color-bg-light)] rounded-lg shadow-[var(--shadow-md)] p-8 border border-[var(--color-border)] text-center">
-        <div className="text-6xl mb-4"> <MdMap /> </div>
         <h3 className="text-xl font-semibold text-[var(--color-text-light)] mb-3">
           興味マップ
         </h3>
