@@ -21,8 +21,18 @@ import { getBatchStatus, getUserDataStatus, triggerDemoDataGeneration } from "./
 
 const app = express();
 
-// CORS設定 - 本番環境では特定のドメインのみ許可するよう変更すること
-app.use(cors({ origin: true }));
+// CORS設定 - 環境変数で許可ドメインを指定
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : [];
+
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production'
+    ? allowedOrigins.length > 0 ? allowedOrigins : false // 本番時は指定ドメインのみ許可
+    : true, // 開発時は全て許可
+  credentials: true
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // エラーハンドリングミドルウェア
